@@ -3,4 +3,7 @@ __pycache__/
 *.pyc
 *.pyo
 .env
+etf_bowl_results.json
+etf_kline_data.json
+etf_hs_bottom_results.json
 
