@@ -7,7 +7,7 @@ description: Use when analyzing A-share ETFs for bowl-bottom (碗底) bottoming 
 
 ## Overview
 
-Quantitatively scans the 352 largest A-share ETFs (from `all_etfs_larggest.json`) for bowl-bottom (saucer-bottom) chart patterns. A bowl-bottom pattern = the ETF declined to its range low, then **decelerated and stabilized** with **higher lows forming** — the classic basing formation before a potential reversal.
+Quantitatively scans the 352 largest A-share ETFs (from `all_etfs_larggest.json` in project root) for bowl-bottom (saucer-bottom) chart patterns. A bowl-bottom pattern = the ETF declined to its range low, then **decelerated and stabilized** with **higher lows forming** — the classic basing formation before a potential reversal.
 
 Uses `westock-data` to fetch ETF K-line data, then runs an enhanced multi-dimension scoring engine that **distinguishes true bowl bottoms from persistent downtrends**.
 
@@ -33,7 +33,7 @@ Uses `westock-data` to fetch ETF K-line data, then runs an enhanced multi-dimens
 
 ### Step 1: Verify ETF Input
 
-`analyze.py` automatically loads ETF codes from `../../all_etfs_larggest.json` (352 ETFs). No manual sector enumeration needed.
+`analyze.py` automatically loads ETF codes from `all_etfs_larggest.json` in project root (352 ETFs). No manual sector enumeration needed.
 
 ### Step 2: Run Analysis
 

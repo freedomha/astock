@@ -20,14 +20,14 @@ Uses `westock-data` to fetch ETF K-line data, then runs a multi-dimension scorin
 - `westock-data` skill must be loaded first (use `Skill` tool with `"westock-data"`)
 - Node.js at `/Users/aldiadmin/.workbuddy/binaries/node/versions/22.22.2/bin/node`
 - Python 3.13 at `/Users/aldiadmin/.workbuddy/binaries/python/versions/3.13.12/bin/python3`
-- `all_etfs_larggest.json` exists at `.workbuddy/skills/etf-bowl-bottom-scanner/all_etfs_larggest.json`
+- `all_etfs_larggest.json` must exist in project root
 
 ## Quick Start
 
 ```
-1. Ensure all_etfs_larggest.json exists
-2. Run analyze.py → fetches K-line + detects HS patterns + scores → etf_hs_bottom_results.json & etf_kline_data.json
-3. Run generate_report.py → reports/etf/etf_hs_bottom_report.html
+1. Ensure all_etfs_larggest.json exists in project root
+2. Run analyze.py → fetches K-line + detects HS patterns + scores → saves etf_hs_bottom_results.json & etf_kline_data.json in skill directory
+3. Run generate_report.py → reads data from skill directory → reports/etf/etf_hs_bottom_report.html
 4. present_files the HTML report
 ```
 
@@ -35,7 +35,7 @@ Uses `westock-data` to fetch ETF K-line data, then runs a multi-dimension scorin
 
 ### Step 1: Verify ETF Input
 
-`analyze.py` automatically loads ETF codes from `.workbuddy/skills/etf-bowl-bottom-scanner/all_etfs_larggest.json` (352 ETFs). No manual enumeration needed.
+`analyze.py` automatically loads ETF codes from `all_etfs_larggest.json` in project root (352 ETFs). No manual enumeration needed.
 
 ### Step 2: Run Analysis
 
@@ -46,8 +46,8 @@ $PYTHON .codebuddy/skills/etf-head-shoulder-bottom-scanner/analyze.py
 
 `analyze.py` does everything in one run:
 - Loads ETF codes from `all_etfs_larggest.json` (352 ETFs)
-- Fetches 250-day daily K-line for each ETF (parallel, 8 workers) → `etf_kline_data.json`
-- Detects head-shoulder-bottom patterns with extrema-finding algorithm → `etf_hs_bottom_results.json`
+- Fetches 250-day daily K-line for each ETF (parallel, 8 workers) → `etf_kline_data.json` (in skill directory)
+- Detects head-shoulder-bottom patterns with extrema-finding algorithm → `etf_hs_bottom_results.json` (in skill directory)
 - Prints summary with pattern labels
 
 ### Step 3: Generate HTML Report

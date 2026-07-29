@@ -52,9 +52,7 @@ def fetch_kline(code, retries=4):
 
 def load_etfs():
     """Load ETF codes from all_etfs_larggest.json in project root."""
-    skill_dir = os.path.dirname(os.path.abspath(__file__))
-    input_path = os.path.join(skill_dir, "all_etfs_larggest.json")
-    input_path = os.path.normpath(input_path)
+    input_path = os.path.join(os.getcwd(), "all_etfs_larggest.json")
     if not os.path.exists(input_path):
         print(f"❌ Input file not found: {input_path}", file=sys.stderr)
         return []

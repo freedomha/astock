@@ -50,10 +50,8 @@ def fetch_kline(code, retries=4):
 
 
 def load_etfs():
-    """Load ETF codes from all_etfs_larggest.json."""
-    skill_dir = os.path.dirname(os.path.abspath(__file__))
-    input_path = os.path.join(skill_dir, "..", "..", "..", ".workbuddy", "skills", "etf-bowl-bottom-scanner", "all_etfs_larggest.json")
-    input_path = os.path.normpath(input_path)
+    """Load ETF codes from all_etfs_larggest.json in project root."""
+    input_path = os.path.join(os.getcwd(), "all_etfs_larggest.json")
     if not os.path.exists(input_path):
         print(f"ERROR: Input file not found: {input_path}", file=sys.stderr)
         return []
@@ -526,7 +524,8 @@ def main():
     
     # Step 2: Check for existing K-line data
     cwd = os.getcwd()
-    kline_file = os.path.join(cwd, "etf_kline_data.json")
+    skill_dir = os.path.dirname(os.path.abspath(__file__))
+    kline_file = os.path.join(skill_dir, "etf_kline_data.json")
     kline_data = {}
     
     if os.path.exists(kline_file):
@@ -590,7 +589,7 @@ def main():
     
     results.sort(key=lambda x: x["score"], reverse=True)
     
-    results_file = os.path.join(cwd, "etf_hs_bottom_results.json")
+    results_file = os.path.join(skill_dir, "etf_hs_bottom_results.json")
     with open(results_file, "w") as f:
         json.dump(results, f, ensure_ascii=False, indent=2)
     print(f"分析结果已保存: {results_file}")
