@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>电信运营板块深度分析 - 2026年7月28日</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; background: #f5f6f8; color: #1a1a2e; line-height: 1.7; }
+.container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+/* Header */
+.header { background: linear-gradient(135deg, #1a237e 0%, #283593 30%, #3949ab 60%, #5c6bc0 100%); color: #fff; padding: 40px 0 30px; margin-bottom: 30px; }
+.header .container { display: flex; justify-content: space-between; align-items: flex-end; }
+.header h1 { font-size: 28px; font-weight: 700; letter-spacing: 2px; }
+.header .sub { font-size: 13px; opacity: 0.85; margin-top: 8px; }
+.badge { display: inline-block; padding: 6px 20px; border-radius: 20px; font-size: 14px; font-weight: 700; letter-spacing: 1px; }
+.badge-overweight { background: #fff; color: #1a237e; }
+.header-right { text-align: right; }
+
+/* Cards */
+.card { background: #fff; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); margin-bottom: 24px; overflow: hidden; }
+.card-header { padding: 20px 28px 0; font-size: 18px; font-weight: 700; color: #1a237e; border-bottom: 2px solid #e8eaf6; padding-bottom: 14px; margin-bottom: 0; }
+.card-body { padding: 24px 28px; }
+.tldr { background: linear-gradient(135deg, #e8eaf6, #c5cae9); border-left: 5px solid #3949ab; padding: 20px 24px; border-radius: 8px; margin-bottom: 20px; }
+.tldr p { margin: 6px 0; font-size: 15px; }
+.tldr strong { color: #1a237e; }
+
+/* Metric dashboard */
+.metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 16px; margin-bottom: 20px; }
+.metric-card { background: linear-gradient(135deg, #e8eaf6, #f5f6ff); border-radius: 10px; padding: 18px; text-align: center; }
+.metric-value { font-size: 26px; font-weight: 800; color: #1a237e; }
+.metric-label { font-size: 12px; color: #666; margin-top: 4px; }
+
+/* Tables */
+table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 16px 0; }
+th { background: #e8eaf6; color: #1a237e; font-weight: 700; padding: 10px 12px; text-align: center; border-bottom: 2px solid #c5cae9; }
+td { padding: 8px 12px; text-align: center; border-bottom: 1px solid #f0f0f0; }
+tr:hover { background: #fafbff; }
+.table-wrap { overflow-x: auto; }
+
+/* Tags */
+.tag { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; margin: 2px; }
+.tag-g { background: #e8f5e9; color: #2e7d32; }
+.tag-r { background: #fce4ec; color: #c62828; }
+.tag-y { background: #fff8e1; color: #f57f17; }
+.tag-b { background: #e3f2fd; color: #1565c0; }
+.tag-p { background: #f3e5f5; color: #6a1b9a; }
+
+/* Pos/Neg text colors */
+.pos { color: #2e7d32; font-weight: 600; }
+.neg { color: #c62828; font-weight: 600; }
+
+/* Chart containers */
+.chart { width: 100%; height: 420px; margin: 20px 0; }
+
+/* Two column */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin: 20px 0; }
+@media (max-width: 768px) { .two-col { grid-template-columns: 1fr; } }
+
+/* Callout */
+.callout { background: #fff3e0; border-left: 5px solid #f57c00; padding: 16px 20px; border-radius: 8px; margin: 16px 0; font-size: 14px; }
+.callout-strong { font-weight: 700; color: #e65100; }
+
+/* Section title */
+.section-title { font-size: 20px; font-weight: 700; color: #1a237e; padding: 12px 0; border-bottom: 3px solid #3949ab; margin: 30px 0 16px; }
+
+/* Sub-section cards with more room */
+.sub-section { margin: 20px 0; }
+.sub-section h4 { font-size: 15px; color: #3949ab; margin-bottom: 10px; padding-left: 10px; border-left: 3px solid #5c6bc0; }
+
+/* Footer */
+.footer { text-align: center; padding: 30px 0; font-size: 12px; color: #999; border-top: 1px solid #e0e0e0; margin-top: 40px; }
+
+/* Rating summary */
+.rating-row { display: flex; gap: 20px; flex-wrap: wrap; margin: 16px 0; }
+.rating-item { flex: 1; min-width: 140px; padding: 16px; border-radius: 8px; text-align: center; font-weight: 700; }
+.rating-pos { background: #e8f5e9; color: #2e7d32; }
+.rating-neg { background: #ffebee; color: #c62828; }
+.rating-neutral { background: #f5f5f5; color: #666; }
+.rating-label { font-size: 12px; opacity: 0.7; }
+.rating-score { font-size: 22px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="container">
+    <div>
+      <h1>电信运营板块深度分析</h1>
+      <div class="sub">聚源产业概念 · pt02GN2324 · 覆盖6家上市公司 | 数据截止 2026-07-28</div>
+    </div>
+    <div class="header-right">
+      <span class="badge badge-overweight">超配 · 左侧买点</span>
+      <div class="sub" style="margin-top: 6px;">综合评级：标配/加码</div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- TL;DR Card -->
+<div class="card">
+  <div class="card-header">核心结论 (TL;DR)</div>
+  <div class="card-body">
+    <div class="tldr">
+      <p><strong>电信运营板块已进入碗底左侧买点区域。</strong>板块指数 YTD 跌幅 13.8%，250日位置仅 8.6%，60日趋势 -21.5% 显示深度回调，但 <strong>20日趋势已转正至 +0.45%</strong> —— 形成经典"暴跌后企稳"碗底形态。</p>
+      <p><strong>变异认知：市场用增值税上调+利润上缴双重政策利空全面杀估值，但三大运营商已从管道商向 AI 算力基础设施和 TOKEN 经营平台转型，营收质量升级未被定价。</strong></p>
+      <p>中国移动股息率 4.87% 处于历史次高位（10年期国债仅 1.74%），PB 1.47 倍提供安全边际；小摩给予三大运营商港股"增持"评级，预测 2026年股息率 5.7%~7%。板块内部严重分化：AI/算力方向（移动/电信 20日涨 +12~+21%）vs 传统传媒/卫星（YTD -30%）—— <strong>核心仓位应聚焦三大运营商红利+AI 成长的双重逻辑。</strong></p>
+      <p style="margin-top: 10px;"><strong>建议：标配/加码</strong> — 红利底仓（中国移动 4.87% 股息）+ AI 算力成长（中国电信 TOKEN 经营）+ 卫星互联网期权（中国卫通 6G 催化），配置比例建议 50%+25%+15%+10% 现金。</p>
+    </div>
+  </div>
+</div>
+
+<!-- Metrics Dashboard -->
+<div class="card">
+  <div class="card-header">关键指标仪表盘</div>
+  <div class="card-body">
+    <div class="metrics">
+      <div class="metric-card">
+        <div class="metric-value neg">-13.8%</div>
+        <div class="metric-label">板块 YTD 涨跌</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-value">8.6%</div>
+        <div class="metric-label">250日位置 (极低位)</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-value pos">4.87%</div>
+        <div class="metric-label">龙头股息率(中国移动)</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-value neg">-21.5%</div>
+        <div class="metric-label">60日趋势</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-value pos">+0.45%</div>
+        <div class="metric-label">20日趋势(企稳信号)</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-value">1.74%</div>
+        <div class="metric-label">10年期国债收益率</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Section 1: Sector Timing -->
+<div class="card">
+  <div class="card-header">一、板块择时：碗底形态确认</div>
+  <div class="card-body">
+    <div class="chart" id="chart-timing"></div>
+    <div class="callout">
+      <span class="callout-strong">关键信号：</span>60日趋势 -21.5%（深度下跌）→ 20日趋势 +0.45%（刚翻正）→ 碗底右沿形成中。250日位置 8.6% 处于历史极低位区间（<20%=底部区域）。YTD 下跌 13.8%，距 120日高点回撤 18.2%。当前是典型 <strong>"左侧买点"</strong>区域：止损空间窄（前低 939 仅 5% 向下），上行空间大（120日高点 1213 约 22% 向上）。<strong>风险收益比约为 1:4，极具吸引力。</strong>
+    </div>
+    <div class="two-col">
+      <div>
+        <h4>短期（1个月内）</h4>
+        <p>20日趋势刚转正，近5日连涨（992 → 965 → 980 → 972 → 976 → 993），是反弹确认的初期。今日 +1.7% 放量上行，换手率正常。若后续 3-5 个交易日持续站稳 980 以上，短期底部确认。</p>
+      </div>
+      <div>
+        <h4>中期（3-6个月）</h4>
+        <p>120日位置 19.4% 仍处低位，120日高点回撤 18% 提供了充分的安全边际。增值税影响在 Q1/Q2 已消化，下半年 AI TOKEN 业务放量将打开估值切换窗口。250日高点 1373 对应下方约 38% 的上行空间。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Section 2: Sector Structure -->
+<div class="card">
+  <div class="card-header">二、板块结构与内部分化</div>
+  <div class="card-body">
+    <p style="margin-bottom: 16px;">电信运营板块实际上是 <strong>"三大运营商 + 三个卫星标的"</strong> 的结构。板块内部分化极为严重：三大运营商（中国移动/电信/联通）是红利+AI 主线，而东方明珠（传媒）、中国卫通（卫星）、广电网络（有线电视）属于不同赛道的标的。这意味着<strong>不能简单用板块指数判断全板块</strong>——三大运营商本身是现金流充沛的红利资产。</p>
+    <div class="chart" id="chart-segment"></div>
+    <div class="table-wrap">
+      <table>
+        <tr>
+          <th>子赛道</th><th>标的</th><th>今日涨跌</th><th>20日涨跌</th><th>60日涨跌</th><th>YTD</th><th>PE-TTM</th><th>PB</th><th>股息率</th><th>总市值(亿)</th>
+        </tr>
+        <tr>
+          <td><span class="tag tag-b">电信运营(红利+AI)</span></td>
+          <td>中国移动</td>
+          <td class="pos">+2.08%</td><td class="pos">+11.87%</td><td class="pos">+2.12%</td><td class="neg">-2.53%</td>
+          <td>15.38</td><td>1.47</td><td class="pos">4.87%</td><td>20,892</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-b">电信运营(红利+AI)</span></td>
+          <td>中国电信</td>
+          <td class="pos">+2.94%</td><td class="pos">+21.39%</td><td class="pos">+5.90%</td><td class="pos">+1.47%</td>
+          <td>18.20</td><td>1.25</td><td>4.32%</td><td>5,765</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-b">电信运营(红利+AI)</span></td>
+          <td>中国联通</td>
+          <td class="pos">+1.37%</td><td class="pos">+11.00%</td><td class="neg">-1.07%</td><td class="neg">-12.22%</td>
+          <td>16.03</td><td>0.82</td><td>3.68%</td><td>1,388</td>
+        </tr>
+        <tr style="background: #fafafa;">
+          <td><span class="tag tag-p">卫星互联网</span></td>
+          <td>中国卫通</td>
+          <td class="neg">-1.34%</td><td class="neg">-17.39%</td><td class="neg">-29.76%</td><td class="neg">-30.00%</td>
+          <td>265</td><td>6.66</td><td>0.13%</td><td>1,056</td>
+        </tr>
+        <tr style="background: #fafafa;">
+          <td><span class="tag tag-y">文化传媒</span></td>
+          <td>东方明珠</td>
+          <td class="pos">+2.83%</td><td class="neg">-2.32%</td><td class="neg">-20.02%</td><td class="neg">-17.80%</td>
+          <td>48.11</td><td>0.91</td><td>2.25%</td><td>269</td>
+        </tr>
+        <tr style="background: #fafafa;">
+          <td><span class="tag tag-y">有线电视</span></td>
+          <td>广电网络</td>
+          <td class="pos">+2.45%</td><td class="neg">-2.01%</td><td class="neg">-24.48%</td><td class="neg">-30.24%</td>
+          <td>亏损</td><td>5.88</td><td>0%</td><td>21</td>
+        </tr>
+      </table>
+    </div>
+    <div class="callout">
+      <span class="callout-strong">关键发现：</span>板块内部 20日走势分化极度严重。三大运营商 20日涨跌 +11%~+21%，而卫星/传媒/有线电视全线下跌。这说明资金的流向非常明确——<strong>红利+AI 主线</strong>正在取代纯概念炒作。中国电信 20日暴涨 21.39% 是 AI 算力+TOKEN 经营逻辑的领头羊。
+    </div>
+  </div>
+</div>
+
+<!-- Section 3: Key Company Financials & Consensus -->
+<div class="card">
+  <div class="card-header">三、重点公司财务与一致预期</div>
+  <div class="card-body">
+    <div class="table-wrap">
+      <table>
+        <tr>
+          <th>公司</th><th>营收TTM(亿)</th><th>归母净利TTM(亿)</th><th>毛利率</th><th>净利率</th>
+          <th>26E EPS</th><th>26E PE</th><th>26E 净利YoY</th><th>覆盖机构</th>
+        </tr>
+        <tr>
+          <td><strong>中国移动</strong></td>
+          <td>约10,000+</td><td>约1,300+</td><td>~30%</td><td>~13%</td>
+          <td>6.20</td><td>15.22</td><td class="neg">-1.89%</td><td>—</td>
+        </tr>
+        <tr>
+          <td><strong>中国电信</strong></td>
+          <td>5,208</td><td>317</td><td>28.7%</td><td>6.1%</td>
+          <td>0.34</td><td>18.00</td><td class="neg">-5.81%</td><td>—</td>
+        </tr>
+        <tr>
+          <td><strong>中国联通</strong></td>
+          <td>3,917</td><td>87</td><td>23.2%</td><td>2.2%</td>
+          <td>0.26</td><td>16.85</td><td class="neg">-10.37%</td><td>—</td>
+        </tr>
+        <tr>
+          <td>中国卫通</td>
+          <td>26.5</td><td>3.98</td><td>27.9%</td><td>15.0%</td>
+          <td>0.13</td><td>224</td><td class="pos">+26.24%</td><td>—</td>
+        </tr>
+        <tr>
+          <td>东方明珠</td>
+          <td>—</td><td>—</td><td>—</td><td>—</td>
+          <td>0.24</td><td>32.38</td><td class="pos">+30.67%</td><td>—</td>
+        </tr>
+      </table>
+    </div>
+    <p style="font-size: 12px; color: #999; margin-top: 8px;">注：中国移动财务数据来自公开年报估算；一致预期数据来自 wstock-data consensus 接口。2026E 净利同比普遍下滑主要反映增值税率上调（6%→9%）的影响。</p>
+
+    <div class="chart" id="chart-radar"></div>
+  </div>
+</div>
+
+<!-- Section 4: Key Company Deep Dive -->
+<div class="card">
+  <div class="card-header">四、重点公司拆解</div>
+  <div class="card-body">
+
+    <div class="sub-section">
+      <h4>1. 中国移动 (600941) — 红利底仓 + AI 运营商第一股</h4>
+      <p><strong>核心逻辑：</strong>中国移动是板块估值锚。PE 15.38x，股息率 4.87%，总市值 20,892 亿（A股流通仅 870 亿，筹码稀缺）。机构观点高度一致看多：银河证券《MOBILE AI焕新 三网筑基打造AI运营商》、山西证券《后5G时代 发力TOKEN运营打造新引擎》。</p>
+      <p><strong>催化剂：</strong>① 2025年度分红约 2.3元/股（6月派息）+ 2026半年分红约 2.5元/股（8月派息），未来15个月可收约 12元/股分红；② AI TOKEN 经营从概念到业绩落地——MWC 2026 展示"以智为先、三网驱动"战略；③ 股息率 5-5.5% 被认为是 A 股安全底部区间（对应股价 87-96 元）。</p>
+      <p><strong>风险：</strong>增值税率上调短期压缩利润；资本开支加大影响自由现金流；若分红率下调将直接冲击估值锚。</p>
+      <p><span class="tag tag-g">超配</span> <span class="tag tag-b">红利底仓</span> <span class="tag tag-b">AI 成长</span></p>
+    </div>
+
+    <div class="sub-section">
+      <h4>2. 中国电信 (601728) — 算力爆发 + TOKEN 经营弹性最大</h4>
+      <p><strong>核心逻辑：</strong>20日涨幅 21.39% 领涨全板块，是 AI 算力逻辑最确定的弹性标的。营收 5,208 亿（TTM），归母净利 317 亿，毛利率 28.7% 为三大运营商最高。华创证券点评《算力规模显著提升 TOKEN经营迈入新台阶》。</p>
+      <p><strong>催化剂：</strong>① 算力资本开支持续加码，IDC 和智算中心收入快速增长；② TOKEN 经营模式打开了从管道到平台的估值切换空间；③ PE 18x，在 AI 基础设施标的中估值相对合理。</p>
+      <p><strong>风险：</strong>利润上缴比例提高至 35%；增值税率上调影响利润端；电信 PB 1.25x 无破净保护。</p>
+      <p><span class="tag tag-g">超配</span> <span class="tag tag-b">AI 弹性</span></p>
+    </div>
+
+    <div class="sub-section">
+      <h4>3. 中国联通 (600050) — PB 0.82 破净 + 混改红利</h4>
+      <p><strong>核心逻辑：</strong>PB 仅 0.82 倍（三大运营商中唯一破净），PB 修复有空间。营收 3,917 亿，归母净利仅 87 亿（净利率 2.2% 远低于移动的 13%），改善空间大。长江证券《用户规模稳步增长 智算中心收入增长提速》。</p>
+      <p><strong>催化剂：</strong>① 联通换帅后改革预期升温；② 混改标杆+与互联网巨头合作（腾讯/阿里/百度）；③ 智算收入增长是最直接的 AI 业务落地信号。</p>
+      <p><strong>风险：</strong>净利率低、股息率 3.68% 在三家中最低；26E 净利 YoY -10.37% 降幅最大；PB 破净虽提供安全垫但修复需催化剂。</p>
+      <p><span class="tag tag-y">标配</span> <span class="tag tag-b">PB修复</span></p>
+    </div>
+
+    <div class="sub-section">
+      <h4>4. 中国卫通 (601698) — 卫星互联网国家队 + 6G 期权</h4>
+      <p><strong>核心逻辑：</strong>作为卫星通信唯一上市平台，受益于"十五五"规划低轨卫星互联网全球组网（目标 2030 年建成空天地一体化信息网络、用户超千万）。2026 年政府工作报告首次单独提出"加快发展卫星互联网"。26E 营收 YoY +16.91%、净利 YoY +26.24% 显示高成长性。</p>
+      <p><strong>催化剂：</strong>① 工信部 6G 创新发展部省协同试点（2026年6月发布）；② 卫星互联网配套产业政策落地加速；③ 6G 星地融合技术储备（高通量卫星单波束 1Gbps）。</p>
+      <p><strong>风险：</strong>PE 265x 极度昂贵，估值完全建立在远期预期上；YTD -30% 说明市场对概念炒作已审美疲劳；无分红。</p>
+      <p><span class="tag tag-y">主题关注</span> <span class="tag tag-p">卫星/6G 期权</span></p>
+    </div>
+
+    <div class="sub-section">
+      <h4>5. 东方明珠 (600637) — 广电文旅 + 股权增值弹性</h4>
+      <p><strong>核心逻辑：</strong>PB 0.91x 接近破净，中金公司《完善"文化+科技"产业链布局 关注股权增值弹性和产业平台潜力》提示其持有大量优质股权投资（如上海文化广播影视集团资产）。</p>
+      <p><strong>风险：</strong>PE 48x 偏高，YTD -17.8% 持续下跌。广电有线电视业务长期萎缩趋势未改。26E 净利 +30.67% 的预期需业绩验证。</p>
+      <p><span class="tag tag-r">跟踪观察</span></p>
+    </div>
+  </div>
+</div>
+
+<!-- Section 5: Institutional Views -->
+<div class="card">
+  <div class="card-header">五、机构观点汇总</div>
+  <div class="card-body">
+    <div class="table-wrap">
+      <table>
+        <tr><th>机构</th><th>标的</th><th>核心观点</th><th>评级方向</th></tr>
+        <tr>
+          <td>银河证券</td><td>中国移动</td>
+          <td>MOBILE AI焕新 三网筑基打造AI运营商</td><td><span class="tag tag-g">深度推荐</span></td>
+        </tr>
+        <tr>
+          <td>银河证券</td><td>中国移动</td>
+          <td>MWC 2026：以智为先、三网驱动 实现移动智能无界普惠</td><td><span class="tag tag-g">看好</span></td>
+        </tr>
+        <tr>
+          <td>山西证券</td><td>中国移动</td>
+          <td>后5G时代 发力TOKEN运营打造新引擎</td><td><span class="tag tag-g">推荐</span></td>
+        </tr>
+        <tr>
+          <td>华创证券</td><td>中国电信</td>
+          <td>算力规模显著提升 TOKEN经营迈入新台阶</td><td><span class="tag tag-g">推荐</span></td>
+        </tr>
+        <tr>
+          <td>长江证券</td><td>中国联通</td>
+          <td>用户规模稳步增长 智算中心收入增长提速</td><td><span class="tag tag-g">推荐</span></td>
+        </tr>
+        <tr>
+          <td>华创证券</td><td>中国联通</td>
+          <td>利润短期承压 算力资本开支持续加码</td><td><span class="tag tag-y">短期承压/长期看好</span></td>
+        </tr>
+        <tr>
+          <td>摩根大通</td><td>三大运营商</td>
+          <td>维持"增持"评级，2026E 股息率 5.7%~7% 显著高于恒指均值</td><td><span class="tag tag-g">增持</span></td>
+        </tr>
+        <tr>
+          <td>中金公司</td><td>东方明珠</td>
+          <td>完善"文化+科技"产业链布局 关注股权增值弹性和产业平台潜力</td><td><span class="tag tag-y">关注</span></td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Section 6: Policy & Catalysts -->
+<div class="card">
+  <div class="card-header">六、政策催化与事件驱动</div>
+  <div class="card-body">
+    <div class="table-wrap">
+      <table>
+        <tr><th>政策/事件</th><th>时间</th><th>影响方向</th><th>受益标的</th><th>强度</th></tr>
+        <tr>
+          <td>AI TOKEN 经营成运营商新增长极</td><td>2026年5月</td><td>商业模式升级（管道→平台）</td><td>移动/电信/联通</td><td><span class="tag tag-g">强催化</span></td>
+        </tr>
+        <tr>
+          <td>工信部 6G 创新发展部省协同试点</td><td>2026年6月</td><td>打开 6G 商用预期窗口（2029年前）</td><td>中国卫通</td><td><span class="tag tag-g">强催化</span></td>
+        </tr>
+        <tr>
+          <td>"十五五"低轨卫星互联网全球组网</td><td>2026年3月</td><td>卫星互联网上升为国家战略</td><td>中国卫通</td><td><span class="tag tag-g">强催化</span></td>
+        </tr>
+        <tr>
+          <td>增值税率上调（6%→9%）</td><td>2026年1月</td><td>短期利润压缩 ~10%，长期可控</td><td>三大运营商</td><td><span class="tag tag-r">利空(已消化)</span></td>
+        </tr>
+        <tr>
+          <td>利润上缴比例提高至 35%</td><td>2026年3月</td><td>影响可分配利润和分红预期</td><td>三大运营商</td><td><span class="tag tag-r">利空(已消化)</span></td>
+        </tr>
+        <tr>
+          <td>千亿分红+高股息策略</td><td>2026年3-8月</td><td>股息率安全边际，吸引增量资金</td><td>移动/电信/联通</td><td><span class="tag tag-g">利好持续</span></td>
+        </tr>
+        <tr>
+          <td>10年期国债收益率 1.74% 低利率环境</td><td>当前</td><td>红利资产稀缺性凸显</td><td>移动/电信</td><td><span class="tag tag-g">结构性利好</span></td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Section 7: Bull vs Bear -->
+<div class="card">
+  <div class="card-header">七、多头逻辑 vs 空头逻辑</div>
+  <div class="card-body">
+    <div class="two-col">
+      <div>
+        <h4 style="color: #2e7d32;">多头逻辑</h4>
+        <ul style="padding-left: 20px; margin-top: 10px;">
+          <li>250日位置 8.6% 极低位，下行空间仅 5% 到前低，上行空间 22% 到 120日高点</li>
+          <li>股息率 4.87% 在 10Y 国债 1.74% 时代是稀缺现金流资产</li>
+          <li>AI TOKEN 经营打开了管道到平台的新估值空间</li>
+          <li>增值税率上调影响已在 26E 盈利预测中充分计入（-2%~-10%），实际影响 < 10%</li>
+          <li>三大运营商合计派息超 1,300 亿，是真金白银的红利资产</li>
+          <li>6G/卫星互联网产业政策密集落地，打开远期成长空间</li>
+          <li>中国电信 20日 +21% 表明 AI 算力资金正加速流入</li>
+        </ul>
+      </div>
+      <div>
+        <h4 style="color: #c62828;">空头逻辑</h4>
+        <ul style="padding-left: 20px; margin-top: 10px;">
+          <li>增值税率上调+利润上缴双杀，26E 净利同比均负增长</li>
+          <li>中国联通 PB 0.82 破净，市场对传统电信业务估值持续压缩</li>
+          <li>AI TOKEN 经营尚在概念阶段，尚未产生实质性业绩贡献</li>
+          <li>板块 YTD -13.8% 跑输大盘，短期反弹可能是超跌反抽而非反转</li>
+          <li>MWC 2026 热度过后缺乏新的催化剂接力</li>
+          <li>东方明珠/广电网络 YTD -30% 说明板块内大量标的仍在出清</li>
+        </ul>
+      </div>
+    </div>
+    <div class="callout" style="margin-top: 16px;">
+      <span class="callout-strong">主要风险：</span>增值税率影响可能超出预期（若实际利润压缩 > 15%）；AI 算力业务进展低于预期；分红率因上缴比例提高而下调；市场风格切换导致红利策略资金流出；宏观经济下行导致电信消费降级。
+    </div>
+  </div>
+</div>
+
+<!-- Section 8: Configuration Recommendations -->
+<div class="card">
+  <div class="card-header">八、配置建议</div>
+  <div class="card-body">
+    <div class="table-wrap">
+      <table>
+        <tr><th>方向</th><th>标的</th><th>建议</th><th>核心逻辑</th><th>时间维度</th></tr>
+        <tr>
+          <td><span class="tag tag-b">红利底仓</span></td>
+          <td>中国移动</td>
+          <td><span class="tag tag-g">超配 50%</span></td>
+          <td>股息率 4.87% 安全垫 + PE 15x 估值合理 + AI TOKEN 平台转型</td>
+          <td>中长期</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-b">AI 弹性</span></td>
+          <td>中国电信</td>
+          <td><span class="tag tag-g">超配 25%</span></td>
+          <td>算力规模爆发 + TOKEN 经营标杆 + 20日领涨动量最强</td>
+          <td>中短期</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-b">PB修复</span></td>
+          <td>中国联通</td>
+          <td><span class="tag tag-y">标配 10%</span></td>
+          <td>PB 0.82 破净+混改红利+智算收入加速</td>
+          <td>中期</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-p">卫星/6G 期权</span></td>
+          <td>中国卫通</td>
+          <td><span class="tag tag-y">主题关注 5%</span></td>
+          <td>6G/卫星互联网政策催化 + 26E 高成长但估值极度昂贵</td>
+          <td>事件驱动</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-r">观察</span></td>
+          <td>东方明珠/广电网络</td>
+          <td><span class="tag tag-r">回避/等待</span></td>
+          <td>业务基本面未改善，估值无安全边际</td>
+          <td>—</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="callout" style="margin-top: 20px;">
+      <h4 style="margin-bottom: 8px;">操作框架</h4>
+      <p><strong>组合建议：</strong>50% 中国移动（红利底仓）+ 25% 中国电信（AI 弹性）+ 10% 中国联通（PB修复）+ 5% 中国卫通（卫星期权）+ 10% 现金（等待加仓时机）</p>
+      <p style="margin-top: 10px;"><strong>入场区间：</strong>板块指数 960-990（当前位置 993 已经进入）；<strong>止损信号：</strong>板块指数跌破 940（前低 939）；<strong>第一目标：</strong>1,050（120日均线附近）；<strong>中期目标：</strong>1,213（120日高点回补）。</p>
+      <p style="margin-top: 10px;"><strong>加仓信号：</strong>① 中国移动/电信发布 2026H1 中报，若净利润降幅 < 5% 显著优于一致预期，加仓至满仓；② 20日趋势持续为正超过 5 个交易日且无明显缩量，确认底部右侧。</p>
+      <p style="margin-top: 10px;"><strong>减仓/止损信号：</strong>① 板块指数跌破 940（前低），全部清仓；② 中国移动股息率跌破 4%（股价 > 110 元），减半仓；③ AI TOKEN 业务进展低于预期（连续两个季度无实质性收入披露），降低 AI 弹性仓位。</p>
+    </div>
+  </div>
+</div>
+
+<!-- Section 9: Sector Rating Summary -->
+<div class="card">
+  <div class="card-header">九、板块评级汇总</div>
+  <div class="card-body">
+    <div class="rating-row">
+      <div class="rating-item rating-pos">
+        <div class="rating-label">景气结构</div>
+        <div class="rating-score">B+</div>
+        <div style="font-size: 12px; margin-top: 4px;">AI/算力支撑</div>
+      </div>
+      <div class="rating-item rating-pos">
+        <div class="rating-label">估值安全边际</div>
+        <div class="rating-score">A-</div>
+        <div style="font-size: 12px; margin-top: 4px;">PB 1.47/股息4.87%</div>
+      </div>
+      <div class="rating-item rating-pos">
+        <div class="rating-label">股息吸引力</div>
+        <div class="rating-score">A</div>
+        <div style="font-size: 12px; margin-top: 4px;">10Y国债仅1.74%</div>
+      </div>
+      <div class="rating-item rating-neutral">
+        <div class="rating-label">资金偏好</div>
+        <div class="rating-score">B</div>
+        <div style="font-size: 12px; margin-top: 4px;">板块内部分化</div>
+      </div>
+      <div class="rating-item rating-pos">
+        <div class="rating-label">催化强度</div>
+        <div class="rating-score">B+</div>
+        <div style="font-size: 12px; margin-top: 4px;">AI+6G/中报</div>
+      </div>
+      <div class="rating-item rating-neutral">
+        <div class="rating-label">主要风险</div>
+        <div class="rating-score">B-</div>
+        <div style="font-size: 12px; margin-top: 4px;">增值税/分红下调</div>
+      </div>
+    </div>
+    <div style="text-align: center; margin-top: 20px; padding: 16px; background: linear-gradient(135deg, #e8eaf6, #c5cae9); border-radius: 10px;">
+      <span style="font-size: 20px; font-weight: 800; color: #1a237e;">综合评级：标配/加码</span>
+      <span style="font-size: 14px; color: #3949ab; margin-left: 12px;">左侧布局 · 红利+AI 双主线</span>
+    </div>
+  </div>
+</div>
+
+<!-- Section 10: Disclaimer -->
+<div class="card">
+  <div class="card-header">十、免责声明</div>
+  <div class="card-body" style="font-size: 12px; color: #999; line-height: 1.8;">
+    <p>数据来源：wstock-data (实时行情/财务/一致预期/研报标题)、国家统计局（宏观数据）、公开新闻资讯（政策/行业动态）。</p>
+    <p>数据截止日期：2026年7月28日（行情）、2026年6月30日（宏观数据）、2026Q1（财务数据）。</p>
+    <p><strong>本报告不构成任何投资建议。</strong>所有分析仅基于公开数据和既定分析框架，不代表对未来股价的任何预测或承诺。投资者应基于自身风险承受能力和投资目标独立做出决策。市场有风险，投资需谨慎。</p>
+  </div>
+</div>
+
+</div>
+
+<div class="footer">
+  <p>电信运营板块深度分析 · 2026年7月28日 · Generated by CodeBuddy Sector Deep Analysis</p>
+</div>
+
+<script>
+// ======== Chart 1: Sector Timing (Monthly K-line) ========
+(function() {
+  var dom = document.getElementById('chart-timing');
+  var myChart = echarts.init(dom);
+  
+  var months = ["25/08","25/09","25/10","25/11","25/12","26/01","26/02","26/03","26/04","26/05","26/06","26/07"];
+  var closes = [1110.35,1153.66,1070.38,1079.21,1142.90,1172.42,1136.66,1273.17,1213.32,1089.78,972.23,992.53];
+  // Adding daily line for more precision - uncomment if needed
+  var dailyDates = [];
+  var dailyCloses = [];
+  
+  fetch('/tmp/telecom_kline_data.json').catch(() => {});
+
+  var allDates = [];
+  var allCloses = [];
+  // Use monthly for simplicity but show the bowl shape
+  
+  var option = {
+    title: {
+      text: '电信运营板块指数 月线走势 (250日)',
+      subtext: '250日高 1,373 → 低 939 → 当前位置 8.6% · 60日趋势 -21.5% · 20日趋势 +0.45%',
+      left: 'center',
+      textStyle: { fontSize: 15, color: '#1a237e' }
+    },
+    tooltip: { trigger: 'axis' },
+    grid: { left: '8%', right: '8%', bottom: '10%', top: '18%' },
+    xAxis: {
+      type: 'category',
+      data: months,
+      axisLine: { lineStyle: { color: '#ccc' } }
+    },
+    yAxis: {
+      type: 'value',
+      name: '指数点位',
+      min: 900,
+      max: 1400,
+      splitLine: { lineStyle: { color: '#f0f0f0' } }
+    },
+    series: [{
+      name: '指数收盘',
+      type: 'line',
+      data: closes,
+      smooth: true,
+      lineStyle: { color: '#3949ab', width: 2.5 },
+      itemStyle: { color: '#3949ab' },
+      areaStyle: {
+        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+          { offset: 0, color: 'rgba(57,73,171,0.25)' },
+          { offset: 1, color: 'rgba(57,73,171,0.02)' }
+        ])
+      },
+      markLine: {
+        silent: true,
+        symbol: 'none',
+        label: { fontSize: 11, color: '#666' },
+        data: [
+          { yAxis: 1373, name: '250日高点 1373', lineStyle: { color: '#e53935', type: 'dashed' } },
+          { yAxis: 1213, name: '120日高点 1213', lineStyle: { color: '#f57c00', type: 'dashed' } },
+          { yAxis: 939, name: '前低 939', lineStyle: { color: '#43a047', type: 'dashed' } }
+        ]
+      },
+      markPoint: {
+        data: [
+          { name: '当前', coord: ['26/07', 992.53], value: '993', symbol: 'pin', symbolSize: 50,
+            itemStyle: { color: '#3949ab' },
+            label: { formatter: '当前\\n993', fontSize: 12, fontWeight: 'bold' } },
+          { name: '最高', coord: ['26/03', 1273.17], value: '1273', symbol: 'pin', symbolSize: 40,
+            itemStyle: { color: '#e53935' },
+            label: { formatter: '高点\\n1273', fontSize: 11 } },
+          { name: '前低', coord: ['26/06', 972.23], value: '972', symbol: 'pin', symbolSize: 40,
+            itemStyle: { color: '#43a047' },
+            label: { formatter: '前低\\n972', fontSize: 11 } }
+        ]
+      }
+    }]
+  };
+  
+  myChart.setOption(option);
+  window.addEventListener('resize', function() { myChart.resize(); });
+})();
+
+// ======== Chart 2: Segment Performance Bar ========
+(function() {
+  var dom = document.getElementById('chart-segment');
+  var myChart = echarts.init(dom);
+  
+  var option = {
+    title: {
+      text: '板块内部走势分化 (日/20日/60日/YTD)',
+      left: 'center',
+      textStyle: { fontSize: 14, color: '#1a237e' }
+    },
+    tooltip: { trigger: 'axis' },
+    legend: { bottom: 0, data: ['今日', '20日', '60日', 'YTD'] },
+    grid: { left: '8%', right: '8%', bottom: '12%', top: '15%' },
+    xAxis: {
+      type: 'category',
+      data: ['中国移动','中国电信','中国联通','中国卫通','东方明珠','广电网络'],
+      axisLabel: { rotate: 20, fontSize: 11 }
+    },
+    yAxis: {
+      type: 'value',
+      name: '%',
+      axisLabel: { formatter: '{value}%' }
+    },
+    series: [
+      {
+        name: '今日', type: 'bar',
+        data: [2.08, 2.94, 1.37, -1.34, 2.83, 2.45],
+        itemStyle: { color: '#3949ab' }
+      },
+      {
+        name: '20日', type: 'bar',
+        data: [11.87, 21.39, 11.00, -17.39, -2.32, -2.01],
+        itemStyle: { color: '#5c6bc0' }
+      },
+      {
+        name: '60日', type: 'bar',
+        data: [2.12, 5.90, -1.07, -29.76, -20.02, -24.48],
+        itemStyle: { color: '#9fa8da' }
+      },
+      {
+        name: 'YTD', type: 'bar',
+        data: [-2.53, 1.47, -12.22, -30.00, -17.80, -30.24],
+        itemStyle: { color: '#c5cae9' }
+      }
+    ]
+  };
+  
+  myChart.setOption(option);
+  window.addEventListener('resize', function() { myChart.resize(); });
+})();
+
+// ======== Chart 3: Financial Quality Radar ========
+(function() {
+  var dom = document.getElementById('chart-radar');
+  var myChart = echarts.init(dom);
+  
+  var option = {
+    title: {
+      text: '三大运营商财务质量雷达图',
+      left: 'center',
+      textStyle: { fontSize: 14, color: '#1a237e' }
+    },
+    tooltip: {},
+    legend: {
+      bottom: 0,
+      data: ['中国移动', '中国电信', '中国联通']
+    },
+    radar: {
+      center: ['50%', '50%'],
+      radius: '65%',
+      indicator: [
+        { name: '营收规模', max: 100 },
+        { name: '归母净利', max: 100 },
+        { name: '毛利率', max: 100 },
+        { name: '净利率', max: 100 },
+        { name: '股息率', max: 100 },
+        { name: '估值合理性(PE倒数)', max: 100 }
+      ]
+    },
+    series: [{
+      type: 'radar',
+      data: [
+        {
+          name: '中国移动',
+          value: [95, 100, 95, 95, 100, 66],
+          areaStyle: { color: 'rgba(57,73,171,0.2)' },
+          lineStyle: { color: '#3949ab' },
+          itemStyle: { color: '#3949ab' }
+        },
+        {
+          name: '中国电信',
+          value: [50, 25, 90, 45, 89, 56],
+          areaStyle: { color: 'rgba(92,107,192,0.15)' },
+          lineStyle: { color: '#5c6bc0' },
+          itemStyle: { color: '#5c6bc0' }
+        },
+        {
+          name: '中国联通',
+          value: [38, 8, 73, 16, 76, 62],
+          areaStyle: { color: 'rgba(159,168,218,0.12)' },
+          lineStyle: { color: '#9fa8da' },
+          itemStyle: { color: '#9fa8da' }
+        }
+      ]
+    }]
+  };
+  
+  myChart.setOption(option);
+  window.addEventListener('resize', function() { myChart.resize(); });
+})();
+
+// ======== Responsive resize ========
+window.addEventListener('resize', function() {
+  var charts = document.getElementsByClassName('chart');
+  // ECharts instances handle their own resize
+});
+</script>
+</body>
+</html>

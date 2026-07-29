@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A股题材碗底形态分析报告 · 2026-07-28</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif; background:#f5f6fa; color:#2c3e50; line-height:1.6; }
+.container { max-width:1280px; margin:0 auto; padding:20px; }
+.header { background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%); color:#fff; padding:36px 30px; border-radius:12px; margin-bottom:24px; box-shadow:0 4px 20px rgba(0,0,0,0.15); }
+.header h1 { font-size:26px; margin-bottom:8px; }
+.header .subtitle { opacity:0.85; font-size:14px; }
+.header .meta { margin-top:14px; display:flex; gap:24px; font-size:13px; opacity:0.75; flex-wrap:wrap; }
+.summary-cards { display:grid; grid-template-columns:repeat(5,1fr); gap:14px; margin-bottom:28px; }
+.summary-card { background:#fff; border-radius:10px; padding:18px; text-align:center; box-shadow:0 2px 10px rgba(0,0,0,0.06); }
+.summary-card .number { font-size:30px; font-weight:700; }
+.summary-card .label { font-size:12px; color:#7f8c8d; margin-top:4px; }
+.c-green .number { color:#27ae60; }
+.c-orange .number { color:#e67e22; }
+.c-red .number { color:#e74c3c; }
+.c-blue .number { color:#2980b9; }
+.c-gray .number { color:#7f8c8d; }
+.section-title { font-size:19px; font-weight:600; margin:28px 0 14px; padding-bottom:10px; border-bottom:2px solid #ecf0f1; display:flex; align-items:center; gap:8px; }
+.section-title .count { font-size:13px; color:#7f8c8d; font-weight:400; }
+.table-wrapper { background:#fff; border-radius:10px; overflow:hidden; box-shadow:0 2px 10px rgba(0,0,0,0.06); margin-bottom:28px; overflow-x:auto; }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+th { background:#f8f9fa; padding:11px 9px; text-align:left; font-weight:600; color:#5a6473; white-space:nowrap; border-bottom:2px solid #e8eaed; }
+td { padding:10px 9px; border-bottom:1px solid #f0f2f5; white-space:nowrap; }
+tr:hover td { background:#fafbfc; }
+.muted { color:#95a5a6; font-size:12px; }
+.pos { color:#e74c3c; font-weight:600; }
+.neg { color:#16a085; font-weight:600; }
+.low { color:#e67e22; font-weight:600; }
+.tag-green { background:#e8f8f0; color:#27ae60; padding:2px 6px; border-radius:4px; font-size:11px; }
+.tag-red { background:#fdecea; color:#e74c3c; padding:2px 6px; border-radius:4px; font-size:11px; }
+.charts-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-bottom:28px; }
+.chart-card { background:#fff; border-radius:10px; padding:16px; box-shadow:0 2px 10px rgba(0,0,0,0.06); }
+.chart-card h4 { font-size:15px; margin-bottom:4px; display:flex; align-items:center; gap:8px; }
+.chart-card .sub { font-size:12px; color:#7f8c8d; margin-bottom:10px; }
+.chart-box { height:150px; position:relative; }
+.detail-card { background:#fff; border-radius:10px; padding:20px; margin-bottom:18px; box-shadow:0 2px 10px rgba(0,0,0,0.06); border-left:4px solid #27ae60; }
+.detail-head { display:flex; align-items:center; gap:12px; margin-bottom:14px; flex-wrap:wrap; }
+.detail-head .rank { background:#27ae60; color:#fff; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px; }
+.detail-head h3 { font-size:18px; }
+.badge { color:#fff; padding:3px 10px; border-radius:12px; font-size:12px; }
+.score-badge { background:#34495e; color:#fff; padding:3px 10px; border-radius:12px; font-size:12px; font-weight:600; }
+.detail-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:14px; }
+.metric { background:#f8f9fa; padding:9px 12px; border-radius:6px; }
+.metric .ml { font-size:12px; color:#7f8c8d; display:block; }
+.metric .mv { font-size:15px; font-weight:600; }
+.reasons { background:#f8f9fa; padding:12px 16px; border-radius:6px; }
+.reasons ul { list-style:none; margin-top:6px; }
+.reasons li { padding:2px 0; font-size:13px; }
+.note { background:#fff8e1; border-left:4px solid #f39c12; padding:14px 18px; border-radius:6px; margin:20px 0; font-size:13px; }
+.disclaimer { background:#fdecea; border-radius:8px; padding:16px 20px; margin-top:28px; font-size:12px; color:#c0392b; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+  <h1>🥣 A股题材板块碗底形态分析报告</h1>
+  <div class="subtitle">按"碗底形状"筛选处于底部区间的题材 · 申万一级行业 + 聚源产业概念板块</div>
+  <div class="meta">
+    <span>📅 数据日期: 2026-07-28</span>
+    <span>📊 样本: 842 个板块</span>
+    <span>📈 K线周期: 日线 250 天</span>
+    <span>🔍 算法: 区间位置 + U形拟合 + 双窗口减速 + 低点抬升</span>
+  </div>
+</div>
+
+<div class="summary-cards">
+  <div class="summary-card c-blue"><div class="number">842</div><div class="label">分析题材总数</div></div>
+  <div class="summary-card c-green"><div class="number">49</div><div class="label">🟢 碗底确认/确认中</div></div>
+  <div class="summary-card c-orange"><div class="number">48</div><div class="label">🟡 减速筑底中</div></div>
+  <div class="summary-card c-red"><div class="number">614</div><div class="label">🔴 下跌中继</div></div>
+  <div class="summary-card c-gray"><div class="number">131</div><div class="label">⚪ 观望</div></div>
+</div>
+
+<div class="note">
+  <b>📌 碗底判定逻辑 (增强版 v2):</b> 真碗底 = ① 处于 120/250 日区间底部 (位置≤25%) + ② 前期明显下跌后近期趋稳/走平 (减速比&lt;0.8) + ③ 低点抬升 (近10日低点&gt;前10日低点)。
+  <b>减速比</b> = 近20日跌幅 ÷ 前40日(等效20日)跌幅，越小代表跌势减速越明显 (0≈已止跌)。
+  本算法会剔除"仍在创新低"的伪碗底 (如近期破位下跌的题材)。
+</div>
+
+<div class="section-title">🏆 碗底确认题材 — K线缩略图 <span class="count">(展示前9名 120日走势)</span></div>
+<div class="charts-grid" id="chartsGrid"></div>
+
+<div class="section-title">📊 综合得分排名 (TOP 25) <span class="count">颜色: 涨红跌绿 (A股惯例)</span></div>
+<div class="table-wrapper">
+<table>
+<thead><tr>
+<th>#</th><th>板块</th><th>形态判定</th><th>得分</th><th>120日位</th><th>250日位</th><th>近20日</th><th>前40日</th><th>减速比</th><th>低点</th><th>120日回撤</th><th>距60MA</th>
+</tr></thead>
+<tbody>
+
+        <tr>
+          <td><b>1</b></td>
+          <td><b>电信运营</b><br><span class="muted">聚源产业概念</span></td>
+          <td><span style="color:#27ae60;font-weight:600">🟢 确认碗底</span></td>
+          <td><b>90</b></td>
+          <td class="low">19.4%</td>
+          <td class="low">12.2%</td>
+          <td class="pos">+0.4%</td>
+          <td class="neg">-19.0%</td>
+          <td>-0.05</td>
+          <td><span class="tag-green">抬底</span></td>
+          <td class="neg">-18.2%</td>
+          <td class="neg">-5.0%</td>
+        </tr>
+        <tr>
+          <td><b>2</b></td>
+          <td><b>Manus概念</b><br><span class="muted">聚源产业概念</span></td>
+          <td><span style="color:#27ae60;font-weight:600">🟢 确认碗底</span></td>
+          <td><b>89</b></td>
+          <td class="low">7.8%</td>
+          <td class="low">7.2%</td>
+          <td class="pos">+0.1%</td>
+          <td class="neg">-34.5%</td>
+          <td>-0.01</td>
+          <td><span class="tag-green">抬底</span></td>
+          <td class="neg">-38.8%</td>
+          <td class="neg">-12.6%</td>
+        </tr>
+        <tr>
+          <td><b>3</b></td>
+          <td><b>玉米</b><br><span class="muted">聚源产业概念</span></td>
+          <td><span style="color:#27ae60;font-weight:600">🟢 确认碗底</span></td>
+          <td><b>88</b></td>
+          <td class="low">8.1%</td>
+          <td class="low">8.1%</td>
+          <td class="pos">+0.1%</td>
+          <td class="neg">-26.3%</td>
+          <td>-0.01</td>
+          <td><span class="tag-green">抬底</span></td>
+          <td class="neg">-33.9%</td>
+          <td class="neg">-7.7%</td>
+        </tr>
+        <tr>
+          <td><b>4</b></td>
+          <td><b>钢铁</b><br><span class="muted">申万一级行业</span></td>
+          <td><span style="color:#27ae60;font-weight:600">🟢 确认碗底</span></td>
+          <td><b>88</b></td>
+          <td class="low">9.8%</td>
+          <td class="low">9.8%</td>
+          <td class="neg">-1.3%</td>
+          <td class="neg">-22.8%</td>
+          <td>0.12</td>
+          <td><span class="tag-green">抬底</span></td>
+          <td class="neg">-31.5%</td>
+          <td class="neg">-7.2%</td>
+        </tr>
+        <tr>
+          <td><b>5</b></td>
+          <td><b>服务消费</b><br><span class="muted">聚源产业概念</span></td>
+          <td><span style="color:#27ae60;font-weight:600">🟢 确认碗底</span></td>
+          <td><b>85</b></td>
+          <td class="low">5.6%</td>
+          <td class="low">5.5%</td>
+          <td class="neg">-1.0%</td>
+          <td class="neg">-31.7%</td>
+          <td>0.07</td>
+          <td><span class="tag-green">抬底</span></td>
+          <td class="neg">-50.5%</td>
+          <td class="neg">-7.0%</td>
+        </tr>
+        <tr>
+          <td><b>6</b></td>
+          <td><b>尼帕病毒</b><br><span class="muted">聚源产业概念</span></td>
+          <td><span style="color:#27ae60;font-weight:600">🟢 碗底确认中</span></td>
+          <td><b>85</b></td>
+          <td class="low">10.4%</td>
+          <td class="low">10.4%</td>
+          <td class="neg">-1.6%</td>
+          <td class="neg">-27.4%</td>
+          <td>0.12</td>
+          <td><span class="tag-red">新低</span></td>
+          <td class="neg">-34.2%</td>
+          <td class="neg">-8.6%</td>
+        </tr>
+        <tr>
+          <td><b>7</b></td>
+          <td><b>C股(上市次日至五日)</b><br><span class="muted">聚源风格概念</span></td>
+          <td><span style="color:#27ae60;font-weight:600">🟢 碗底确认中</span></td>
+          <td><b>85</b></td>
+          <td class="low">2.0%</td>
+          <td class="low">0.4%</td>
+          <td class="neg">+0.0%</td>
+          <td class="neg">-125.3%</td>
+          <td>-0.0</td>
+          <td><span class="tag-red">新低</span></td>
+          <td class="neg">-98.0%</td>
+          <td class="neg">-38.1%</td>
+        </tr>
+        <tr>
+          <td><b>8</b></td>
+          <td><b>敦煌网概念</b><br><span class="muted">聚源产业概念</span></td>
+          <td><span style="color:#27ae60;font-weight:600">🟢 确认碗底</span></td>
+          <td><b>83</b></td>
+          <td class="low">19.5%</td>
+          <td class="low">12.3%</td>
+          <td class="pos">+1.9%</td>
+          <td class="neg">-22.8%</td>
+          <td>-0.17</td>
+          <td><span class="tag-green">抬底</span></td>
+          <td class="neg">-25.4%</td>
+          <td class="neg">-4.2%</td>
+        </tr>
+        <tr>
+          <td><b>9</b></td>
+          <td><b>油价相关</b><br><span class="muted">聚源产业概念</span></td>
+          <td><span style="color:#27ae60;font-weight:600">🟢 确认碗底</span></td>
+          <td><b>83</b></td>
+          <td class="low">10.4%</td>
+          <td class="low">10.4%</td>
+          <td class="pos">+2.4%</td>
+          <td class="neg">-23.4%</td>
+          <td>-0.21</td>
+          <td><span class="tag-green">抬底</span></td>
+          <td class="neg">-30.9%</td>
+          <td class="neg">-6.4%</td>
+        </tr>
+        <tr>
+          <td><b>10</b></td>
+          <td><b>秘塔AI</b><br><span class="muted">聚源产业概念</span></td>
+          <td><span style="color:#27ae60;font-weight:600">🟢 确认碗底</span></td>
+          <td><b>83</b></td>
+          <td class="low">11.9%</td>
+          <td class="low">11.7%</td>
+          <td class="neg">-0.4%</td>
+          <td class="neg">-27.2%</td>
+          <td>0.03</td>
+          <td><span class="tag-green">抬底</span></td>
+          <td class="neg">-31.6%</td>
+          <td class="neg">-6.7%</td>
+        </tr>
+        <tr>
+          <td><b>11</b></td>
+          <td><b>汽车销售</b><br><span class="muted">聚源产业概念</span></td>
+          <td><span style="color:#27ae60;font-weight:600">🟢 确认碗底</span></td>
+          <td><b>82</b></td>
+          <td class="low">8.0%</td>
+          <td class="low">7.6%</td>
+          <td class="neg">-1.7%</td>
+          <td class="neg">-24.0%</td>
+          <td>0.14</td>
+          <td><span class="tag-green">抬底</span></td>
+          <td class="neg">-28.9%</td>
+          <td class="neg">-7.9%</td>
+        </tr>
+        <tr>
+          <td><b>12</b></td>
+          <td><b>钢铁概念</b><br><span class="muted">聚源产业概念</span></td>
+          <td><span style="color:#27ae60;font-weight:600">🟢 碗底确认中</span></td>
+          <td><b>82</b></td>
+          <td class="low">8.7%</td>
+          <td class="low">8.7%</td>
+          <td class="neg">-2.4%</td>
+          <td class="neg">-23.4%</td>
+          <td>0.2</td>
+          <td><span class="tag-green">抬底</span></td>
+          <td class="neg">-31.5%</td>
+          <td class="neg">-7.5%</td>
+        </tr>
+        <tr>
+          <td><b>13</b></td>
+          <td><b>REITs</b><br><span class="muted">聚源产业概念</span></td>
+          <td><span style="color:#27ae60;font-weight:600">🟢 确认碗底</span></td>
+          <td><b>82</b></td>
+          <td class="low">12.9%</td>
+          <td class="low">12.1%</td>
+          <td class="neg">-0.8%</td>
+          <td class="neg">-23.4%</td>
+          <td>0.07</td>
+          <td><span class="tag-green">抬底</span></td>
+          <td class="neg">-21.8%</td>
+          <td class="neg">-7.2%</td>
+        </tr>
+        <tr>
+          <td><b>14</b></td>
+          <td><b>油改概念</b><br><span class="muted">聚源产业概念</span></td>
+          <td><span style="color:#27ae60;font-weight:600">🟢 碗底确认中</span></td>
+          <td><b>80</b></td>
+          <td class="low">8.6%</td>
+          <td class="low">8.6%</td>
+          <td class="pos">+2.1%</td>
+          <td class="neg">-30.1%</td>
+          <td>-0.14</td>
+          <td><span class="tag-red">新低</span></td>
+          <td class="neg">-39.4%</td>
+          <td class="neg">-7.5%</td>
+        </tr>
+        <tr>
+          <td><b>15</b></td>
+          <td><b>信托概念</b><br><span class="muted">聚源产业概念</span></td>
+          <td><span style="color:#27ae60;font-weight:600">🟢 确认碗底</span></td>
+          <td><b>80</b></td>
+          <td class="low">20.0%</td>
+          <td class="low">17.2%</td>
+          <td class="pos">+2.2%</td>
+          <td class="neg">-20.0%</td>
+          <td>-0.22</td>
+          <td><span class="tag-green">抬底</span></td>
+          <td class="neg">-19.0%</td>
+          <td class="neg">-4.9%</td>
+        </tr>
+        <tr>
+          <td><b>16</b></td>
+          <td><b>白酒概念</b><br><span class="muted">聚源产业概念</span></td>
+          <td><span style="color:#27ae60;font-weight:600">🟢 确认碗底</span></td>
+          <td><b>80</b></td>
+          <td class="low">10.8%</td>
+          <td class="low">10.1%</td>
+          <td class="neg">-1.2%</td>
+          <td class="neg">-20.4%</td>
+          <td>0.12</td>
+          <td><span class="tag-green">抬底</span></td>
+          <td class="neg">-24.9%</td>
+          <td class="neg">-6.3%</td>
+        </tr>
+        <tr>
+          <td><b>17</b></td>
+          <td><b>免税店概念</b><br><span class="muted">聚源产业概念</span></td>
+          <td><span style="color:#27ae60;font-weight:600">🟢 确认碗底</span></td>
+          <td><b>80</b></td>
+          <td class="low">11.7%</td>
+          <td class="low">10.7%</td>
+          <td class="neg">-1.6%</td>
+          <td class="neg">-21.2%</td>
+          <td>0.15</td>
+          <td><span class="tag-green">抬底</span></td>
+          <td class="neg">-30.6%</td>
+          <td class="neg">-6.2%</td>
+        </tr>
+        <tr>
+          <td><b>18</b></td>
+          <td><b>进口博览会</b><br><span class="muted">聚源产业概念</span></td>
+          <td><span style="color:#27ae60;font-weight:600">🟢 确认碗底</span></td>
+          <td><b>80</b></td>
+          <td class="low">19.8%</td>
+          <td class="low">18.9%</td>
+          <td class="neg">-0.0%</td>
+          <td class="neg">-17.0%</td>
+          <td>0.01</td>
+          <td><span class="tag-green">抬底</span></td>
+          <td class="neg">-18.2%</td>
+          <td class="neg">-3.6%</td>
+        </tr>
+        <tr>
+          <td><b>19</b></td>
+          <td><b>CIPS概念</b><br><span class="muted">聚源产业概念</span></td>
+          <td><span style="color:#27ae60;font-weight:600">🟢 确认碗底</span></td>
+          <td><b>80</b></td>
+          <td class="low">15.4%</td>
+          <td class="low">11.2%</td>
+          <td class="pos">+1.5%</td>
+          <td class="neg">-19.8%</td>
+          <td>-0.15</td>
+          <td><span class="tag-green">抬底</span></td>
+          <td class="neg">-25.9%</td>
+          <td class="neg">-4.7%</td>
+        </tr>
+        <tr>
+          <td><b>20</b></td>
+          <td><b>国资云概念</b><br><span class="muted">聚源产业概念</span></td>
+          <td><span style="color:#27ae60;font-weight:600">🟢 确认碗底</span></td>
+          <td><b>79</b></td>
+          <td class="low">18.1%</td>
+          <td class="low">14.9%</td>
+          <td class="pos">+1.1%</td>
+          <td class="neg">-22.2%</td>
+          <td>-0.1</td>
+          <td><span class="tag-green">抬底</span></td>
+          <td class="neg">-21.1%</td>
+          <td class="neg">-5.6%</td>
+        </tr>
+        <tr>
+          <td><b>21</b></td>
+          <td><b>黄酒概念</b><br><span class="muted">聚源产业概念</span></td>
+          <td><span style="color:#f39c12;font-weight:600">🟡 减速筑底</span></td>
+          <td><b>79</b></td>
+          <td class="low">8.3%</td>
+          <td class="low">8.3%</td>
+          <td class="neg">-2.6%</td>
+          <td class="neg">-18.0%</td>
+          <td>0.29</td>
+          <td><span class="tag-red">新低</span></td>
+          <td class="neg">-31.4%</td>
+          <td class="neg">-8.2%</td>
+        </tr>
+        <tr>
+          <td><b>22</b></td>
+          <td><b>人民币升值受益</b><br><span class="muted">聚源产业概念</span></td>
+          <td><span style="color:#f39c12;font-weight:600">🟡 减速筑底</span></td>
+          <td><b>79</b></td>
+          <td class="low">10.9%</td>
+          <td class="low">10.9%</td>
+          <td class="neg">-2.2%</td>
+          <td class="neg">-18.9%</td>
+          <td>0.23</td>
+          <td><span class="tag-red">新低</span></td>
+          <td class="neg">-24.4%</td>
+          <td class="neg">-6.0%</td>
+        </tr>
+        <tr>
+          <td><b>23</b></td>
+          <td><b>参股券商</b><br><span class="muted">聚源产业概念</span></td>
+          <td><span style="color:#27ae60;font-weight:600">🟢 碗底确认中</span></td>
+          <td><b>78</b></td>
+          <td class="low">11.4%</td>
+          <td class="low">11.0%</td>
+          <td class="neg">-1.8%</td>
+          <td class="neg">-18.1%</td>
+          <td>0.2</td>
+          <td><span class="tag-red">新低</span></td>
+          <td class="neg">-19.6%</td>
+          <td class="neg">-5.7%</td>
+        </tr>
+        <tr>
+          <td><b>24</b></td>
+          <td><b>农业种植</b><br><span class="muted">聚源产业概念</span></td>
+          <td><span style="color:#27ae60;font-weight:600">🟢 碗底确认中</span></td>
+          <td><b>78</b></td>
+          <td class="low">14.7%</td>
+          <td class="low">14.7%</td>
+          <td class="neg">-1.4%</td>
+          <td class="neg">-23.6%</td>
+          <td>0.12</td>
+          <td><span class="tag-red">新低</span></td>
+          <td class="neg">-24.6%</td>
+          <td class="neg">-6.9%</td>
+        </tr>
+        <tr>
+          <td><b>25</b></td>
+          <td><b>内蒙古</b><br><span class="muted">聚源地域概念</span></td>
+          <td><span style="color:#27ae60;font-weight:600">🟢 确认碗底</span></td>
+          <td><b>78</b></td>
+          <td class="low">14.1%</td>
+          <td class="low">16.2%</td>
+          <td class="neg">-0.8%</td>
+          <td class="neg">-21.6%</td>
+          <td>0.07</td>
+          <td><span class="tag-green">抬底</span></td>
+          <td class="neg">-25.0%</td>
+          <td class="neg">-7.2%</td>
+        </tr>
+</tbody></table>
+</div>
+
+<div class="section-title">📝 碗底确认题材详细分析</div>
+
+        <div class="detail-card">
+          <div class="detail-head">
+            <span class="rank">#1</span>
+            <h3>电信运营 <span class="muted">(聚源产业概念)</span></h3>
+            <span class="badge" style="background:#27ae60">🟢 确认碗底</span>
+            <span class="score-badge">得分 90/100</span>
+          </div>
+          <div class="detail-grid">
+            <div class="metric"><span class="ml">当前点位</span><span class="mv">992.53</span></div>
+            <div class="metric"><span class="ml">120日区间位</span><span class="mv">19.4%</span></div>
+            <div class="metric"><span class="ml">250日区间位</span><span class="mv">12.2%</span></div>
+            <div class="metric"><span class="ml">120日回撤</span><span class="mv neg">-18.2%</span></div>
+            <div class="metric"><span class="ml">距120日低点</span><span class="mv">5.6%</span></div>
+            <div class="metric"><span class="ml">近5日</span><span class="mv pos">+2.3%</span></div>
+            <div class="metric"><span class="ml">近10日</span><span class="mv pos">+1.3%</span></div>
+            <div class="metric"><span class="ml">近20日</span><span class="mv pos">+3.5%</span></div>
+            <div class="metric"><span class="ml">60日趋势</span><span class="mv neg">-21.5%</span></div>
+            <div class="metric"><span class="ml">减速比</span><span class="mv">-0.05</span></div>
+            <div class="metric"><span class="ml">低点抬升</span><span class="mv pos">是 (+0.6%)</span></div>
+            <div class="metric"><span class="ml">U形曲率</span><span class="mv">2840.94</span></div>
+            <div class="metric"><span class="ml">量比(20/60)</span><span class="mv">0.78</span></div>
+            <div class="metric"><span class="ml">波幅比</span><span class="mv">0.85</span></div>
+            <div class="metric"><span class="ml">距20MA</span><span class="mv pos">+1.5%</span></div>
+            <div class="metric"><span class="ml">距60MA</span><span class="mv neg">-5.0%</span></div>
+          </div>
+          <div class="reasons"><b>判定依据:</b><ul><li>✅ 120日低位(19%)</li><li>✅ 250日极低位(12%)</li><li>✅ 碗形:前期跌(-19%)后近期企稳(+0.4%) 减速-5%</li><li>✅ 近10日抬底(+0.6%)</li><li>🟡 凸形(曲率2840.94)</li><li>✅ 量缩(78%)</li><li>✅ 波幅降(85%)</li><li>✅ 低于60MA(-5.0%)</li></ul></div>
+        </div>
+        <div class="detail-card">
+          <div class="detail-head">
+            <span class="rank">#2</span>
+            <h3>Manus概念 <span class="muted">(聚源产业概念)</span></h3>
+            <span class="badge" style="background:#27ae60">🟢 确认碗底</span>
+            <span class="score-badge">得分 89/100</span>
+          </div>
+          <div class="detail-grid">
+            <div class="metric"><span class="ml">当前点位</span><span class="mv">660.55</span></div>
+            <div class="metric"><span class="ml">120日区间位</span><span class="mv">7.8%</span></div>
+            <div class="metric"><span class="ml">250日区间位</span><span class="mv">7.2%</span></div>
+            <div class="metric"><span class="ml">120日回撤</span><span class="mv neg">-38.8%</span></div>
+            <div class="metric"><span class="ml">距120日低点</span><span class="mv">5.6%</span></div>
+            <div class="metric"><span class="ml">近5日</span><span class="mv neg">-3.2%</span></div>
+            <div class="metric"><span class="ml">近10日</span><span class="mv pos">+2.7%</span></div>
+            <div class="metric"><span class="ml">近20日</span><span class="mv neg">-1.9%</span></div>
+            <div class="metric"><span class="ml">60日趋势</span><span class="mv neg">-41.9%</span></div>
+            <div class="metric"><span class="ml">减速比</span><span class="mv">-0.01</span></div>
+            <div class="metric"><span class="ml">低点抬升</span><span class="mv pos">是 (+1.6%)</span></div>
+            <div class="metric"><span class="ml">U形曲率</span><span class="mv">7600.17</span></div>
+            <div class="metric"><span class="ml">量比(20/60)</span><span class="mv">0.93</span></div>
+            <div class="metric"><span class="ml">波幅比</span><span class="mv">0.83</span></div>
+            <div class="metric"><span class="ml">距20MA</span><span class="mv pos">+0.2%</span></div>
+            <div class="metric"><span class="ml">距60MA</span><span class="mv neg">-12.6%</span></div>
+          </div>
+          <div class="reasons"><b>判定依据:</b><ul><li>✅ 120日极低位(8%)</li><li>✅ 250日极低位(7%)</li><li>✅ 碗形:前期跌(-35%)后近期企稳(+0.1%) 减速-1%</li><li>✅ 近10日抬底(+1.6%)</li><li>🟡 凸形(曲率7600.17)</li><li>🟡 量稳(93%)</li><li>✅ 波幅降(83%)</li><li>🟡 远低于60MA(-12.6%)</li></ul></div>
+        </div>
+        <div class="detail-card">
+          <div class="detail-head">
+            <span class="rank">#3</span>
+            <h3>玉米 <span class="muted">(聚源产业概念)</span></h3>
+            <span class="badge" style="background:#27ae60">🟢 确认碗底</span>
+            <span class="score-badge">得分 88/100</span>
+          </div>
+          <div class="detail-grid">
+            <div class="metric"><span class="ml">当前点位</span><span class="mv">697.18</span></div>
+            <div class="metric"><span class="ml">120日区间位</span><span class="mv">8.1%</span></div>
+            <div class="metric"><span class="ml">250日区间位</span><span class="mv">8.1%</span></div>
+            <div class="metric"><span class="ml">120日回撤</span><span class="mv neg">-33.9%</span></div>
+            <div class="metric"><span class="ml">距120日低点</span><span class="mv">4.7%</span></div>
+            <div class="metric"><span class="ml">近5日</span><span class="mv pos">+2.3%</span></div>
+            <div class="metric"><span class="ml">近10日</span><span class="mv pos">+1.0%</span></div>
+            <div class="metric"><span class="ml">近20日</span><span class="mv pos">+3.4%</span></div>
+            <div class="metric"><span class="ml">60日趋势</span><span class="mv neg">-29.4%</span></div>
+            <div class="metric"><span class="ml">减速比</span><span class="mv">-0.01</span></div>
+            <div class="metric"><span class="ml">低点抬升</span><span class="mv pos">是 (+1.1%)</span></div>
+            <div class="metric"><span class="ml">U形曲率</span><span class="mv">5856.08</span></div>
+            <div class="metric"><span class="ml">量比(20/60)</span><span class="mv">0.99</span></div>
+            <div class="metric"><span class="ml">波幅比</span><span class="mv">1.07</span></div>
+            <div class="metric"><span class="ml">距20MA</span><span class="mv pos">+1.0%</span></div>
+            <div class="metric"><span class="ml">距60MA</span><span class="mv neg">-7.7%</span></div>
+          </div>
+          <div class="reasons"><b>判定依据:</b><ul><li>✅ 120日极低位(8%)</li><li>✅ 250日极低位(8%)</li><li>✅ 碗形:前期跌(-26%)后近期企稳(+0.1%) 减速-1%</li><li>✅ 近10日抬底(+1.1%)</li><li>🟡 凸形(曲率5856.08)</li><li>🟡 量稳(99%)</li><li>❌ 波幅大(107%)</li><li>✅ 低于60MA(-7.7%)</li></ul></div>
+        </div>
+        <div class="detail-card">
+          <div class="detail-head">
+            <span class="rank">#4</span>
+            <h3>钢铁 <span class="muted">(申万一级行业)</span></h3>
+            <span class="badge" style="background:#27ae60">🟢 确认碗底</span>
+            <span class="score-badge">得分 88/100</span>
+          </div>
+          <div class="detail-grid">
+            <div class="metric"><span class="ml">当前点位</span><span class="mv">2159.26</span></div>
+            <div class="metric"><span class="ml">120日区间位</span><span class="mv">9.8%</span></div>
+            <div class="metric"><span class="ml">250日区间位</span><span class="mv">9.8%</span></div>
+            <div class="metric"><span class="ml">120日回撤</span><span class="mv neg">-31.5%</span></div>
+            <div class="metric"><span class="ml">距120日低点</span><span class="mv">5.2%</span></div>
+            <div class="metric"><span class="ml">近5日</span><span class="mv pos">+1.4%</span></div>
+            <div class="metric"><span class="ml">近10日</span><span class="mv pos">+1.8%</span></div>
+            <div class="metric"><span class="ml">近20日</span><span class="mv pos">+0.2%</span></div>
+            <div class="metric"><span class="ml">60日趋势</span><span class="mv neg">-26.6%</span></div>
+            <div class="metric"><span class="ml">减速比</span><span class="mv">0.12</span></div>
+            <div class="metric"><span class="ml">低点抬升</span><span class="mv pos">是 (+2.0%)</span></div>
+            <div class="metric"><span class="ml">U形曲率</span><span class="mv">5451.97</span></div>
+            <div class="metric"><span class="ml">量比(20/60)</span><span class="mv">0.9</span></div>
+            <div class="metric"><span class="ml">波幅比</span><span class="mv">1.06</span></div>
+            <div class="metric"><span class="ml">距20MA</span><span class="mv pos">+0.8%</span></div>
+            <div class="metric"><span class="ml">距60MA</span><span class="mv neg">-7.2%</span></div>
+          </div>
+          <div class="reasons"><b>判定依据:</b><ul><li>✅ 120日极低位(10%)</li><li>✅ 250日极低位(10%)</li><li>✅ 碗形:前期跌(-23%)后近期企稳(-1.3%) 减速12%</li><li>✅ 近10日抬底(+2.0%)</li><li>🟡 凸形(曲率5451.97)</li><li>🟡 量稳(90%)</li><li>❌ 波幅大(106%)</li><li>✅ 低于60MA(-7.2%)</li></ul></div>
+        </div>
+        <div class="detail-card">
+          <div class="detail-head">
+            <span class="rank">#5</span>
+            <h3>服务消费 <span class="muted">(聚源产业概念)</span></h3>
+            <span class="badge" style="background:#27ae60">🟢 确认碗底</span>
+            <span class="score-badge">得分 85/100</span>
+          </div>
+          <div class="detail-grid">
+            <div class="metric"><span class="ml">当前点位</span><span class="mv">687.41</span></div>
+            <div class="metric"><span class="ml">120日区间位</span><span class="mv">5.6%</span></div>
+            <div class="metric"><span class="ml">250日区间位</span><span class="mv">5.5%</span></div>
+            <div class="metric"><span class="ml">120日回撤</span><span class="mv neg">-50.5%</span></div>
+            <div class="metric"><span class="ml">距120日低点</span><span class="mv">6.5%</span></div>
+            <div class="metric"><span class="ml">近5日</span><span class="mv pos">+3.1%</span></div>
+            <div class="metric"><span class="ml">近10日</span><span class="mv pos">+4.0%</span></div>
+            <div class="metric"><span class="ml">近20日</span><span class="mv pos">+3.6%</span></div>
+            <div class="metric"><span class="ml">60日趋势</span><span class="mv neg">-32.8%</span></div>
+            <div class="metric"><span class="ml">减速比</span><span class="mv">0.07</span></div>
+            <div class="metric"><span class="ml">低点抬升</span><span class="mv pos">是 (+1.6%)</span></div>
+            <div class="metric"><span class="ml">U形曲率</span><span class="mv">11318.71</span></div>
+            <div class="metric"><span class="ml">量比(20/60)</span><span class="mv">1.39</span></div>
+            <div class="metric"><span class="ml">波幅比</span><span class="mv">1.14</span></div>
+            <div class="metric"><span class="ml">距20MA</span><span class="mv pos">+2.2%</span></div>
+            <div class="metric"><span class="ml">距60MA</span><span class="mv neg">-7.0%</span></div>
+          </div>
+          <div class="reasons"><b>判定依据:</b><ul><li>✅ 120日极低位(6%)</li><li>✅ 250日极低位(5%)</li><li>✅ 碗形:前期跌(-32%)后近期企稳(-1.0%) 减速7%</li><li>✅ 近10日抬底(+1.6%)</li><li>🟡 凸形(曲率11318.71)</li><li>❌ 放量(139%)</li><li>❌ 波幅大(114%)</li><li>✅ 低于60MA(-7.0%)</li></ul></div>
+        </div>
+        <div class="detail-card">
+          <div class="detail-head">
+            <span class="rank">#6</span>
+            <h3>尼帕病毒 <span class="muted">(聚源产业概念)</span></h3>
+            <span class="badge" style="background:#27ae60">🟢 碗底确认中</span>
+            <span class="score-badge">得分 85/100</span>
+          </div>
+          <div class="detail-grid">
+            <div class="metric"><span class="ml">当前点位</span><span class="mv">693.82</span></div>
+            <div class="metric"><span class="ml">120日区间位</span><span class="mv">10.4%</span></div>
+            <div class="metric"><span class="ml">250日区间位</span><span class="mv">10.4%</span></div>
+            <div class="metric"><span class="ml">120日回撤</span><span class="mv neg">-34.2%</span></div>
+            <div class="metric"><span class="ml">距120日低点</span><span class="mv">6.4%</span></div>
+            <div class="metric"><span class="ml">近5日</span><span class="mv pos">+0.7%</span></div>
+            <div class="metric"><span class="ml">近10日</span><span class="mv neg">-1.8%</span></div>
+            <div class="metric"><span class="ml">近20日</span><span class="mv pos">+2.3%</span></div>
+            <div class="metric"><span class="ml">60日趋势</span><span class="mv neg">-28.5%</span></div>
+            <div class="metric"><span class="ml">减速比</span><span class="mv">0.12</span></div>
+            <div class="metric"><span class="ml">低点抬升</span><span class="mv neg">否 (-0.3%)</span></div>
+            <div class="metric"><span class="ml">U形曲率</span><span class="mv">4363.01</span></div>
+            <div class="metric"><span class="ml">量比(20/60)</span><span class="mv">0.58</span></div>
+            <div class="metric"><span class="ml">波幅比</span><span class="mv">0.94</span></div>
+            <div class="metric"><span class="ml">距20MA</span><span class="mv neg">-0.9%</span></div>
+            <div class="metric"><span class="ml">距60MA</span><span class="mv neg">-8.6%</span></div>
+          </div>
+          <div class="reasons"><b>判定依据:</b><ul><li>✅ 120日低位(10%)</li><li>✅ 250日极低位(10%)</li><li>✅ 碗形:前期跌(-27%)后近期企稳(-1.6%) 减速12%</li><li>❌ 仍创新低(-0.3%)</li><li>🟡 凸形(曲率4363.01)</li><li>✅ 缩量(58%)</li><li>🟡 波幅稳(94%)</li><li>✅ 低于60MA(-8.6%)</li></ul></div>
+        </div>
+        <div class="detail-card">
+          <div class="detail-head">
+            <span class="rank">#7</span>
+            <h3>C股(上市次日至五日) <span class="muted">(聚源风格概念)</span></h3>
+            <span class="badge" style="background:#27ae60">🟢 碗底确认中</span>
+            <span class="score-badge">得分 85/100</span>
+          </div>
+          <div class="detail-grid">
+            <div class="metric"><span class="ml">当前点位</span><span class="mv">0.01</span></div>
+            <div class="metric"><span class="ml">120日区间位</span><span class="mv">2.0%</span></div>
+            <div class="metric"><span class="ml">250日区间位</span><span class="mv">0.4%</span></div>
+            <div class="metric"><span class="ml">120日回撤</span><span class="mv neg">-98.0%</span></div>
+            <div class="metric"><span class="ml">距120日低点</span><span class="mv">0%</span></div>
+            <div class="metric"><span class="ml">近5日</span><span class="mv pos">+0.0%</span></div>
+            <div class="metric"><span class="ml">近10日</span><span class="mv pos">+0.0%</span></div>
+            <div class="metric"><span class="ml">近20日</span><span class="mv pos">+0.0%</span></div>
+            <div class="metric"><span class="ml">60日趋势</span><span class="mv neg">-142.6%</span></div>
+            <div class="metric"><span class="ml">减速比</span><span class="mv">-0.0</span></div>
+            <div class="metric"><span class="ml">低点抬升</span><span class="mv neg">否 (-100.0%)</span></div>
+            <div class="metric"><span class="ml">U形曲率</span><span class="mv">54155.37</span></div>
+            <div class="metric"><span class="ml">量比(20/60)</span><span class="mv">0.26</span></div>
+            <div class="metric"><span class="ml">波幅比</span><span class="mv">0.0</span></div>
+            <div class="metric"><span class="ml">距20MA</span><span class="mv pos">+0.0%</span></div>
+            <div class="metric"><span class="ml">距60MA</span><span class="mv neg">-38.1%</span></div>
+          </div>
+          <div class="reasons"><b>判定依据:</b><ul><li>✅ 120日极低位(2%)</li><li>✅ 250日极低位(0%)</li><li>✅ 碗形:前期跌(-125%)后近期企稳(+0.0%) 减速-0%</li><li>❌ 仍创新低(-100.0%)</li><li>🟡 凸形(曲率54155.37)</li><li>✅ 缩量(26%)</li><li>✅ 波幅压缩(0%)</li><li>❌ 高于60MA(-38.1%)</li></ul></div>
+        </div>
+        <div class="detail-card">
+          <div class="detail-head">
+            <span class="rank">#8</span>
+            <h3>敦煌网概念 <span class="muted">(聚源产业概念)</span></h3>
+            <span class="badge" style="background:#27ae60">🟢 确认碗底</span>
+            <span class="score-badge">得分 83/100</span>
+          </div>
+          <div class="detail-grid">
+            <div class="metric"><span class="ml">当前点位</span><span class="mv">947.76</span></div>
+            <div class="metric"><span class="ml">120日区间位</span><span class="mv">19.5%</span></div>
+            <div class="metric"><span class="ml">250日区间位</span><span class="mv">12.3%</span></div>
+            <div class="metric"><span class="ml">120日回撤</span><span class="mv neg">-25.4%</span></div>
+            <div class="metric"><span class="ml">距120日低点</span><span class="mv">9.0%</span></div>
+            <div class="metric"><span class="ml">近5日</span><span class="mv pos">+0.4%</span></div>
+            <div class="metric"><span class="ml">近10日</span><span class="mv pos">+5.8%</span></div>
+            <div class="metric"><span class="ml">近20日</span><span class="mv pos">+5.3%</span></div>
+            <div class="metric"><span class="ml">60日趋势</span><span class="mv neg">-24.5%</span></div>
+            <div class="metric"><span class="ml">减速比</span><span class="mv">-0.17</span></div>
+            <div class="metric"><span class="ml">低点抬升</span><span class="mv pos">是 (+0.9%)</span></div>
+            <div class="metric"><span class="ml">U形曲率</span><span class="mv">4977.09</span></div>
+            <div class="metric"><span class="ml">量比(20/60)</span><span class="mv">0.97</span></div>
+            <div class="metric"><span class="ml">波幅比</span><span class="mv">1.21</span></div>
+            <div class="metric"><span class="ml">距20MA</span><span class="mv pos">+3.1%</span></div>
+            <div class="metric"><span class="ml">距60MA</span><span class="mv neg">-4.2%</span></div>
+          </div>
+          <div class="reasons"><b>判定依据:</b><ul><li>✅ 120日低位(19%)</li><li>✅ 250日极低位(12%)</li><li>✅ 碗形:前期跌(-23%)后近期企稳(+1.9%) 减速-17%</li><li>✅ 近10日抬底(+0.9%)</li><li>🟡 凸形(曲率4977.09)</li><li>🟡 量稳(97%)</li><li>❌ 波幅大(121%)</li><li>✅ 低于60MA(-4.2%)</li></ul></div>
+        </div>
+        <div class="detail-card">
+          <div class="detail-head">
+            <span class="rank">#9</span>
+            <h3>油价相关 <span class="muted">(聚源产业概念)</span></h3>
+            <span class="badge" style="background:#27ae60">🟢 确认碗底</span>
+            <span class="score-badge">得分 83/100</span>
+          </div>
+          <div class="detail-grid">
+            <div class="metric"><span class="ml">当前点位</span><span class="mv">1853.34</span></div>
+            <div class="metric"><span class="ml">120日区间位</span><span class="mv">10.4%</span></div>
+            <div class="metric"><span class="ml">250日区间位</span><span class="mv">10.4%</span></div>
+            <div class="metric"><span class="ml">120日回撤</span><span class="mv neg">-30.9%</span></div>
+            <div class="metric"><span class="ml">距120日低点</span><span class="mv">5.4%</span></div>
+            <div class="metric"><span class="ml">近5日</span><span class="mv pos">+1.6%</span></div>
+            <div class="metric"><span class="ml">近10日</span><span class="mv neg">-0.2%</span></div>
+            <div class="metric"><span class="ml">近20日</span><span class="mv pos">+4.1%</span></div>
+            <div class="metric"><span class="ml">60日趋势</span><span class="mv neg">-25.4%</span></div>
+            <div class="metric"><span class="ml">减速比</span><span class="mv">-0.21</span></div>
+            <div class="metric"><span class="ml">低点抬升</span><span class="mv pos">是 (+2.3%)</span></div>
+            <div class="metric"><span class="ml">U形曲率</span><span class="mv">4952.54</span></div>
+            <div class="metric"><span class="ml">量比(20/60)</span><span class="mv">0.87</span></div>
+            <div class="metric"><span class="ml">波幅比</span><span class="mv">1.08</span></div>
+            <div class="metric"><span class="ml">距20MA</span><span class="mv pos">+1.1%</span></div>
+            <div class="metric"><span class="ml">距60MA</span><span class="mv neg">-6.4%</span></div>
+          </div>
+          <div class="reasons"><b>判定依据:</b><ul><li>✅ 120日低位(10%)</li><li>✅ 250日极低位(10%)</li><li>✅ 碗形:前期跌(-23%)后近期企稳(+2.4%) 减速-21%</li><li>✅ 近10日抬底(+2.3%)</li><li>🟡 凸形(曲率4952.54)</li><li>🟡 量稳(87%)</li><li>❌ 波幅大(108%)</li><li>✅ 低于60MA(-6.4%)</li></ul></div>
+        </div>
+
+<div class="disclaimer">
+  ⚠️ <b>风险提示:</b> 本报告仅基于历史价格形态的客观量化分析，不构成任何投资建议。碗底形态识别属于技术分析方法，存在误判可能；
+  处于底部区间的题材可能继续下跌 (底部之下还有底)。投资有风险，决策需谨慎。请结合基本面、资金面、宏观环境综合判断。
+  数据来源: 腾讯自选股行情接口，可能存在延迟，以交易所官方数据为准。
+</div>
+
+</div>
+
+<script>
+const chartData = [{"name": "电信运营", "type": "聚源产业概念", "score": 90, "label": "🟢 确认碗底", "closes": [1178.01, 1183.71, 1190.98, 1185.72, 1155.71, 1168.21, 1172.61, 1166.67, 1160.56, 1177.08, 1180.13, 1170.53, 1165.58, 1154.86, 1157.11, 1168.6, 1166.34, 1176.36, 1177.27, 1141.59, 1137.18, 1154.06, 1161.75, 1163.75, 1167.95, 1169.07, 1157.28, 1157.54, 1148.47, 1134.4, 1142.94, 1135.25, 1096.92, 1045.24, 1065.31, 1073.63, 1060.26, 1065.49, 1075.01, 1067.57, 1070.01, 1048.57, 1040.08, 1038.3, 1077.1, 1061.62, 1066.82, 1064.95, 1077.58, 1070.98, 1077.79, 1077.77, 1092.39, 1107.43, 1093.89, 1097.74, 1088.76, 1120.37, 1108.68, 1117.12, 1118.16, 1125.86, 1133.58, 1151.36, 1161.6, 1142.69, 1149.54, 1124.76, 1117.18, 1167.83, 1195.92, 1165.15, 1127.43, 1118.42, 1156.46, 1117.6, 1101.63, 1090.23, 1077.39, 1074.63, 1070.25, 1066.08, 1054.36, 1070.89, 1060.09, 1058.21, 1052.53, 1045.43, 1052.06, 1045.82, 1040.57, 1024.52, 1011.63, 1012.48, 997.48, 978.86, 966.6, 964.73, 958.6, 959.35, 971.37, 970.82, 981.31, 978.97, 958.58, 964.75, 973.51, 1007.87, 988.07, 980.0, 985.64, 989.43, 968.73, 974.54, 970.27, 964.43, 980.08, 971.63, 975.74, 992.53], "dates": ["2026-01-27", "2026-01-28", "2026-01-29", "2026-01-30", "2026-02-02", "2026-02-03", "2026-02-04", "2026-02-05", "2026-02-06", "2026-02-09", "2026-02-10", "2026-02-11", "2026-02-12", "2026-02-13", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02", "2026-04-03", "2026-04-07", "2026-04-08", "2026-04-09", "2026-04-10", "2026-04-13", "2026-04-14", "2026-04-15", "2026-04-16", "2026-04-17", "2026-04-20", "2026-04-21", "2026-04-22", "2026-04-23", "2026-04-24", "2026-04-27", "2026-04-28", "2026-04-29", "2026-04-30", "2026-05-06", "2026-05-07", "2026-05-08", "2026-05-11", "2026-05-12", "2026-05-13", "2026-05-14", "2026-05-15", "2026-05-18", "2026-05-19", "2026-05-20", "2026-05-21", "2026-05-22", "2026-05-25", "2026-05-26", "2026-05-27", "2026-05-28", "2026-05-29", "2026-06-01", "2026-06-02", "2026-06-03", "2026-06-04", "2026-06-05", "2026-06-08", "2026-06-09", "2026-06-10", "2026-06-11", "2026-06-12", "2026-06-15", "2026-06-16", "2026-06-17", "2026-06-18", "2026-06-22", "2026-06-23", "2026-06-24", "2026-06-25", "2026-06-26", "2026-06-29", "2026-06-30", "2026-07-01", "2026-07-02", "2026-07-03", "2026-07-06", "2026-07-07", "2026-07-08", "2026-07-09", "2026-07-10", "2026-07-13", "2026-07-14", "2026-07-15", "2026-07-16", "2026-07-17", "2026-07-20", "2026-07-21", "2026-07-22", "2026-07-23", "2026-07-24", "2026-07-27", "2026-07-28"], "pos120": 19.4, "t20": 0.4, "t_prior": -19.0, "decel": -0.05, "hl": true}, {"name": "Manus概念", "type": "聚源产业概念", "score": 89, "label": "🟢 确认碗底", "closes": [1040.56, 1032.59, 1032.09, 1015.15, 1010.87, 1038.89, 1008.36, 1006.07, 1013.65, 1038.31, 1061.07, 1059.68, 1065.0, 1067.01, 1014.8, 1003.2, 1027.62, 1057.24, 1033.71, 977.81, 977.4, 987.7, 1022.68, 1041.04, 1037.77, 1017.48, 1016.31, 977.18, 956.08, 928.71, 971.44, 957.11, 920.58, 859.91, 887.26, 908.91, 883.8, 896.84, 909.96, 908.11, 929.0, 901.49, 901.99, 897.52, 946.13, 920.24, 916.13, 913.68, 929.87, 930.66, 972.65, 978.4, 971.73, 947.52, 973.28, 987.64, 964.69, 924.68, 890.44, 893.28, 877.48, 912.36, 943.33, 947.86, 936.66, 908.48, 932.52, 900.51, 897.81, 912.4, 938.96, 901.96, 864.36, 867.52, 845.0, 818.41, 785.98, 801.16, 769.62, 779.34, 761.06, 753.85, 743.27, 748.74, 736.18, 742.25, 759.13, 724.48, 726.35, 748.23, 757.59, 743.06, 751.19, 759.26, 740.03, 726.85, 705.78, 672.14, 660.07, 673.17, 683.57, 669.77, 673.18, 654.52, 631.67, 643.73, 648.5, 677.85, 648.16, 643.23, 648.33, 658.94, 642.86, 659.97, 682.36, 677.43, 677.71, 643.27, 660.89, 660.55], "dates": ["2026-01-27", "2026-01-28", "2026-01-29", "2026-01-30", "2026-02-02", "2026-02-03", "2026-02-04", "2026-02-05", "2026-02-06", "2026-02-09", "2026-02-10", "2026-02-11", "2026-02-12", "2026-02-13", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02", "2026-04-03", "2026-04-07", "2026-04-08", "2026-04-09", "2026-04-10", "2026-04-13", "2026-04-14", "2026-04-15", "2026-04-16", "2026-04-17", "2026-04-20", "2026-04-21", "2026-04-22", "2026-04-23", "2026-04-24", "2026-04-27", "2026-04-28", "2026-04-29", "2026-04-30", "2026-05-06", "2026-05-07", "2026-05-08", "2026-05-11", "2026-05-12", "2026-05-13", "2026-05-14", "2026-05-15", "2026-05-18", "2026-05-19", "2026-05-20", "2026-05-21", "2026-05-22", "2026-05-25", "2026-05-26", "2026-05-27", "2026-05-28", "2026-05-29", "2026-06-01", "2026-06-02", "2026-06-03", "2026-06-04", "2026-06-05", "2026-06-08", "2026-06-09", "2026-06-10", "2026-06-11", "2026-06-12", "2026-06-15", "2026-06-16", "2026-06-17", "2026-06-18", "2026-06-22", "2026-06-23", "2026-06-24", "2026-06-25", "2026-06-26", "2026-06-29", "2026-06-30", "2026-07-01", "2026-07-02", "2026-07-03", "2026-07-06", "2026-07-07", "2026-07-08", "2026-07-09", "2026-07-10", "2026-07-13", "2026-07-14", "2026-07-15", "2026-07-16", "2026-07-17", "2026-07-20", "2026-07-21", "2026-07-22", "2026-07-23", "2026-07-24", "2026-07-27", "2026-07-28"], "pos120": 7.8, "t20": 0.1, "t_prior": -34.5, "decel": -0.01, "hl": true}, {"name": "玉米", "type": "聚源产业概念", "score": 88, "label": "🟢 确认碗底", "closes": [897.38, 929.37, 947.72, 990.31, 926.47, 931.4, 934.07, 908.91, 909.03, 913.65, 904.48, 907.67, 895.93, 890.81, 915.57, 932.79, 927.0, 942.19, 964.64, 976.91, 1016.38, 960.61, 998.19, 997.53, 991.16, 1008.43, 1010.15, 1010.88, 1033.78, 999.23, 979.07, 956.43, 931.5, 881.71, 894.74, 914.74, 906.28, 921.54, 953.44, 918.44, 916.14, 913.13, 878.49, 909.26, 915.0, 912.47, 909.3, 912.32, 917.56, 906.39, 914.38, 902.62, 906.59, 900.65, 898.53, 894.78, 880.62, 874.24, 879.19, 890.49, 891.89, 889.12, 879.57, 884.65, 887.65, 875.38, 873.57, 860.08, 843.25, 835.95, 839.95, 824.47, 805.19, 810.22, 801.51, 797.5, 789.56, 785.0, 783.39, 804.33, 786.53, 781.4, 769.48, 769.42, 753.4, 750.77, 745.93, 743.77, 754.94, 756.14, 748.88, 734.57, 726.22, 735.87, 736.44, 713.24, 698.97, 687.48, 691.09, 674.12, 694.52, 696.31, 696.93, 701.95, 682.66, 679.23, 674.85, 685.0, 675.29, 690.37, 702.5, 706.37, 690.26, 686.87, 681.52, 686.3, 704.17, 681.3, 691.89, 697.18], "dates": ["2026-01-27", "2026-01-28", "2026-01-29", "2026-01-30", "2026-02-02", "2026-02-03", "2026-02-04", "2026-02-05", "2026-02-06", "2026-02-09", "2026-02-10", "2026-02-11", "2026-02-12", "2026-02-13", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02", "2026-04-03", "2026-04-07", "2026-04-08", "2026-04-09", "2026-04-10", "2026-04-13", "2026-04-14", "2026-04-15", "2026-04-16", "2026-04-17", "2026-04-20", "2026-04-21", "2026-04-22", "2026-04-23", "2026-04-24", "2026-04-27", "2026-04-28", "2026-04-29", "2026-04-30", "2026-05-06", "2026-05-07", "2026-05-08", "2026-05-11", "2026-05-12", "2026-05-13", "2026-05-14", "2026-05-15", "2026-05-18", "2026-05-19", "2026-05-20", "2026-05-21", "2026-05-22", "2026-05-25", "2026-05-26", "2026-05-27", "2026-05-28", "2026-05-29", "2026-06-01", "2026-06-02", "2026-06-03", "2026-06-04", "2026-06-05", "2026-06-08", "2026-06-09", "2026-06-10", "2026-06-11", "2026-06-12", "2026-06-15", "2026-06-16", "2026-06-17", "2026-06-18", "2026-06-22", "2026-06-23", "2026-06-24", "2026-06-25", "2026-06-26", "2026-06-29", "2026-06-30", "2026-07-01", "2026-07-02", "2026-07-03", "2026-07-06", "2026-07-07", "2026-07-08", "2026-07-09", "2026-07-10", "2026-07-13", "2026-07-14", "2026-07-15", "2026-07-16", "2026-07-17", "2026-07-20", "2026-07-21", "2026-07-22", "2026-07-23", "2026-07-24", "2026-07-27", "2026-07-28"], "pos120": 8.1, "t20": 0.1, "t_prior": -26.3, "decel": -0.01, "hl": true}, {"name": "钢铁", "type": "申万一级行业", "score": 88, "label": "🟢 确认碗底", "closes": [2862.96, 2924.86, 2931.28, 2848.46, 2679.64, 2767.65, 2824.74, 2763.89, 2753.17, 2809.42, 2810.82, 2857.96, 2861.91, 2791.43, 2857.98, 2992.14, 3031.82, 3133.97, 3144.92, 3013.96, 2999.85, 3012.69, 3022.79, 3003.49, 2988.51, 2977.47, 2997.91, 2972.26, 2878.43, 2861.78, 2839.93, 2724.1, 2666.44, 2554.47, 2636.56, 2684.56, 2637.43, 2677.57, 2693.33, 2646.7, 2688.55, 2658.65, 2625.11, 2642.84, 2729.46, 2720.53, 2717.95, 2750.92, 2734.92, 2707.99, 2765.62, 2758.63, 2753.9, 2739.54, 2757.44, 2708.11, 2699.05, 2674.38, 2671.62, 2729.47, 2690.21, 2733.43, 2721.84, 2720.26, 2727.91, 2684.33, 2675.47, 2608.31, 2559.25, 2525.02, 2523.82, 2495.75, 2441.99, 2454.94, 2449.62, 2462.61, 2396.03, 2394.79, 2379.05, 2394.99, 2371.1, 2365.5, 2341.66, 2349.15, 2286.51, 2298.22, 2275.63, 2275.8, 2335.32, 2357.92, 2343.93, 2296.75, 2295.3, 2334.1, 2272.04, 2245.88, 2219.84, 2151.97, 2150.85, 2154.68, 2200.22, 2200.93, 2197.78, 2186.24, 2148.05, 2120.41, 2076.14, 2107.21, 2066.04, 2121.71, 2150.93, 2132.64, 2101.23, 2120.97, 2129.21, 2135.33, 2190.94, 2128.46, 2164.89, 2159.26], "dates": ["2026-01-27", "2026-01-28", "2026-01-29", "2026-01-30", "2026-02-02", "2026-02-03", "2026-02-04", "2026-02-05", "2026-02-06", "2026-02-09", "2026-02-10", "2026-02-11", "2026-02-12", "2026-02-13", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02", "2026-04-03", "2026-04-07", "2026-04-08", "2026-04-09", "2026-04-10", "2026-04-13", "2026-04-14", "2026-04-15", "2026-04-16", "2026-04-17", "2026-04-20", "2026-04-21", "2026-04-22", "2026-04-23", "2026-04-24", "2026-04-27", "2026-04-28", "2026-04-29", "2026-04-30", "2026-05-06", "2026-05-07", "2026-05-08", "2026-05-11", "2026-05-12", "2026-05-13", "2026-05-14", "2026-05-15", "2026-05-18", "2026-05-19", "2026-05-20", "2026-05-21", "2026-05-22", "2026-05-25", "2026-05-26", "2026-05-27", "2026-05-28", "2026-05-29", "2026-06-01", "2026-06-02", "2026-06-03", "2026-06-04", "2026-06-05", "2026-06-08", "2026-06-09", "2026-06-10", "2026-06-11", "2026-06-12", "2026-06-15", "2026-06-16", "2026-06-17", "2026-06-18", "2026-06-22", "2026-06-23", "2026-06-24", "2026-06-25", "2026-06-26", "2026-06-29", "2026-06-30", "2026-07-01", "2026-07-02", "2026-07-03", "2026-07-06", "2026-07-07", "2026-07-08", "2026-07-09", "2026-07-10", "2026-07-13", "2026-07-14", "2026-07-15", "2026-07-16", "2026-07-17", "2026-07-20", "2026-07-21", "2026-07-22", "2026-07-23", "2026-07-24", "2026-07-27", "2026-07-28"], "pos120": 9.8, "t20": -1.3, "t_prior": -22.8, "decel": 0.12, "hl": true}, {"name": "服务消费", "type": "聚源产业概念", "score": 85, "label": "🟢 确认碗底", "closes": [1280.21, 1266.68, 1301.36, 1260.05, 1254.13, 1291.49, 1289.94, 1303.76, 1302.06, 1369.03, 1340.84, 1367.63, 1327.72, 1334.35, 1200.97, 1157.55, 1129.35, 1136.12, 1101.15, 1067.74, 1082.26, 1077.89, 1080.28, 1058.85, 1063.08, 1048.0, 1039.68, 1033.33, 1059.84, 1062.38, 1056.88, 1023.04, 1017.96, 997.8, 998.51, 1012.61, 996.67, 1010.21, 999.07, 992.3, 1006.68, 986.95, 971.72, 958.47, 986.8, 957.2, 973.41, 971.44, 973.97, 964.11, 965.66, 941.69, 954.38, 948.45, 939.43, 934.5, 922.37, 925.19, 910.25, 929.84, 925.19, 888.67, 888.96, 883.74, 883.88, 867.81, 865.41, 857.23, 831.85, 819.31, 822.83, 815.08, 805.07, 798.72, 800.84, 797.03, 792.8, 772.07, 772.79, 783.01, 760.91, 748.14, 738.68, 746.11, 726.5, 729.72, 732.09, 711.17, 722.08, 725.41, 720.32, 707.48, 697.55, 696.24, 696.46, 683.25, 680.81, 665.02, 671.79, 663.68, 683.03, 681.96, 690.41, 688.93, 669.25, 666.71, 658.3, 673.68, 650.34, 660.79, 677.41, 687.36, 664.84, 665.2, 666.47, 667.83, 679.52, 658.08, 678.57, 687.41], "dates": ["2026-01-27", "2026-01-28", "2026-01-29", "2026-01-30", "2026-02-02", "2026-02-03", "2026-02-04", "2026-02-05", "2026-02-06", "2026-02-09", "2026-02-10", "2026-02-11", "2026-02-12", "2026-02-13", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02", "2026-04-03", "2026-04-07", "2026-04-08", "2026-04-09", "2026-04-10", "2026-04-13", "2026-04-14", "2026-04-15", "2026-04-16", "2026-04-17", "2026-04-20", "2026-04-21", "2026-04-22", "2026-04-23", "2026-04-24", "2026-04-27", "2026-04-28", "2026-04-29", "2026-04-30", "2026-05-06", "2026-05-07", "2026-05-08", "2026-05-11", "2026-05-12", "2026-05-13", "2026-05-14", "2026-05-15", "2026-05-18", "2026-05-19", "2026-05-20", "2026-05-21", "2026-05-22", "2026-05-25", "2026-05-26", "2026-05-27", "2026-05-28", "2026-05-29", "2026-06-01", "2026-06-02", "2026-06-03", "2026-06-04", "2026-06-05", "2026-06-08", "2026-06-09", "2026-06-10", "2026-06-11", "2026-06-12", "2026-06-15", "2026-06-16", "2026-06-17", "2026-06-18", "2026-06-22", "2026-06-23", "2026-06-24", "2026-06-25", "2026-06-26", "2026-06-29", "2026-06-30", "2026-07-01", "2026-07-02", "2026-07-03", "2026-07-06", "2026-07-07", "2026-07-08", "2026-07-09", "2026-07-10", "2026-07-13", "2026-07-14", "2026-07-15", "2026-07-16", "2026-07-17", "2026-07-20", "2026-07-21", "2026-07-22", "2026-07-23", "2026-07-24", "2026-07-27", "2026-07-28"], "pos120": 5.6, "t20": -1.0, "t_prior": -31.7, "decel": 0.07, "hl": true}, {"name": "尼帕病毒", "type": "聚源产业概念", "score": 85, "label": "🟢 碗底确认中", "closes": [1038.77, 1006.2, 962.88, 940.02, 902.72, 910.17, 917.08, 907.91, 909.77, 917.03, 915.69, 901.88, 892.36, 887.8, 886.75, 886.0, 876.07, 883.93, 859.61, 832.39, 823.7, 832.43, 851.65, 847.44, 860.55, 855.98, 865.67, 861.95, 862.88, 852.54, 860.87, 842.66, 826.32, 786.44, 808.62, 810.65, 794.71, 814.14, 812.44, 801.38, 836.35, 844.09, 821.49, 837.55, 860.45, 840.01, 830.44, 816.22, 827.75, 838.16, 838.59, 838.98, 847.9, 839.22, 846.09, 834.66, 827.64, 829.55, 819.6, 827.66, 823.48, 828.94, 839.02, 869.42, 925.23, 887.5, 879.53, 849.75, 830.71, 843.35, 859.3, 869.74, 831.88, 837.66, 853.43, 861.49, 848.84, 842.2, 834.45, 818.64, 788.19, 779.71, 755.76, 758.64, 735.16, 731.01, 721.03, 725.75, 738.18, 737.99, 732.87, 725.28, 722.83, 715.87, 728.36, 708.95, 689.51, 669.19, 690.67, 677.9, 697.46, 697.17, 714.87, 713.26, 690.5, 687.72, 683.0, 702.12, 692.69, 706.86, 731.17, 755.27, 707.07, 700.37, 688.88, 682.5, 689.41, 675.45, 693.75, 693.82], "dates": ["2026-01-27", "2026-01-28", "2026-01-29", "2026-01-30", "2026-02-02", "2026-02-03", "2026-02-04", "2026-02-05", "2026-02-06", "2026-02-09", "2026-02-10", "2026-02-11", "2026-02-12", "2026-02-13", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02", "2026-04-03", "2026-04-07", "2026-04-08", "2026-04-09", "2026-04-10", "2026-04-13", "2026-04-14", "2026-04-15", "2026-04-16", "2026-04-17", "2026-04-20", "2026-04-21", "2026-04-22", "2026-04-23", "2026-04-24", "2026-04-27", "2026-04-28", "2026-04-29", "2026-04-30", "2026-05-06", "2026-05-07", "2026-05-08", "2026-05-11", "2026-05-12", "2026-05-13", "2026-05-14", "2026-05-15", "2026-05-18", "2026-05-19", "2026-05-20", "2026-05-21", "2026-05-22", "2026-05-25", "2026-05-26", "2026-05-27", "2026-05-28", "2026-05-29", "2026-06-01", "2026-06-02", "2026-06-03", "2026-06-04", "2026-06-05", "2026-06-08", "2026-06-09", "2026-06-10", "2026-06-11", "2026-06-12", "2026-06-15", "2026-06-16", "2026-06-17", "2026-06-18", "2026-06-22", "2026-06-23", "2026-06-24", "2026-06-25", "2026-06-26", "2026-06-29", "2026-06-30", "2026-07-01", "2026-07-02", "2026-07-03", "2026-07-06", "2026-07-07", "2026-07-08", "2026-07-09", "2026-07-10", "2026-07-13", "2026-07-14", "2026-07-15", "2026-07-16", "2026-07-17", "2026-07-20", "2026-07-21", "2026-07-22", "2026-07-23", "2026-07-24", "2026-07-27", "2026-07-28"], "pos120": 10.4, "t20": -1.6, "t_prior": -27.4, "decel": 0.12, "hl": false}, {"name": "C股(上市次日至五日)", "type": "聚源风格概念", "score": 85, "label": "🟢 碗底确认中", "closes": [0.46, 0.46, 0.43, 0.38, 0.34, 0.33, 0.33, 0.33, 0.31, 0.35, 0.3, 0.29, 0.26, 0.27, 0.26, 0.25, 0.22, 0.19, 0.19, 0.19, 0.2, 0.19, 0.17, 0.17, 0.18, 0.16, 0.15, 0.17, 0.15, 0.15, 0.15, 0.14, 0.13, 0.11, 0.11, 0.1, 0.1, 0.1, 0.09, 0.1, 0.1, 0.1, 0.1, 0.11, 0.09, 0.07, 0.07, 0.06, 0.06, 0.06, 0.05, 0.05, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.03, 0.04, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.03, 0.02, 0.02, 0.02, 0.02, 0.02, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01], "dates": ["2024-12-30", "2024-12-31", "2025-01-02", "2025-01-03", "2025-01-06", "2025-01-07", "2025-01-08", "2025-01-09", "2025-01-13", "2025-01-14", "2025-01-15", "2025-01-16", "2025-01-17", "2025-01-20", "2025-01-21", "2025-01-23", "2025-01-24", "2025-01-27", "2025-02-05", "2025-02-06", "2025-02-07", "2025-02-10", "2025-03-04", "2025-03-05", "2025-03-06", "2025-03-07", "2025-03-10", "2025-03-12", "2025-03-13", "2025-03-14", "2025-03-17", "2025-03-19", "2025-03-20", "2025-03-21", "2025-03-24", "2025-03-25", "2025-03-26", "2025-03-27", "2025-03-28", "2025-03-31", "2025-04-01", "2025-04-02", "2025-04-03", "2025-04-07", "2025-04-08", "2025-04-09", "2025-04-10", "2025-04-11", "2025-04-14", "2025-04-15", "2025-04-16", "2025-04-17", "2025-04-18", "2025-04-21", "2025-04-22", "2025-04-23", "2025-04-25", "2025-04-28", "2025-04-29", "2025-04-30", "2025-05-06", "2025-05-19", "2025-05-20", "2025-05-21", "2025-05-22", "2025-05-23", "2025-05-30", "2025-06-03", "2025-06-04", "2025-06-05", "2025-06-06", "2025-06-09", "2025-06-10", "2025-06-11", "2025-06-12", "2025-06-13", "2025-06-16", "2025-06-17", "2025-06-18", "2025-06-23", "2025-06-24", "2025-06-25", "2025-06-26", "2025-07-02", "2025-07-03", "2025-07-04", "2025-07-07", "2025-07-09", "2025-07-10", "2025-07-11", "2025-07-14", "2025-07-15", "2025-07-16", "2025-07-17", "2025-07-18", "2025-07-21", "2025-07-22", "2025-07-24", "2025-07-25", "2025-07-28", "2025-07-29", "2025-07-31", "2025-08-01", "2025-08-04", "2025-08-05", "2025-08-07", "2025-08-08", "2025-08-11", "2025-08-12", "2025-08-13", "2025-08-14", "2025-08-15", "2025-08-18", "2025-09-09", "2025-09-10", "2025-09-11", "2025-12-11", "2025-12-12", "2025-12-15", "2025-12-16"], "pos120": 2.0, "t20": 0.0, "t_prior": -125.3, "decel": -0.0, "hl": false}, {"name": "敦煌网概念", "type": "聚源产业概念", "score": 83, "label": "🟢 确认碗底", "closes": [1248.61, 1248.5, 1268.54, 1231.29, 1216.21, 1229.91, 1237.95, 1246.26, 1251.88, 1257.13, 1251.46, 1246.21, 1238.62, 1229.01, 1205.14, 1220.83, 1217.77, 1229.73, 1190.92, 1178.89, 1157.43, 1161.87, 1186.91, 1184.89, 1188.86, 1181.79, 1188.05, 1158.77, 1161.12, 1140.81, 1145.33, 1122.27, 1096.53, 1049.26, 1071.66, 1092.4, 1072.92, 1086.07, 1078.16, 1078.35, 1091.94, 1076.98, 1061.63, 1082.93, 1116.07, 1088.59, 1111.38, 1082.78, 1085.3, 1089.85, 1097.32, 1126.78, 1120.72, 1116.6, 1115.71, 1115.06, 1090.93, 1103.51, 1087.02, 1098.79, 1098.39, 1106.78, 1109.06, 1113.81, 1127.2, 1113.75, 1113.37, 1104.19, 1099.57, 1083.92, 1095.65, 1088.73, 1068.22, 1064.45, 1065.71, 1064.33, 1045.54, 1036.76, 1038.87, 1062.12, 1034.47, 1023.49, 1011.07, 1004.24, 988.41, 987.38, 981.77, 960.42, 973.01, 983.29, 982.72, 965.95, 950.4, 961.76, 958.95, 928.31, 919.58, 889.83, 896.12, 899.88, 923.96, 922.0, 935.6, 931.75, 906.76, 901.37, 895.63, 904.66, 888.49, 896.05, 921.5, 932.75, 909.21, 921.55, 943.78, 938.2, 932.69, 906.51, 924.72, 947.76], "dates": ["2026-01-27", "2026-01-28", "2026-01-29", "2026-01-30", "2026-02-02", "2026-02-03", "2026-02-04", "2026-02-05", "2026-02-06", "2026-02-09", "2026-02-10", "2026-02-11", "2026-02-12", "2026-02-13", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02", "2026-04-03", "2026-04-07", "2026-04-08", "2026-04-09", "2026-04-10", "2026-04-13", "2026-04-14", "2026-04-15", "2026-04-16", "2026-04-17", "2026-04-20", "2026-04-21", "2026-04-22", "2026-04-23", "2026-04-24", "2026-04-27", "2026-04-28", "2026-04-29", "2026-04-30", "2026-05-06", "2026-05-07", "2026-05-08", "2026-05-11", "2026-05-12", "2026-05-13", "2026-05-14", "2026-05-15", "2026-05-18", "2026-05-19", "2026-05-20", "2026-05-21", "2026-05-22", "2026-05-25", "2026-05-26", "2026-05-27", "2026-05-28", "2026-05-29", "2026-06-01", "2026-06-02", "2026-06-03", "2026-06-04", "2026-06-05", "2026-06-08", "2026-06-09", "2026-06-10", "2026-06-11", "2026-06-12", "2026-06-15", "2026-06-16", "2026-06-17", "2026-06-18", "2026-06-22", "2026-06-23", "2026-06-24", "2026-06-25", "2026-06-26", "2026-06-29", "2026-06-30", "2026-07-01", "2026-07-02", "2026-07-03", "2026-07-06", "2026-07-07", "2026-07-08", "2026-07-09", "2026-07-10", "2026-07-13", "2026-07-14", "2026-07-15", "2026-07-16", "2026-07-17", "2026-07-20", "2026-07-21", "2026-07-22", "2026-07-23", "2026-07-24", "2026-07-27", "2026-07-28"], "pos120": 19.5, "t20": 1.9, "t_prior": -22.8, "decel": -0.17, "hl": true}, {"name": "油价相关", "type": "聚源产业概念", "score": 83, "label": "🟢 确认碗底", "closes": [2314.5, 2353.72, 2381.93, 2358.92, 2274.81, 2294.11, 2380.85, 2384.91, 2413.39, 2427.32, 2403.21, 2412.88, 2374.52, 2336.12, 2419.67, 2428.66, 2406.19, 2424.59, 2538.78, 2668.25, 2585.79, 2509.23, 2488.02, 2493.38, 2401.88, 2404.38, 2410.86, 2395.41, 2385.4, 2398.17, 2359.29, 2341.82, 2275.56, 2217.24, 2230.89, 2262.59, 2246.98, 2286.47, 2287.98, 2240.9, 2259.98, 2278.35, 2234.62, 2261.54, 2274.19, 2254.02, 2253.83, 2268.22, 2246.05, 2225.71, 2241.77, 2237.75, 2259.57, 2260.88, 2243.87, 2237.22, 2216.45, 2213.55, 2224.85, 2267.43, 2273.39, 2259.06, 2226.52, 2267.12, 2267.74, 2242.7, 2259.59, 2229.65, 2204.26, 2201.15, 2200.97, 2181.1, 2124.21, 2108.19, 2095.66, 2086.67, 2034.44, 2033.39, 2028.05, 2060.97, 2034.17, 2043.87, 2034.78, 2037.26, 1989.6, 1959.72, 1941.21, 1934.95, 1978.0, 1990.14, 1952.88, 1933.31, 1902.73, 1913.6, 1905.38, 1884.08, 1870.92, 1829.07, 1816.7, 1780.77, 1824.2, 1827.08, 1836.52, 1843.12, 1804.38, 1808.61, 1796.93, 1806.17, 1788.12, 1857.9, 1844.02, 1829.11, 1812.39, 1860.91, 1824.6, 1849.23, 1892.99, 1842.62, 1852.6, 1853.34], "dates": ["2026-01-27", "2026-01-28", "2026-01-29", "2026-01-30", "2026-02-02", "2026-02-03", "2026-02-04", "2026-02-05", "2026-02-06", "2026-02-09", "2026-02-10", "2026-02-11", "2026-02-12", "2026-02-13", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02", "2026-04-03", "2026-04-07", "2026-04-08", "2026-04-09", "2026-04-10", "2026-04-13", "2026-04-14", "2026-04-15", "2026-04-16", "2026-04-17", "2026-04-20", "2026-04-21", "2026-04-22", "2026-04-23", "2026-04-24", "2026-04-27", "2026-04-28", "2026-04-29", "2026-04-30", "2026-05-06", "2026-05-07", "2026-05-08", "2026-05-11", "2026-05-12", "2026-05-13", "2026-05-14", "2026-05-15", "2026-05-18", "2026-05-19", "2026-05-20", "2026-05-21", "2026-05-22", "2026-05-25", "2026-05-26", "2026-05-27", "2026-05-28", "2026-05-29", "2026-06-01", "2026-06-02", "2026-06-03", "2026-06-04", "2026-06-05", "2026-06-08", "2026-06-09", "2026-06-10", "2026-06-11", "2026-06-12", "2026-06-15", "2026-06-16", "2026-06-17", "2026-06-18", "2026-06-22", "2026-06-23", "2026-06-24", "2026-06-25", "2026-06-26", "2026-06-29", "2026-06-30", "2026-07-01", "2026-07-02", "2026-07-03", "2026-07-06", "2026-07-07", "2026-07-08", "2026-07-09", "2026-07-10", "2026-07-13", "2026-07-14", "2026-07-15", "2026-07-16", "2026-07-17", "2026-07-20", "2026-07-21", "2026-07-22", "2026-07-23", "2026-07-24", "2026-07-27", "2026-07-28"], "pos120": 10.4, "t20": 2.4, "t_prior": -23.4, "decel": -0.21, "hl": true}];
+const colors = ['#e74c3c','#2980b9','#9b59b6','#16a085','#e67e22','#34495e','#1abc9c','#d35400','#8e44ad'];
+const grid = document.getElementById('chartsGrid');
+chartData.forEach((c, idx) => {
+  const card = document.createElement('div');
+  card.className = 'chart-card';
+  const hlText = c.hl ? '抬底✓' : '新低✗';
+  const hlColor = c.hl ? '#27ae60' : '#e74c3c';
+  card.innerHTML = `
+    <h4><span style="color:${colors[idx%colors.length]}">●</span> ${c.name} <span class="muted">${c.type}</span></h4>
+    <div class="sub">得分${c.score} · 120日位${c.pos120}% · 近20日${c.t20>0?'+':''}${c.t20}% · 减速${c.decel} · <span style="color:${hlColor}">${hlText}</span></div>
+    <div class="chart-box"><canvas></canvas></div>
+  `;
+  grid.appendChild(card);
+  const ctx = card.querySelector('canvas');
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: c.dates,
+      datasets: [{ data: c.closes, borderColor: colors[idx%colors.length], backgroundColor: colors[idx%colors.length]+'15', borderWidth: 1.8, pointRadius:0, fill:true, tension:0.35 }]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins: { legend:{display:false}, tooltip:{ callbacks:{ title:(i)=>c.dates[i[0].dataIndex], label:(i)=>'点位 '+i.parsed.y }}},
+      scales: { x: { display:false }, y: { display:true, position:'right', ticks:{ font:{size:9}, color:'#95a5a6' }, grid:{ color:'#f0f2f5' } } }
+    }
+  });
+});
+</script>
+</body>
+</html>

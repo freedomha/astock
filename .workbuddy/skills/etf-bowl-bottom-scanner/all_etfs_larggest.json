@@ -1,0 +1,2466 @@
+[
+  {
+    "code": "sh510300",
+    "name": "沪深300ETF华泰柏瑞",
+    "type": "ETF",
+    "size": 117252066752.91,
+    "totalMV": 1169.95
+  },
+  {
+    "code": "sh511880",
+    "name": "银华日利ETF",
+    "type": "ETF",
+    "size": 94198745831.06,
+    "totalMV": 927.94
+  },
+  {
+    "code": "sh518880",
+    "name": "黄金ETF华安",
+    "type": "ETF",
+    "size": 92150802556.56,
+    "totalMV": 906.5
+  },
+  {
+    "code": "sh588000",
+    "name": "科创50ETF华夏",
+    "type": "ETF",
+    "size": 87897922790.58,
+    "totalMV": 828.59
+  },
+  {
+    "code": "sh511360",
+    "name": "短融ETF海富通",
+    "type": "ETF",
+    "size": 86823616078.56,
+    "totalMV": 854.13
+  },
+  {
+    "code": "sh511990",
+    "name": "华宝添益ETF",
+    "type": "ETF",
+    "size": 83583450000,
+    "totalMV": 829.59
+  },
+  {
+    "code": "sh511380",
+    "name": "可转债ETF博时",
+    "type": "ETF",
+    "size": 64475892827.34,
+    "totalMV": 638.74
+  },
+  {
+    "code": "sh512880",
+    "name": "证券ETF国泰",
+    "type": "ETF",
+    "size": 63022170390.9,
+    "totalMV": 628.27
+  },
+  {
+    "code": "sz159915",
+    "name": "创业板ETF易方达",
+    "type": "ETF",
+    "size": 61352250211.6656,
+    "totalMV": 638.68
+  },
+  {
+    "code": "sh511220",
+    "name": "城投债ETF海富通",
+    "type": "ETF",
+    "size": 54927653691.12,
+    "totalMV": 549.13
+  },
+  {
+    "code": "sh588200",
+    "name": "科创芯片ETF嘉实",
+    "type": "ETF",
+    "size": 54307715103.49,
+    "totalMV": 481.7
+  },
+  {
+    "code": "sh510500",
+    "name": "中证500ETF南方",
+    "type": "ETF",
+    "size": 47437516248.58,
+    "totalMV": 417.56
+  },
+  {
+    "code": "sh515880",
+    "name": "通信ETF国泰",
+    "type": "ETF",
+    "size": 44215237235.4,
+    "totalMV": 404.72
+  },
+  {
+    "code": "sh511520",
+    "name": "政金债ETF富国",
+    "type": "ETF",
+    "size": 43179472685.95,
+    "totalMV": 434.03
+  },
+  {
+    "code": "sz159516",
+    "name": "半导体设备ETF国泰",
+    "type": "ETF",
+    "size": 42157640682.5408,
+    "totalMV": 378.93
+  },
+  {
+    "code": "sh511030",
+    "name": "公司债ETF平安",
+    "type": "ETF",
+    "size": 41952861427.05,
+    "totalMV": 419.45
+  },
+  {
+    "code": "sz159792",
+    "name": "港股通互联网ETF富国",
+    "type": "ETF",
+    "size": 41385082010.778,
+    "totalMV": 430.25
+  },
+  {
+    "code": "sh512000",
+    "name": "券商ETF华宝",
+    "type": "ETF",
+    "size": 40184203894.74,
+    "totalMV": 401.03
+  },
+  {
+    "code": "sh588170",
+    "name": "科创半导体ETF华夏",
+    "type": "ETF",
+    "size": 37039027401.6,
+    "totalMV": 337.34
+  },
+  {
+    "code": "sh563360",
+    "name": "A500ETF华泰柏瑞",
+    "type": "ETF",
+    "size": 36855303544.4,
+    "totalMV": 364.24
+  },
+  {
+    "code": "sh512890",
+    "name": "红利低波ETF华泰柏瑞",
+    "type": "ETF",
+    "size": 34620006859,
+    "totalMV": 350.97
+  },
+  {
+    "code": "sh511090",
+    "name": "30年国债ETF鹏扬",
+    "type": "ETF",
+    "size": 32753857642.52,
+    "totalMV": 331.99
+  },
+  {
+    "code": "sz159995",
+    "name": "芯片ETF华夏",
+    "type": "ETF",
+    "size": 29070968827.4964,
+    "totalMV": 259.87
+  },
+  {
+    "code": "sh512100",
+    "name": "中证1000ETF南方",
+    "type": "ETF",
+    "size": 27559077167.52,
+    "totalMV": 253.98
+  },
+  {
+    "code": "sz159338",
+    "name": "中证A500ETF国泰",
+    "type": "ETF",
+    "size": 26760732055.3664,
+    "totalMV": 261.06
+  },
+  {
+    "code": "sh512170",
+    "name": "医疗ETF华宝",
+    "type": "ETF",
+    "size": 25799297111.25,
+    "totalMV": 259.01
+  },
+  {
+    "code": "sh510880",
+    "name": "红利ETF华泰柏瑞",
+    "type": "ETF",
+    "size": 24641185530.06,
+    "totalMV": 239.64
+  },
+  {
+    "code": "sz159570",
+    "name": "港股通创新药ETF汇添富",
+    "type": "ETF",
+    "size": 24432466497.0672,
+    "totalMV": 242.37
+  },
+  {
+    "code": "sz159949",
+    "name": "创业板50ETF华安",
+    "type": "ETF",
+    "size": 24155179538.1792,
+    "totalMV": 244.92
+  },
+  {
+    "code": "sh510050",
+    "name": "上证50ETF华夏",
+    "type": "ETF",
+    "size": 23299412074.4,
+    "totalMV": 226.38
+  },
+  {
+    "code": "sh512400",
+    "name": "有色金属ETF南方",
+    "type": "ETF",
+    "size": 22597825609.4,
+    "totalMV": 221.72
+  },
+  {
+    "code": "sz159819",
+    "name": "人工智能ETF易方达",
+    "type": "ETF",
+    "size": 21935384961.6194,
+    "totalMV": 205.17
+  },
+  {
+    "code": "sh511200",
+    "name": "信用债ETF华夏",
+    "type": "ETF",
+    "size": 21915572786.25,
+    "totalMV": 219.79
+  },
+  {
+    "code": "sh512480",
+    "name": "半导体ETF国联安",
+    "type": "ETF",
+    "size": 20975424476.96,
+    "totalMV": 187.34
+  },
+  {
+    "code": "sh511260",
+    "name": "十年国债ETF国泰",
+    "type": "ETF",
+    "size": 19942851201,
+    "totalMV": 199.48
+  },
+  {
+    "code": "sh515450",
+    "name": "红利低波50ETF南方",
+    "type": "ETF",
+    "size": 19685769980.5,
+    "totalMV": 200.23
+  },
+  {
+    "code": "sz159326",
+    "name": "电网设备ETF华夏",
+    "type": "ETF",
+    "size": 19575113505.5425,
+    "totalMV": 191.71
+  },
+  {
+    "code": "sh513090",
+    "name": "香港证券ETF易方达",
+    "type": "ETF",
+    "size": 18904954614,
+    "totalMV": 187.04
+  },
+  {
+    "code": "sh510210",
+    "name": "上证指数ETF富国",
+    "type": "ETF",
+    "size": 17654217043.54,
+    "totalMV": 180.94
+  },
+  {
+    "code": "sh510180",
+    "name": "上证180ETF华安",
+    "type": "ETF",
+    "size": 17628281972.9,
+    "totalMV": 173.22
+  },
+  {
+    "code": "sz159992",
+    "name": "创新药ETF银华",
+    "type": "ETF",
+    "size": 17372843694.1332,
+    "totalMV": 173
+  },
+  {
+    "code": "sh562500",
+    "name": "机器人ETF华夏",
+    "type": "ETF",
+    "size": 17158485079.61,
+    "totalMV": 166.95
+  },
+  {
+    "code": "sh512010",
+    "name": "医药ETF易方达",
+    "type": "ETF",
+    "size": 17115002948.61,
+    "totalMV": 172.18
+  },
+  {
+    "code": "sz159781",
+    "name": "科创创业ETF易方达",
+    "type": "ETF",
+    "size": 16930496085.3106,
+    "totalMV": 160.18
+  },
+  {
+    "code": "sz159201",
+    "name": "自由现金流ETF华夏",
+    "type": "ETF",
+    "size": 16866478281.9511,
+    "totalMV": 171.67
+  },
+  {
+    "code": "sh512070",
+    "name": "证券保险ETF易方达",
+    "type": "ETF",
+    "size": 15793152873.99,
+    "totalMV": 156.58
+  },
+  {
+    "code": "sz159928",
+    "name": "消费ETF汇添富",
+    "type": "ETF",
+    "size": 15308839561.576,
+    "totalMV": 158.12
+  },
+  {
+    "code": "sh513750",
+    "name": "港股通非银ETF广发",
+    "type": "ETF",
+    "size": 15274744350.8,
+    "totalMV": 153.16
+  },
+  {
+    "code": "sh515220",
+    "name": "煤炭ETF国泰",
+    "type": "ETF",
+    "size": 14797995674.89,
+    "totalMV": 146.41
+  },
+  {
+    "code": "sz159206",
+    "name": "卫星ETF永赢",
+    "type": "ETF",
+    "size": 14352863783.2965,
+    "totalMV": 137.48
+  },
+  {
+    "code": "sz159870",
+    "name": "化工ETF鹏华",
+    "type": "ETF",
+    "size": 14267501677.9827,
+    "totalMV": 142.87
+  },
+  {
+    "code": "sh512690",
+    "name": "酒ETF鹏华",
+    "type": "ETF",
+    "size": 14070828088.98,
+    "totalMV": 145.84
+  },
+  {
+    "code": "sh513630",
+    "name": "港股低波红利ETF摩根",
+    "type": "ETF",
+    "size": 12548558635.9,
+    "totalMV": 127.78
+  },
+  {
+    "code": "sh515080",
+    "name": "中证红利ETF招商",
+    "type": "ETF",
+    "size": 12333251718.86,
+    "totalMV": 125.06
+  },
+  {
+    "code": "sh517520",
+    "name": "黄金股ETF永赢",
+    "type": "ETF",
+    "size": 12176855012.8,
+    "totalMV": 121.57
+  },
+  {
+    "code": "sh513980",
+    "name": "港股科技ETF景顺",
+    "type": "ETF",
+    "size": 12105108123.6,
+    "totalMV": 121.22
+  },
+  {
+    "code": "sh511100",
+    "name": "国债ETF华夏",
+    "type": "ETF",
+    "size": 11977514301.6,
+    "totalMV": 120.34
+  },
+  {
+    "code": "sh511120",
+    "name": "科创债ETF广发",
+    "type": "ETF",
+    "size": 11609368958.64,
+    "totalMV": 119.56
+  },
+  {
+    "code": "sh512800",
+    "name": "银行ETF华宝",
+    "type": "ETF",
+    "size": 11412631615.38,
+    "totalMV": 112.21
+  },
+  {
+    "code": "sz159611",
+    "name": "电力ETF广发",
+    "type": "ETF",
+    "size": 11004178182.87,
+    "totalMV": 110.26
+  },
+  {
+    "code": "sh511270",
+    "name": "10年地方债ETF海富通",
+    "type": "ETF",
+    "size": 10008511708,
+    "totalMV": 100.03
+  },
+  {
+    "code": "sh588710",
+    "name": "科创半导体设备ETF华泰柏瑞",
+    "type": "ETF",
+    "size": 9530862264,
+    "totalMV": 85.99
+  },
+  {
+    "code": "sz159755",
+    "name": "电池ETF广发",
+    "type": "ETF",
+    "size": 8627450950.5334,
+    "totalMV": 86.52
+  },
+  {
+    "code": "sh560860",
+    "name": "工业有色ETF万家",
+    "type": "ETF",
+    "size": 8624297295.8,
+    "totalMV": 84.92
+  },
+  {
+    "code": "sz159869",
+    "name": "游戏ETF华夏",
+    "type": "ETF",
+    "size": 8457028624.1337,
+    "totalMV": 88.14
+  },
+  {
+    "code": "sh511580",
+    "name": "国债政金债ETF招商",
+    "type": "ETF",
+    "size": 8172009007.8,
+    "totalMV": 78.98
+  },
+  {
+    "code": "sz159852",
+    "name": "软件ETF嘉实",
+    "type": "ETF",
+    "size": 7929294375.0363,
+    "totalMV": 79.41
+  },
+  {
+    "code": "sh511660",
+    "name": "货币ETF建信",
+    "type": "ETF",
+    "size": 7454160000,
+    "totalMV": 74.53
+  },
+  {
+    "code": "sz159363",
+    "name": "创业板人工智能ETF华宝",
+    "type": "ETF",
+    "size": 7257956941.2648,
+    "totalMV": 66.42
+  },
+  {
+    "code": "sh512710",
+    "name": "军工龙头ETF富国",
+    "type": "ETF",
+    "size": 7159561673.04,
+    "totalMV": 71.38
+  },
+  {
+    "code": "sh518680",
+    "name": "金ETF富国",
+    "type": "ETF",
+    "size": 6906250960.2,
+    "totalMV": 69.72
+  },
+  {
+    "code": "sh512660",
+    "name": "军工ETF国泰",
+    "type": "ETF",
+    "size": 6339430784,
+    "totalMV": 62.53
+  },
+  {
+    "code": "sz159851",
+    "name": "金融科技ETF华宝",
+    "type": "ETF",
+    "size": 6236656214.136,
+    "totalMV": 63.13
+  },
+  {
+    "code": "sh512950",
+    "name": "央企改革ETF华夏",
+    "type": "ETF",
+    "size": 6131882491.6,
+    "totalMV": 59.82
+  },
+  {
+    "code": "sh516150",
+    "name": "稀土ETF嘉实",
+    "type": "ETF",
+    "size": 6100819357.5,
+    "totalMV": 59.29
+  },
+  {
+    "code": "sh515100",
+    "name": "红利低波100ETF景顺",
+    "type": "ETF",
+    "size": 5940817251.75,
+    "totalMV": 60.82
+  },
+  {
+    "code": "sh563300",
+    "name": "中证2000ETF华泰柏瑞",
+    "type": "ETF",
+    "size": 5660844418,
+    "totalMV": 58.46
+  },
+  {
+    "code": "sh512960",
+    "name": "央企结构调整ETF博时",
+    "type": "ETF",
+    "size": 5642887872.71,
+    "totalMV": 55
+  },
+  {
+    "code": "sh513770",
+    "name": "港股互联网ETF华宝",
+    "type": "ETF",
+    "size": 5498634195.6,
+    "totalMV": 57.27
+  },
+  {
+    "code": "sh588220",
+    "name": "科创100ETF鹏华",
+    "type": "ETF",
+    "size": 5464809002.7,
+    "totalMV": 49.53
+  },
+  {
+    "code": "sh515800",
+    "name": "中证800ETF汇添富",
+    "type": "ETF",
+    "size": 5224971217.24,
+    "totalMV": 51.18
+  },
+  {
+    "code": "sz159566",
+    "name": "储能电池ETF易方达",
+    "type": "ETF",
+    "size": 5214425230.56,
+    "totalMV": 50.11
+  },
+  {
+    "code": "sh562800",
+    "name": "稀有金属ETF嘉实",
+    "type": "ETF",
+    "size": 5149737629.5,
+    "totalMV": 49.77
+  },
+  {
+    "code": "sh515790",
+    "name": "光伏ETF华泰柏瑞",
+    "type": "ETF",
+    "size": 5082318410.4,
+    "totalMV": 48.92
+  },
+  {
+    "code": "sh515300",
+    "name": "300红利低波ETF嘉实",
+    "type": "ETF",
+    "size": 5011835234.4,
+    "totalMV": 50.86
+  },
+  {
+    "code": "sh510810",
+    "name": "上海国企ETF汇添富",
+    "type": "ETF",
+    "size": 4975406298.95,
+    "totalMV": 50.26
+  },
+  {
+    "code": "sz159227",
+    "name": "航空航天ETF华夏",
+    "type": "ETF",
+    "size": 4953581739.1041,
+    "totalMV": 49.16
+  },
+  {
+    "code": "sh512040",
+    "name": "价值ETF富国",
+    "type": "ETF",
+    "size": 4714046490.33,
+    "totalMV": 48.53
+  },
+  {
+    "code": "sz159691",
+    "name": "港股红利ETF工银",
+    "type": "ETF",
+    "size": 4673083909.6172,
+    "totalMV": 47.63
+  },
+  {
+    "code": "sh513920",
+    "name": "港股通央企红利ETF华安",
+    "type": "ETF",
+    "size": 4279092177.6,
+    "totalMV": 43.15
+  },
+  {
+    "code": "sh515170",
+    "name": "食品饮料ETF华夏",
+    "type": "ETF",
+    "size": 4178068634,
+    "totalMV": 43.57
+  },
+  {
+    "code": "sh589720",
+    "name": "科创创新药ETF国泰",
+    "type": "ETF",
+    "size": 4147396717.5,
+    "totalMV": 42.44
+  },
+  {
+    "code": "sh515000",
+    "name": "科技ETF华宝",
+    "type": "ETF",
+    "size": 4143537001.24,
+    "totalMV": 37.3
+  },
+  {
+    "code": "sh518860",
+    "name": "上海金ETF建信",
+    "type": "ETF",
+    "size": 4027108761.98,
+    "totalMV": 39.65
+  },
+  {
+    "code": "sh516160",
+    "name": "新能源ETF南方",
+    "type": "ETF",
+    "size": 3885055641.4,
+    "totalMV": 37.32
+  },
+  {
+    "code": "sh515900",
+    "name": "央企创新ETF博时",
+    "type": "ETF",
+    "size": 3705570387.75,
+    "totalMV": 36.53
+  },
+  {
+    "code": "sz159732",
+    "name": "消费电子ETF华夏",
+    "type": "ETF",
+    "size": 3683868471.584,
+    "totalMV": 33.35
+  },
+  {
+    "code": "sz159901",
+    "name": "深证100ETF易方达",
+    "type": "ETF",
+    "size": 3630862564.803,
+    "totalMV": 34.99
+  },
+  {
+    "code": "sh512290",
+    "name": "生物医药ETF国泰",
+    "type": "ETF",
+    "size": 3616227473.91,
+    "totalMV": 36.08
+  },
+  {
+    "code": "sh512980",
+    "name": "传媒ETF广发",
+    "type": "ETF",
+    "size": 3370298945.04,
+    "totalMV": 34.3
+  },
+  {
+    "code": "sh562060",
+    "name": "标普A股红利ETF华宝",
+    "type": "ETF",
+    "size": 3350675342.28,
+    "totalMV": 34.1
+  },
+  {
+    "code": "sh515650",
+    "name": "消费50ETF富国",
+    "type": "ETF",
+    "size": 3343864003.2,
+    "totalMV": 34.7
+  },
+  {
+    "code": "sz159506",
+    "name": "港股通创新药医疗ETF富国",
+    "type": "ETF",
+    "size": 3249521384.4834,
+    "totalMV": 32.19
+  },
+  {
+    "code": "sh513660",
+    "name": "恒生ETF华夏",
+    "type": "ETF",
+    "size": 3196256300.4,
+    "totalMV": 32.41
+  },
+  {
+    "code": "sh512200",
+    "name": "房地产ETF南方",
+    "type": "ETF",
+    "size": 3190623834.66,
+    "totalMV": 32.92
+  },
+  {
+    "code": "sh560280",
+    "name": "工程机械ETF广发",
+    "type": "ETF",
+    "size": 3163749327.2,
+    "totalMV": 30.78
+  },
+  {
+    "code": "sh512930",
+    "name": "AI人工智能ETF平安",
+    "type": "ETF",
+    "size": 3155773335.12,
+    "totalMV": 29.54
+  },
+  {
+    "code": "sz159652",
+    "name": "有色ETF汇添富",
+    "type": "ETF",
+    "size": 3155556271.1387,
+    "totalMV": 31.27
+  },
+  {
+    "code": "sz159766",
+    "name": "旅游ETF富国",
+    "type": "ETF",
+    "size": 3117399637.1168,
+    "totalMV": 31.58
+  },
+  {
+    "code": "sh560050",
+    "name": "中国A50ETF汇添富",
+    "type": "ETF",
+    "size": 2861411538.16,
+    "totalMV": 27.35
+  },
+  {
+    "code": "sh561580",
+    "name": "央企红利ETF华泰柏瑞",
+    "type": "ETF",
+    "size": 2816528942.67,
+    "totalMV": 28.36
+  },
+  {
+    "code": "sh513780",
+    "name": "港股创新药ETF景顺",
+    "type": "ETF",
+    "size": 2769234926.7,
+    "totalMV": 27.47
+  },
+  {
+    "code": "sh516510",
+    "name": "云计算ETF易方达",
+    "type": "ETF",
+    "size": 2694331304,
+    "totalMV": 25.23
+  },
+  {
+    "code": "sh510720",
+    "name": "红利国企ETF国泰",
+    "type": "ETF",
+    "size": 2633843660,
+    "totalMV": 26.51
+  },
+  {
+    "code": "sh560080",
+    "name": "中药ETF汇添富",
+    "type": "ETF",
+    "size": 2577727350,
+    "totalMV": 25.7
+  },
+  {
+    "code": "sh588790",
+    "name": "科创AIETF博时",
+    "type": "ETF",
+    "size": 2536745024,
+    "totalMV": 23.85
+  },
+  {
+    "code": "sh563390",
+    "name": "全指现金流ETF华泰柏瑞",
+    "type": "ETF",
+    "size": 2407602787.2,
+    "totalMV": 25.5
+  },
+  {
+    "code": "sz159131",
+    "name": "港股通信息技术ETF华宝",
+    "type": "ETF",
+    "size": 2351207997.9102,
+    "totalMV": 22.65
+  },
+  {
+    "code": "sh513820",
+    "name": "港股通红利ETF汇添富",
+    "type": "ETF",
+    "size": 2285224112.7,
+    "totalMV": 23.17
+  },
+  {
+    "code": "sz159101",
+    "name": "港股通科技ETF华夏",
+    "type": "ETF",
+    "size": 2274847658.379,
+    "totalMV": 23.39
+  },
+  {
+    "code": "sz159667",
+    "name": "工业母机ETF国泰",
+    "type": "ETF",
+    "size": 2120613194.931,
+    "totalMV": 19.45
+  },
+  {
+    "code": "sh589070",
+    "name": "科创芯片设计ETF天弘",
+    "type": "ETF",
+    "size": 2050674110.9,
+    "totalMV": 18.5
+  },
+  {
+    "code": "sh511060",
+    "name": "5年地方债ETF海富通",
+    "type": "ETF",
+    "size": 2028785156.21,
+    "totalMV": 20.51
+  },
+  {
+    "code": "sh561360",
+    "name": "石油ETF国泰",
+    "type": "ETF",
+    "size": 2026414886,
+    "totalMV": 19.81
+  },
+  {
+    "code": "sh562550",
+    "name": "绿电ETF华夏",
+    "type": "ETF",
+    "size": 2004223610.97,
+    "totalMV": 19.84
+  },
+  {
+    "code": "sh589680",
+    "name": "科创综指ETF鹏华",
+    "type": "ETF",
+    "size": 1981262509.8,
+    "totalMV": 18.39
+  },
+  {
+    "code": "sh516670",
+    "name": "畜牧养殖ETF招商",
+    "type": "ETF",
+    "size": 1945985064.84,
+    "totalMV": 19.57
+  },
+  {
+    "code": "sh513190",
+    "name": "港股通金融ETF华夏",
+    "type": "ETF",
+    "size": 1887364953.6,
+    "totalMV": 19.59
+  },
+  {
+    "code": "sh588300",
+    "name": "科创创业50ETF招商",
+    "type": "ETF",
+    "size": 1873111015.05,
+    "totalMV": 17.16
+  },
+  {
+    "code": "sh513550",
+    "name": "港股通50ETF华泰柏瑞",
+    "type": "ETF",
+    "size": 1869975460.8,
+    "totalMV": 18.98
+  },
+  {
+    "code": "sh588760",
+    "name": "科创人工智能ETF广发",
+    "type": "ETF",
+    "size": 1824065850.4,
+    "totalMV": 17.21
+  },
+  {
+    "code": "sh516820",
+    "name": "医疗创新ETF平安",
+    "type": "ETF",
+    "size": 1775652222.96,
+    "totalMV": 17.87
+  },
+  {
+    "code": "sh561550",
+    "name": "中证500增强ETF华泰柏瑞",
+    "type": "ETF",
+    "size": 1765980544,
+    "totalMV": 17.67
+  },
+  {
+    "code": "sh517160",
+    "name": "长江保护ETF南方",
+    "type": "ETF",
+    "size": 1740370924.25,
+    "totalMV": 16.81
+  },
+  {
+    "code": "sh560710",
+    "name": "船舶ETF富国",
+    "type": "ETF",
+    "size": 1731950536,
+    "totalMV": 17.62
+  },
+  {
+    "code": "sh513600",
+    "name": "恒生指数ETF南方",
+    "type": "ETF",
+    "size": 1676693724.2,
+    "totalMV": 17.07
+  },
+  {
+    "code": "sh512670",
+    "name": "国防ETF鹏华",
+    "type": "ETF",
+    "size": 1665933054.52,
+    "totalMV": 16.39
+  },
+  {
+    "code": "sh515400",
+    "name": "大数据ETF富国",
+    "type": "ETF",
+    "size": 1659574434.04,
+    "totalMV": 15.5
+  },
+  {
+    "code": "sz159601",
+    "name": "A50ETF华夏",
+    "type": "ETF",
+    "size": 1643286540.826,
+    "totalMV": 16.02
+  },
+  {
+    "code": "sz159825",
+    "name": "农业ETF富国",
+    "type": "ETF",
+    "size": 1630235835.7479,
+    "totalMV": 16.32
+  },
+  {
+    "code": "sh562960",
+    "name": "绿色电力ETF易方达",
+    "type": "ETF",
+    "size": 1587861615.9,
+    "totalMV": 15.8
+  },
+  {
+    "code": "sh563080",
+    "name": "中证A50ETF易方达",
+    "type": "ETF",
+    "size": 1573273055.6,
+    "totalMV": 15.6
+  },
+  {
+    "code": "sh561330",
+    "name": "矿业ETF国泰",
+    "type": "ETF",
+    "size": 1572925245.01,
+    "totalMV": 15.44
+  },
+  {
+    "code": "sh515700",
+    "name": "新能源车ETF平安",
+    "type": "ETF",
+    "size": 1545723762.66,
+    "totalMV": 15.3
+  },
+  {
+    "code": "sz159840",
+    "name": "锂电池ETF工银",
+    "type": "ETF",
+    "size": 1544325358.6193,
+    "totalMV": 15.22
+  },
+  {
+    "code": "sh560570",
+    "name": "A500红利ETF国联安",
+    "type": "ETF",
+    "size": 1460530176.6,
+    "totalMV": 14.92
+  },
+  {
+    "code": "sh513070",
+    "name": "港股通消费ETF易方达",
+    "type": "ETF",
+    "size": 1427503728.56,
+    "totalMV": 14.74
+  },
+  {
+    "code": "sh588460",
+    "name": "科创50增强ETF鹏华",
+    "type": "ETF",
+    "size": 1398737744.6,
+    "totalMV": 12.74
+  },
+  {
+    "code": "sh588330",
+    "name": "双创50ETF华宝",
+    "type": "ETF",
+    "size": 1380041180.1,
+    "totalMV": 13.03
+  },
+  {
+    "code": "sh588020",
+    "name": "科创成长ETF易方达",
+    "type": "ETF",
+    "size": 1324106646.3,
+    "totalMV": 11.52
+  },
+  {
+    "code": "sh516970",
+    "name": "基建ETF广发",
+    "type": "ETF",
+    "size": 1253485282.5,
+    "totalMV": 12.6
+  },
+  {
+    "code": "sh517300",
+    "name": "沪港深300ETF国寿",
+    "type": "ETF",
+    "size": 1233689292.5,
+    "totalMV": 12.07
+  },
+  {
+    "code": "sh515210",
+    "name": "钢铁ETF国泰",
+    "type": "ETF",
+    "size": 1171164442.77,
+    "totalMV": 12.1
+  },
+  {
+    "code": "sh516570",
+    "name": "化工行业ETF易方达",
+    "type": "ETF",
+    "size": 1169299454.4,
+    "totalMV": 11.56
+  },
+  {
+    "code": "sh561420",
+    "name": "300现金流ETF汇添富",
+    "type": "ETF",
+    "size": 1141403023.5,
+    "totalMV": 11.6
+  },
+  {
+    "code": "sz159790",
+    "name": "碳中和ETF华夏",
+    "type": "ETF",
+    "size": 1129085620.2285,
+    "totalMV": 11.19
+  },
+  {
+    "code": "sh588010",
+    "name": "科创新材料ETF博时",
+    "type": "ETF",
+    "size": 1058019712.26,
+    "totalMV": 9.83
+  },
+  {
+    "code": "sh516130",
+    "name": "消费龙头ETF华宝",
+    "type": "ETF",
+    "size": 1050417797,
+    "totalMV": 10.92
+  },
+  {
+    "code": "sh513200",
+    "name": "港股通医药ETF易方达",
+    "type": "ETF",
+    "size": 925795740.48,
+    "totalMV": 9.18
+  },
+  {
+    "code": "sz159698",
+    "name": "粮食ETF鹏华",
+    "type": "ETF",
+    "size": 915546677.3406,
+    "totalMV": 9.29
+  },
+  {
+    "code": "sh511850",
+    "name": "招商财富宝ETF",
+    "type": "ETF",
+    "size": 881950000,
+    "totalMV": 8.82
+  },
+  {
+    "code": "sh516520",
+    "name": "智能驾驶ETF华泰柏瑞",
+    "type": "ETF",
+    "size": 857858999.8,
+    "totalMV": 8.32
+  },
+  {
+    "code": "sh588230",
+    "name": "科创200ETF华泰柏瑞",
+    "type": "ETF",
+    "size": 848058253.1,
+    "totalMV": 7.59
+  },
+  {
+    "code": "sh510230",
+    "name": "金融ETF国泰",
+    "type": "ETF",
+    "size": 842982924,
+    "totalMV": 8.12
+  },
+  {
+    "code": "sh588830",
+    "name": "科创新能源ETF鹏华",
+    "type": "ETF",
+    "size": 831086158.89,
+    "totalMV": 7.75
+  },
+  {
+    "code": "sh512220",
+    "name": "TMTETF景顺",
+    "type": "ETF",
+    "size": 818453374.2,
+    "totalMV": 7.17
+  },
+  {
+    "code": "sh515260",
+    "name": "电子ETF华宝",
+    "type": "ETF",
+    "size": 805964402,
+    "totalMV": 7.1
+  },
+  {
+    "code": "sh510410",
+    "name": "资源ETF博时",
+    "type": "ETF",
+    "size": 790368325.28,
+    "totalMV": 7.72
+  },
+  {
+    "code": "sh512090",
+    "name": "MSCIA股ETF易方达",
+    "type": "ETF",
+    "size": 708598969.2,
+    "totalMV": 6.65
+  },
+  {
+    "code": "sh512330",
+    "name": "信息科技ETF南方",
+    "type": "ETF",
+    "size": 694002686.4,
+    "totalMV": 6.19
+  },
+  {
+    "code": "sh560120",
+    "name": "中证500现金流ETF华夏",
+    "type": "ETF",
+    "size": 689335911.9,
+    "totalMV": 7.1
+  },
+  {
+    "code": "sh512580",
+    "name": "环保ETF广发",
+    "type": "ETF",
+    "size": 678180421.1,
+    "totalMV": 6.66
+  },
+  {
+    "code": "sh517900",
+    "name": "银行AH优选ETF招商",
+    "type": "ETF",
+    "size": 675813950.55,
+    "totalMV": 6.8
+  },
+  {
+    "code": "sz159665",
+    "name": "半导体龙头ETF工银",
+    "type": "ETF",
+    "size": 675491554.384,
+    "totalMV": 5.94
+  },
+  {
+    "code": "sh588770",
+    "name": "科创信息ETF摩根",
+    "type": "ETF",
+    "size": 640296528.12,
+    "totalMV": 5.53
+  },
+  {
+    "code": "sh513560",
+    "name": "香港科技ETF兴银",
+    "type": "ETF",
+    "size": 619000699.4,
+    "totalMV": 6.28
+  },
+  {
+    "code": "sz159140",
+    "name": "科创创业人工智能ETF易方达",
+    "type": "ETF",
+    "size": 613873353.2976,
+    "totalMV": 5.96
+  },
+  {
+    "code": "sz159707",
+    "name": "地产ETF华宝",
+    "type": "ETF",
+    "size": 609493952.547,
+    "totalMV": 6.36
+  },
+  {
+    "code": "sh515150",
+    "name": "一带一路ETF富国",
+    "type": "ETF",
+    "size": 601565860.32,
+    "totalMV": 6.02
+  },
+  {
+    "code": "sh511690",
+    "name": "交易货币ETF大成",
+    "type": "ETF",
+    "size": 599240000,
+    "totalMV": 6.02
+  },
+  {
+    "code": "sh563900",
+    "name": "300自由现金流ETF摩根",
+    "type": "ETF",
+    "size": 583589701.43,
+    "totalMV": 5.95
+  },
+  {
+    "code": "sh562070",
+    "name": "沪深300指增ETF华宝",
+    "type": "ETF",
+    "size": 580371306.2,
+    "totalMV": 5.68
+  },
+  {
+    "code": "sh515750",
+    "name": "科技50ETF富国",
+    "type": "ETF",
+    "size": 563836669.75,
+    "totalMV": 5.38
+  },
+  {
+    "code": "sh515950",
+    "name": "医药50ETF富国",
+    "type": "ETF",
+    "size": 557657263.1,
+    "totalMV": 5.58
+  },
+  {
+    "code": "sh562310",
+    "name": "沪深300成长ETF银华",
+    "type": "ETF",
+    "size": 542425792.11,
+    "totalMV": 5.29
+  },
+  {
+    "code": "sh516460",
+    "name": "现金流ETF800鹏华",
+    "type": "ETF",
+    "size": 531852652.8,
+    "totalMV": 5.42
+  },
+  {
+    "code": "sh561300",
+    "name": "沪深300增强ETF国泰",
+    "type": "ETF",
+    "size": 524331529.5,
+    "totalMV": 5.08
+  },
+  {
+    "code": "sh512190",
+    "name": "浙商之江凤凰ETF",
+    "type": "ETF",
+    "size": 521976851.52,
+    "totalMV": 5.13
+  },
+  {
+    "code": "sh588700",
+    "name": "科创医药ETF嘉实",
+    "type": "ETF",
+    "size": 513143901.72,
+    "totalMV": 4.97
+  },
+  {
+    "code": "sz159107",
+    "name": "创业板软件ETF富国",
+    "type": "ETF",
+    "size": 490493713.9234,
+    "totalMV": 4.82
+  },
+  {
+    "code": "sh512720",
+    "name": "计算机ETF国泰",
+    "type": "ETF",
+    "size": 461734627.86,
+    "totalMV": 4.27
+  },
+  {
+    "code": "sh563990",
+    "name": "800现金流ETF富国",
+    "type": "ETF",
+    "size": 452681358.6,
+    "totalMV": 4.61
+  },
+  {
+    "code": "sh510170",
+    "name": "大宗商品ETF国联安",
+    "type": "ETF",
+    "size": 441358388,
+    "totalMV": 4.36
+  },
+  {
+    "code": "sh515580",
+    "name": "科技100ETF华泰柏瑞",
+    "type": "ETF",
+    "size": 435556399.6,
+    "totalMV": 4.15
+  },
+  {
+    "code": "sh562820",
+    "name": "集成电路ETF嘉实",
+    "type": "ETF",
+    "size": 422583038.4,
+    "totalMV": 3.73
+  },
+  {
+    "code": "sh563700",
+    "name": "红利价值ETF易方达",
+    "type": "ETF",
+    "size": 420680205,
+    "totalMV": 4.27
+  },
+  {
+    "code": "sh562570",
+    "name": "信创ETF华夏",
+    "type": "ETF",
+    "size": 416210933.4,
+    "totalMV": 3.97
+  },
+  {
+    "code": "sh563780",
+    "name": "现金流全指ETF方正富邦",
+    "type": "ETF",
+    "size": 414940303.47,
+    "totalMV": 4.23
+  },
+  {
+    "code": "sh560210",
+    "name": "农牧渔ETF景顺",
+    "type": "ETF",
+    "size": 411869970.2,
+    "totalMV": 4.15
+  },
+  {
+    "code": "sh515160",
+    "name": "MSCI中国ETF招商",
+    "type": "ETF",
+    "size": 401497105.24,
+    "totalMV": 3.87
+  },
+  {
+    "code": "sh560500",
+    "name": "500质量成长ETF鹏扬",
+    "type": "ETF",
+    "size": 396090111.1,
+    "totalMV": 3.86
+  },
+  {
+    "code": "sh562000",
+    "name": "A100ETF华宝",
+    "type": "ETF",
+    "size": 394891723.39,
+    "totalMV": 3.81
+  },
+  {
+    "code": "sh562600",
+    "name": "医疗器械ETF华夏",
+    "type": "ETF",
+    "size": 384084849.68,
+    "totalMV": 3.77
+  },
+  {
+    "code": "sh512370",
+    "name": "A500增强ETF华夏",
+    "type": "ETF",
+    "size": 380916219.6,
+    "totalMV": 3.79
+  },
+  {
+    "code": "sh560800",
+    "name": "数字经济ETF鹏扬",
+    "type": "ETF",
+    "size": 360380222.19,
+    "totalMV": 3.26
+  },
+  {
+    "code": "sh560170",
+    "name": "央企科技ETF南方",
+    "type": "ETF",
+    "size": 349628559.75,
+    "totalMV": 4.11
+  },
+  {
+    "code": "sz159902",
+    "name": "中小100ETF华夏",
+    "type": "ETF",
+    "size": 340819603.2715,
+    "totalMV": 3.3
+  },
+  {
+    "code": "sh563510",
+    "name": "A500红利低波ETF易方达",
+    "type": "ETF",
+    "size": 340283981.4,
+    "totalMV": 3.44
+  },
+  {
+    "code": "sh515250",
+    "name": "智能汽车ETF富国",
+    "type": "ETF",
+    "size": 333636024.15,
+    "totalMV": 3.13
+  },
+  {
+    "code": "sh560880",
+    "name": "家电ETF广发",
+    "type": "ETF",
+    "size": 323191814.4,
+    "totalMV": 3.25
+  },
+  {
+    "code": "sh563960",
+    "name": "300质量ETF兴全",
+    "type": "ETF",
+    "size": 318065565.6,
+    "totalMV": 3.25
+  },
+  {
+    "code": "sh563580",
+    "name": "自由现金流800ETF万家",
+    "type": "ETF",
+    "size": 278498841.6,
+    "totalMV": 2.83
+  },
+  {
+    "code": "sh562850",
+    "name": "央企能源ETF嘉实",
+    "type": "ETF",
+    "size": 271531941.8,
+    "totalMV": 2.49
+  },
+  {
+    "code": "sh562910",
+    "name": "高端制造ETF易方达",
+    "type": "ETF",
+    "size": 266692991.11,
+    "totalMV": 3.25
+  },
+  {
+    "code": "sh512770",
+    "name": "战略新兴ETF华夏",
+    "type": "ETF",
+    "size": 265391847.46,
+    "totalMV": 2.4
+  },
+  {
+    "code": "sh560250",
+    "name": "红利质量ETF富国",
+    "type": "ETF",
+    "size": 257787513.1,
+    "totalMV": 2.61
+  },
+  {
+    "code": "sh516110",
+    "name": "汽车ETF国泰",
+    "type": "ETF",
+    "size": 247401051.03,
+    "totalMV": 2.57
+  },
+  {
+    "code": "sh563210",
+    "name": "专精特新ETF富国",
+    "type": "ETF",
+    "size": 247088021.4,
+    "totalMV": 2.13
+  },
+  {
+    "code": "sh560810",
+    "name": "央企ESGETF融通",
+    "type": "ETF",
+    "size": 241662716.4,
+    "totalMV": 2.39
+  },
+  {
+    "code": "sh516050",
+    "name": "科技龙头ETF工银",
+    "type": "ETF",
+    "size": 236109302,
+    "totalMV": 2.1
+  },
+  {
+    "code": "sh517050",
+    "name": "互联网ETF华泰柏瑞",
+    "type": "ETF",
+    "size": 233466219,
+    "totalMV": 2.39
+  },
+  {
+    "code": "sh510010",
+    "name": "180治理ETF交银",
+    "type": "ETF",
+    "size": 229247029.2,
+    "totalMV": 2.29
+  },
+  {
+    "code": "sh510130",
+    "name": "上证中盘ETF易方达",
+    "type": "ETF",
+    "size": 229044656.97,
+    "totalMV": 2.26
+  },
+  {
+    "code": "sh560980",
+    "name": "光伏龙头ETF广发",
+    "type": "ETF",
+    "size": 226423113.2,
+    "totalMV": 2.12
+  },
+  {
+    "code": "sh517800",
+    "name": "人工智能50ETF方正富邦",
+    "type": "ETF",
+    "size": 219279494.55,
+    "totalMV": 2.12
+  },
+  {
+    "code": "sh561760",
+    "name": "油气ETF博时",
+    "type": "ETF",
+    "size": 213502956,
+    "totalMV": 2.15
+  },
+  {
+    "code": "sh563060",
+    "name": "央企50ETF易方达",
+    "type": "ETF",
+    "size": 209644049.4,
+    "totalMV": 2.08
+  },
+  {
+    "code": "sh562860",
+    "name": "疫苗ETF嘉实",
+    "type": "ETF",
+    "size": 209610780.5,
+    "totalMV": 2.02
+  },
+  {
+    "code": "sh512550",
+    "name": "富时A50ETF嘉实",
+    "type": "ETF",
+    "size": 205007661.8,
+    "totalMV": 1.99
+  },
+  {
+    "code": "sh563980",
+    "name": "800红利低波ETF鑫元",
+    "type": "ETF",
+    "size": 200252759,
+    "totalMV": 2.03
+  },
+  {
+    "code": "sh563010",
+    "name": "电信ETF易方达",
+    "type": "ETF",
+    "size": 197663078.13,
+    "totalMV": 1.93
+  },
+  {
+    "code": "sz159003",
+    "name": "招商快线ETF",
+    "type": "ETF",
+    "size": 196404000,
+    "totalMV": 1.92
+  },
+  {
+    "code": "sh563320",
+    "name": "通用航空ETF华泰柏瑞",
+    "type": "ETF",
+    "size": 193502207.6,
+    "totalMV": 1.89
+  },
+  {
+    "code": "sh563330",
+    "name": "A股ETF华泰柏瑞",
+    "type": "ETF",
+    "size": 192377945.76,
+    "totalMV": 1.86
+  },
+  {
+    "code": "sh510200",
+    "name": "上证券商ETF汇安",
+    "type": "ETF",
+    "size": 188350696.2,
+    "totalMV": 1.86
+  },
+  {
+    "code": "sh512160",
+    "name": "MSCI中国A股ETF南方",
+    "type": "ETF",
+    "size": 187111589.7,
+    "totalMV": 1.81
+  },
+  {
+    "code": "sh516800",
+    "name": "智能制造ETF华宝",
+    "type": "ETF",
+    "size": 186363892.4,
+    "totalMV": 1.64
+  },
+  {
+    "code": "sh511900",
+    "name": "富国货币ETF",
+    "type": "ETF",
+    "size": 185610000,
+    "totalMV": 1.86
+  },
+  {
+    "code": "sh517080",
+    "name": "沪港深500ETF汇添富",
+    "type": "ETF",
+    "size": 181981247,
+    "totalMV": 1.8
+  },
+  {
+    "code": "sh516070",
+    "name": "低碳ETF易方达",
+    "type": "ETF",
+    "size": 176661242.8,
+    "totalMV": 1.74
+  },
+  {
+    "code": "sh516760",
+    "name": "养殖ETF平安",
+    "type": "ETF",
+    "size": 176117563.55,
+    "totalMV": 1.77
+  },
+  {
+    "code": "sh510160",
+    "name": "产业升级ETF南方",
+    "type": "ETF",
+    "size": 171334406.54,
+    "totalMV": 1.73
+  },
+  {
+    "code": "sh512530",
+    "name": "沪深300红利ETF建信",
+    "type": "ETF",
+    "size": 166307013.6,
+    "totalMV": 1.66
+  },
+  {
+    "code": "sh517180",
+    "name": "中国国企ETF南方",
+    "type": "ETF",
+    "size": 163740767.02,
+    "totalMV": 1.61
+  },
+  {
+    "code": "sh516500",
+    "name": "生物科技ETF华夏",
+    "type": "ETF",
+    "size": 162664496.36,
+    "totalMV": 1.63
+  },
+  {
+    "code": "sh511800",
+    "name": "易方达货币ETF",
+    "type": "ETF",
+    "size": 161000000,
+    "totalMV": 1.61
+  },
+  {
+    "code": "sh516620",
+    "name": "影视ETF国泰",
+    "type": "ETF",
+    "size": 160551306.5,
+    "totalMV": 1.58
+  },
+  {
+    "code": "sz159150",
+    "name": "深证50ETF易方达",
+    "type": "ETF",
+    "size": 158865382.6323,
+    "totalMV": 1.53
+  },
+  {
+    "code": "sh516560",
+    "name": "养老ETF华宝",
+    "type": "ETF",
+    "size": 158666671.8,
+    "totalMV": 1.63
+  },
+  {
+    "code": "sh560660",
+    "name": "云计算50ETF新华",
+    "type": "ETF",
+    "size": 157206349.2,
+    "totalMV": 1.45
+  },
+  {
+    "code": "sh561590",
+    "name": "中证1000增强ETF华泰柏瑞",
+    "type": "ETF",
+    "size": 155389829.76,
+    "totalMV": 1.5
+  },
+  {
+    "code": "sh515910",
+    "name": "质量ETF中金",
+    "type": "ETF",
+    "size": 155091521.9,
+    "totalMV": 1.5
+  },
+  {
+    "code": "sh588910",
+    "name": "科创价值ETF建信",
+    "type": "ETF",
+    "size": 150389856.54,
+    "totalMV": 1.43
+  },
+  {
+    "code": "sh588850",
+    "name": "科创机械ETF嘉实",
+    "type": "ETF",
+    "size": 150098655.3,
+    "totalMV": 1.29
+  },
+  {
+    "code": "sh517770",
+    "name": "游戏传媒ETF浦银",
+    "type": "ETF",
+    "size": 147651575.86,
+    "totalMV": 1.51
+  },
+  {
+    "code": "sh510290",
+    "name": "上证380ETF南方",
+    "type": "ETF",
+    "size": 146456671.05,
+    "totalMV": 1.42
+  },
+  {
+    "code": "sh510020",
+    "name": "超大盘ETF博时",
+    "type": "ETF",
+    "size": 145549600,
+    "totalMV": 1.44
+  },
+  {
+    "code": "sh515840",
+    "name": "食品ETF南方",
+    "type": "ETF",
+    "size": 142910523.28,
+    "totalMV": 1.32
+  },
+  {
+    "code": "sh588320",
+    "name": "双创50增强ETF广发",
+    "type": "ETF",
+    "size": 140887239.34,
+    "totalMV": 1.22
+  },
+  {
+    "code": "sh589280",
+    "name": "科创增强ETF华宝",
+    "type": "ETF",
+    "size": 137984196.4,
+    "totalMV": 1.3
+  },
+  {
+    "code": "sh515320",
+    "name": "电子50ETF华安",
+    "type": "ETF",
+    "size": 131281122.3,
+    "totalMV": 1.17
+  },
+  {
+    "code": "sh563180",
+    "name": "高股息ETF银华",
+    "type": "ETF",
+    "size": 131128662,
+    "totalMV": 1.34
+  },
+  {
+    "code": "sz159132",
+    "name": "恒生生物科技ETF富国",
+    "type": "ETF",
+    "size": 127351937.4664,
+    "totalMV": 1.27
+  },
+  {
+    "code": "sh515760",
+    "name": "浙江国资ETF华夏",
+    "type": "ETF",
+    "size": 126646780.37,
+    "totalMV": 1.27
+  },
+  {
+    "code": "sh513620",
+    "name": "港股医疗ETF银华",
+    "type": "ETF",
+    "size": 119307259.2,
+    "totalMV": 1.19
+  },
+  {
+    "code": "sz159005",
+    "name": "快钱ETF汇添富",
+    "type": "ETF",
+    "size": 117917100,
+    "totalMV": 1.16
+  },
+  {
+    "code": "sh562700",
+    "name": "汽车零部件ETF华夏",
+    "type": "ETF",
+    "size": 116059125,
+    "totalMV": 1.14
+  },
+  {
+    "code": "sh562050",
+    "name": "药ETF华宝",
+    "type": "ETF",
+    "size": 113696061.6,
+    "totalMV": 1.08
+  },
+  {
+    "code": "sh510140",
+    "name": "上证综指ETF华夏",
+    "type": "ETF",
+    "size": 109901523.3,
+    "totalMV": 1.14
+  },
+  {
+    "code": "sh561130",
+    "name": "国货ETF富国",
+    "type": "ETF",
+    "size": 108969342.08,
+    "totalMV": 1.03
+  },
+  {
+    "code": "sh516610",
+    "name": "医疗设备ETF大成",
+    "type": "ETF",
+    "size": 107704479,
+    "totalMV": 1.08
+  },
+  {
+    "code": "sh515200",
+    "name": "创新100ETF申万菱信",
+    "type": "ETF",
+    "size": 104719087.44,
+    "totalMV": 0.98
+  },
+  {
+    "code": "sh513900",
+    "name": "港股通100ETF华安",
+    "type": "ETF",
+    "size": 104390123.2,
+    "totalMV": 1.05
+  },
+  {
+    "code": "sh513320",
+    "name": "港股通新经济ETF易方达",
+    "type": "ETF",
+    "size": 97355464.96,
+    "totalMV": 1
+  },
+  {
+    "code": "sh516830",
+    "name": "沪深300ESGETF富国",
+    "type": "ETF",
+    "size": 92503408.59,
+    "totalMV": 0.9
+  },
+  {
+    "code": "sh510060",
+    "name": "央企ETF工银",
+    "type": "ETF",
+    "size": 92110500.16,
+    "totalMV": 0.92
+  },
+  {
+    "code": "sh517090",
+    "name": "央企共赢ETF国泰",
+    "type": "ETF",
+    "size": 91729462.5,
+    "totalMV": 0.93
+  },
+  {
+    "code": "sh588500",
+    "name": "科创100增强ETF易方达",
+    "type": "ETF",
+    "size": 89605579.7,
+    "totalMV": 0.81
+  },
+  {
+    "code": "sh562920",
+    "name": "信息安全ETF易方达",
+    "type": "ETF",
+    "size": 86940600.5,
+    "totalMV": 0.83
+  },
+  {
+    "code": "sh563090",
+    "name": "上证50增强ETF易方达",
+    "type": "ETF",
+    "size": 86277960,
+    "totalMV": 0.85
+  },
+  {
+    "code": "sh562810",
+    "name": "上证指数增强ETF嘉实",
+    "type": "ETF",
+    "size": 85274720.2,
+    "totalMV": 0.87
+  },
+  {
+    "code": "sh562320",
+    "name": "沪深300价值ETF银华",
+    "type": "ETF",
+    "size": 85165819.3,
+    "totalMV": 0.86
+  },
+  {
+    "code": "sh516750",
+    "name": "建材ETF富国",
+    "type": "ETF",
+    "size": 85127024.5,
+    "totalMV": 0.87
+  },
+  {
+    "code": "sh516910",
+    "name": "物流ETF富国",
+    "type": "ETF",
+    "size": 81311022.78,
+    "totalMV": 0.8
+  },
+  {
+    "code": "sh561310",
+    "name": "消电ETF国泰",
+    "type": "ETF",
+    "size": 81144407.75,
+    "totalMV": 0.73
+  },
+  {
+    "code": "sh588550",
+    "name": "科创综指增强ETF易方达",
+    "type": "ETF",
+    "size": 80954566,
+    "totalMV": 0.72
+  },
+  {
+    "code": "sh516320",
+    "name": "高端装备ETF华夏",
+    "type": "ETF",
+    "size": 80796299.2,
+    "totalMV": 0.8
+  },
+  {
+    "code": "sh515920",
+    "name": "智能消费ETF博时",
+    "type": "ETF",
+    "size": 76456237.07,
+    "totalMV": 0.72
+  },
+  {
+    "code": "sh563560",
+    "name": "科技成长ETF兴业",
+    "type": "ETF",
+    "size": 73478880.7,
+    "totalMV": 0.66
+  },
+  {
+    "code": "sh516380",
+    "name": "智能电动车ETF华宝",
+    "type": "ETF",
+    "size": 71281911.96,
+    "totalMV": 0.7
+  },
+  {
+    "code": "sh511600",
+    "name": "华安日日鑫ETF",
+    "type": "ETF",
+    "size": 70420000,
+    "totalMV": 0.7
+  },
+  {
+    "code": "sh561960",
+    "name": "央企回报ETF招商",
+    "type": "ETF",
+    "size": 70028995.92,
+    "totalMV": 0.71
+  },
+  {
+    "code": "sh516980",
+    "name": "证券先锋ETF华富",
+    "type": "ETF",
+    "size": 69105408,
+    "totalMV": 0.69
+  },
+  {
+    "code": "sh516260",
+    "name": "物联网ETF华夏",
+    "type": "ETF",
+    "size": 68950944,
+    "totalMV": 0.64
+  },
+  {
+    "code": "sh516600",
+    "name": "消费服务ETF工银",
+    "type": "ETF",
+    "size": 68758585.07,
+    "totalMV": 0.69
+  },
+  {
+    "code": "sh515590",
+    "name": "500等权ETF前海开源",
+    "type": "ETF",
+    "size": 68218779.3,
+    "totalMV": 0.67
+  },
+  {
+    "code": "sh512750",
+    "name": "基本面50ETF嘉实",
+    "type": "ETF",
+    "size": 68168963.85,
+    "totalMV": 0.69
+  },
+  {
+    "code": "sh562530",
+    "name": "中证1000价值ETF华夏",
+    "type": "ETF",
+    "size": 67226050.4,
+    "totalMV": 0.7
+  },
+  {
+    "code": "sh516360",
+    "name": "新材料ETF华宝",
+    "type": "ETF",
+    "size": 66932755.76,
+    "totalMV": 0.61
+  },
+  {
+    "code": "sh563590",
+    "name": "A500红利低波动ETF国寿",
+    "type": "ETF",
+    "size": 66898056.24,
+    "totalMV": 0.68
+  },
+  {
+    "code": "sh513990",
+    "name": "港股通ETF招商",
+    "type": "ETF",
+    "size": 66600000,
+    "totalMV": 0.67
+  },
+  {
+    "code": "sh513830",
+    "name": "港股通高股息ETF嘉实",
+    "type": "ETF",
+    "size": 66500415.3,
+    "totalMV": 0.67
+  },
+  {
+    "code": "sh517950",
+    "name": "沪深港科技50ETF交银",
+    "type": "ETF",
+    "size": 66104996.64,
+    "totalMV": 0.62
+  },
+  {
+    "code": "sh510090",
+    "name": "责任ETF建信",
+    "type": "ETF",
+    "size": 65291425.74,
+    "totalMV": 0.66
+  },
+  {
+    "code": "sh561060",
+    "name": "国企红利ETF华安",
+    "type": "ETF",
+    "size": 63399665,
+    "totalMV": 0.63
+  },
+  {
+    "code": "sh511820",
+    "name": "鹏华添利ETF",
+    "type": "ETF",
+    "size": 62080000,
+    "totalMV": 0.62
+  },
+  {
+    "code": "sh562560",
+    "name": "信息技术ETF华夏",
+    "type": "ETF",
+    "size": 57533500.5,
+    "totalMV": 0.52
+  },
+  {
+    "code": "sh512030",
+    "name": "中证A50增强ETF易方达",
+    "type": "ETF",
+    "size": 57434368,
+    "totalMV": 0.56
+  },
+  {
+    "code": "sh517550",
+    "name": "沪港深消费龙头ETF招商",
+    "type": "ETF",
+    "size": 57104617.92,
+    "totalMV": 0.59
+  },
+  {
+    "code": "sh512640",
+    "name": "金融地产ETF嘉实",
+    "type": "ETF",
+    "size": 52690916.19,
+    "totalMV": 0.52
+  },
+  {
+    "code": "sh561320",
+    "name": "交运ETF国泰",
+    "type": "ETF",
+    "size": 51675887.7,
+    "totalMV": 0.49
+  },
+  {
+    "code": "sh561200",
+    "name": "中证A100ETF工银",
+    "type": "ETF",
+    "size": 51052553.65,
+    "totalMV": 0.49
+  },
+  {
+    "code": "sh517850",
+    "name": "张江ETF汇添富",
+    "type": "ETF",
+    "size": 49635238.84,
+    "totalMV": 0.51
+  },
+  {
+    "code": "sh512650",
+    "name": "长三角ETF汇添富",
+    "type": "ETF",
+    "size": 46570164.48,
+    "totalMV": 0.45
+  },
+  {
+    "code": "sh561500",
+    "name": "漂亮50ETF华泰柏瑞",
+    "type": "ETF",
+    "size": 45777844.8,
+    "totalMV": 0.44
+  },
+  {
+    "code": "sh517350",
+    "name": "沪港深科技ETF广发",
+    "type": "ETF",
+    "size": 45654582.6,
+    "totalMV": 0.44
+  },
+  {
+    "code": "sh517990",
+    "name": "沪港深医药ETF招商",
+    "type": "ETF",
+    "size": 44186114.14,
+    "totalMV": 0.44
+  },
+  {
+    "code": "sh563930",
+    "name": "上证增强ETF招商",
+    "type": "ETF",
+    "size": 43587640.8,
+    "totalMV": 0.43
+  },
+  {
+    "code": "sh511970",
+    "name": "国寿货币ETF",
+    "type": "ETF",
+    "size": 41580000,
+    "totalMV": 0.42
+  },
+  {
+    "code": "sh562580",
+    "name": "可选消费ETF华夏",
+    "type": "ETF",
+    "size": 41549241.69,
+    "totalMV": 0.41
+  },
+  {
+    "code": "sh510990",
+    "name": "180ESGETF工银",
+    "type": "ETF",
+    "size": 41106352.44,
+    "totalMV": 0.4
+  },
+  {
+    "code": "sh512260",
+    "name": "中证500低波动ETF华安",
+    "type": "ETF",
+    "size": 40846858.83,
+    "totalMV": 0.41
+  },
+  {
+    "code": "sh511770",
+    "name": "金鹰增益货币ETF",
+    "type": "ETF",
+    "size": 40350000,
+    "totalMV": 0.4
+  },
+  {
+    "code": "sh517880",
+    "name": "品牌消费ETF华泰柏瑞",
+    "type": "ETF",
+    "size": 38620900.33,
+    "totalMV": 0.4
+  },
+  {
+    "code": "sh562520",
+    "name": "中证1000成长ETF华夏",
+    "type": "ETF",
+    "size": 34458696,
+    "totalMV": 0.33
+  },
+  {
+    "code": "sh561260",
+    "name": "能源ETF工银",
+    "type": "ETF",
+    "size": 33944310.72,
+    "totalMV": 0.34
+  },
+  {
+    "code": "sh511950",
+    "name": "添利货币ETF广发",
+    "type": "ETF",
+    "size": 32960000,
+    "totalMV": 0.33
+  },
+  {
+    "code": "sh561780",
+    "name": "1000增强ETF博时",
+    "type": "ETF",
+    "size": 31736854.38,
+    "totalMV": 0.28
+  },
+  {
+    "code": "sh515730",
+    "name": "家居家电ETF永赢",
+    "type": "ETF",
+    "size": 31728093.6,
+    "totalMV": 0.32
+  },
+  {
+    "code": "sh560030",
+    "name": "800价值ETF汇添富",
+    "type": "ETF",
+    "size": 31571030.4,
+    "totalMV": 0.32
+  },
+  {
+    "code": "sh512870",
+    "name": "杭州湾区ETF南华",
+    "type": "ETF",
+    "size": 29109597.72,
+    "totalMV": 0.28
+  },
+  {
+    "code": "sh560620",
+    "name": "公用事业ETF万家",
+    "type": "ETF",
+    "size": 26288740.2,
+    "totalMV": 0.26
+  },
+  {
+    "code": "sh510270",
+    "name": "国企ETF中银",
+    "type": "ETF",
+    "size": 25628555.46,
+    "totalMV": 0.25
+  },
+  {
+    "code": "sh510770",
+    "name": "G60创新ETF申万菱信",
+    "type": "ETF",
+    "size": 20198751.8,
+    "totalMV": 0.19
+  },
+  {
+    "code": "sh512390",
+    "name": "中国低波ETF平安",
+    "type": "ETF",
+    "size": 19204177.2,
+    "totalMV": 0.19
+  },
+  {
+    "code": "sh560990",
+    "name": "科技先锋ETF中金",
+    "type": "ETF",
+    "size": 18444732.95,
+    "totalMV": 0.17
+  },
+  {
+    "code": "sh562010",
+    "name": "绿色能源ETF华宝",
+    "type": "ETF",
+    "size": 15191718.34,
+    "totalMV": 0.15
+  },
+  {
+    "code": "sh516720",
+    "name": "ESGETF浦银",
+    "type": "ETF",
+    "size": 14528993.28,
+    "totalMV": 0.14
+  },
+  {
+    "code": "sh511670",
+    "name": "华泰天天金ETF",
+    "type": "ETF",
+    "size": 13710000,
+    "totalMV": 0.14
+  },
+  {
+    "code": "sh516960",
+    "name": "机械ETF国泰",
+    "type": "ETF",
+    "size": 13570071.76,
+    "totalMV": 0.13
+  },
+  {
+    "code": "sh562330",
+    "name": "中证500价值ETF银华",
+    "type": "ETF",
+    "size": 13515782.74,
+    "totalMV": 0.12
+  },
+  {
+    "code": "sh515090",
+    "name": "可持续发展ETF博时",
+    "type": "ETF",
+    "size": 12600513.72,
+    "totalMV": 0.14
+  },
+  {
+    "code": "sh512970",
+    "name": "大湾区ETF平安",
+    "type": "ETF",
+    "size": 11875963.68,
+    "totalMV": 0.11
+  },
+  {
+    "code": "sh562340",
+    "name": "中证500成长ETF银华",
+    "type": "ETF",
+    "size": 11432153.91,
+    "totalMV": 0.11
+  },
+  {
+    "code": "sh563280",
+    "name": "A50增强ETF富国",
+    "type": "ETF",
+    "size": 9846630.12,
+    "totalMV": 0.09
+  },
+  {
+    "code": "sh560650",
+    "name": "核心50ETF民生加银",
+    "type": "ETF",
+    "size": 8453746,
+    "totalMV": 8000000
+  },
+  {
+    "code": "sh511910",
+    "name": "融通货币ETF",
+    "type": "ETF",
+    "size": 8330000,
+    "totalMV": 0.08
+  },
+  {
+    "code": "sh512830",
+    "name": "汇添富中国战略新兴产业ETF",
+    "type": "ETF",
+    "size": 0,
+    "totalMV": 0
+  },
+  {
+    "code": "sh516170",
+    "name": "食品饮料行业ETF",
+    "type": "ETF",
+    "size": 0,
+    "totalMV": 0
+  },
+  {
+    "code": "sh517980",
+    "name": "银行AHETF",
+    "type": "ETF",
+    "size": 0,
+    "totalMV": 0
+  },
+  {
+    "code": "sh562170",
+    "name": "沪深300现金流ETF易方达",
+    "type": "ETF",
+    "size": null,
+    "totalMV": null
+  },
+  {
+    "code": "sh588530",
+    "name": "N科创创业人工智能ETF中银证券",
+    "type": "ETF",
+    "size": 0,
+    "totalMV": 2.78
+  }
+]

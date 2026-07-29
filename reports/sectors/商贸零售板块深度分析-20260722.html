@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>商贸零售板块深度分析 | 研股股</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; background: #f5f6f8; color: #1a1a1a; line-height: 1.7; }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 24px 20px 60px; }
+  .hdr { background: linear-gradient(135deg, #1e3a5f, #2c5282); color: #fff; padding: 28px 32px; border-radius: 12px; margin-bottom: 24px; }
+  .hdr h1 { font-size: 26px; font-weight: 700; margin-bottom: 8px; }
+  .hdr .meta { font-size: 13px; opacity: 0.85; display: flex; gap: 20px; flex-wrap: wrap; }
+  .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; }
+  .b-low { background: #fed7d7; color: #9b2c2c; }
+  .b-mid { background: #feebc8; color: #9c4221; }
+  .b-high { background: #c6f6d5; color: #22543d; }
+  .card { background: #fff; border-radius: 10px; padding: 24px 28px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .card h2 { font-size: 19px; color: #1e3a5f; border-left: 4px solid #2c5282; padding-left: 12px; margin-bottom: 16px; }
+  .card h3 { font-size: 16px; color: #2d3748; margin: 18px 0 10px; }
+  .tldr { background: linear-gradient(135deg, #fff8e1, #fff3cd); border: 1px solid #f6d365; border-radius: 10px; padding: 22px 28px; margin-bottom: 20px; }
+  .tldr .ttl { font-size: 15px; font-weight: 700; color: #92400e; margin-bottom: 10px; }
+  .tldr p { font-size: 15px; color: #4a3a1a; }
+  .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 8px; }
+  .metric { background: #fff; border-radius: 8px; padding: 16px; text-align: center; border-top: 3px solid #2c5282; }
+  .metric .v { font-size: 24px; font-weight: 700; color: #1e3a5f; }
+  .metric .l { font-size: 12px; color: #718096; margin-top: 4px; }
+  .metric .sub { font-size: 11px; color: #a0aec0; margin-top: 2px; }
+  .neg { color: #c53030 !important; }
+  .pos { color: #2f855a !important; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 12px 0; }
+  th { background: #edf2f7; color: #2d3748; padding: 10px 8px; text-align: left; font-weight: 600; border-bottom: 2px solid #cbd5e0; }
+  td { padding: 9px 8px; border-bottom: 1px solid #e2e8f0; }
+  tr:hover td { background: #f7fafc; }
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+  .tag-r { background: #fed7d7; color: #9b2c2c; }
+  .tag-g { background: #c6f6d5; color: #22543d; }
+  .tag-y { background: #feebc8; color: #9c4221; }
+  .chart { width: 100%; height: 340px; margin: 10px 0; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .callout { border-left: 4px solid #2c5282; background: #ebf4ff; padding: 14px 18px; border-radius: 0 8px 8px 0; margin: 14px 0; font-size: 14px; }
+  .callout.warn { border-left-color: #dd6b20; background: #fffaf0; }
+  .callout.risk { border-left-color: #c53030; background: #fff5f5; }
+  .callout.alpha { border-left-color: #2f855a; background: #f0fff4; }
+  .rec-tbl td:first-child { font-weight: 600; }
+  .disclaimer { font-size: 12px; color: #718096; border-top: 1px solid #e2e8f0; padding-top: 14px; margin-top: 24px; }
+  .src { font-size: 11px; color: #a0aec0; margin-top: 6px; }
+  .toggle { display: inline-block; background: #edf2f7; border-radius: 6px; padding: 3px; margin: 8px 0; }
+  .toggle button { border: none; background: transparent; padding: 5px 14px; font-size: 12px; cursor: pointer; border-radius: 4px; color: #4a5568; }
+  .toggle button.active { background: #2c5282; color: #fff; }
+  .hide { display: none; }
+  @media (max-width: 768px) { .metrics { grid-template-columns: repeat(2,1fr); } .grid2 { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hdr">
+    <h1>商贸零售板块深度分析</h1>
+    <div class="meta">
+      <span>板块评级：<span class="badge b-low">低配 / 中性偏谨慎</span></span>
+      <span>分析日期：2026-07-22</span>
+      <span>数据截止：2026-07-22 收盘</span>
+      <span>申万一级行业 · 99只成份股</span>
+    </div>
+  </div>
+
+  <!-- TL;DR 结论卡 -->
+  <div class="tldr">
+    <div class="ttl">核心结论 (TL;DR)</div>
+    <p><b>宏观逆风 + 政策托底 + 业态分化</b>。2026 上半年社零增速断崖式放缓至 +1.3%（2025 同期 +5.0%），限额以上零售额负增长 -0.8%，百货 / 专业店 / 品牌专卖三大业态全面转负，板块基本面整体承压。但分化剧烈：<b>超市（+3.8%）、便利店（+6.6%）、跨境电商、免税（海南离岛 +18.8%）</b>逆势增长。板块龙头普遍超跌（中免 YTD -41%），存在结构性错杀。建议 <b>整体低配</b>，但超配「调改兑现的超市 + 出海跨境」两线，左侧观察免税龙头，回避纯百货业态。</p>
+  </div>
+
+  <!-- 关键指标看板 -->
+  <div class="metrics">
+    <div class="metric"><div class="v neg">+1.3%</div><div class="l">2026H1 社零增速</div><div class="sub">vs 2025H1 +5.0%</div></div>
+    <div class="metric"><div class="v neg">-0.8%</div><div class="l">限额以上零售额</div><div class="sub">上市公司群体负增长</div></div>
+    <div class="metric"><div class="v neg">-2.1%</div><div class="l">百货店零售额</div><div class="sub">2026H1 同比</div></div>
+    <div class="metric"><div class="v pos">+18.8%</div><div class="l">海南离岛免税</div><div class="sub">2026H1 购物金额</div></div>
+  </div>
+  <div class="src">数据来源：国家统计局（2026-07-15 发布）、海口海关（2026-07-08）</div>
+
+  <!-- 1. 宏观环境 -->
+  <div class="card">
+    <h2>一、宏观环境：消费引擎明显降速</h2>
+    <p>2026 年上半年社会消费品零售总额 24.87 万亿元，同比仅增长 <b>1.3%</b>，较 2025 年同期 +5.0% 大幅回落 3.7 个百分点，为近三年最低增速。6 月单月社零 +1.0%，虽有环比改善（5 月 -0.6%），但动能依然疲弱。</p>
+    <div class="callout warn">
+      <b>关键警示：</b>限额以上单位消费品零售额 <b>-0.8%</b>（其中商品零售 -1.0%）—— 这意味着以上市公司为主体的规上企业零售额出现<b>负增长</b>，商贸零售板块的基本面正遭受实质性冲击。
+    </div>
+    <div id="chart1" class="chart"></div>
+    <div class="src">数据来源：国家统计局 2026-07-15 / 2025-07-15 发布</div>
+
+    <h3>分品类看：基本生活类稳健，可选消费分化</h3>
+    <table>
+      <tr><th>品类（2026H1）</th><th>同比</th><th>信号</th><th>品类</th><th>同比</th><th>信号</th></tr>
+      <tr><td>通讯器材</td><td class="pos">+14.4%</td><td><span class="tag tag-g">高增</span></td><td>金银珠宝</td><td class="pos">+1.9%</td><td><span class="tag tag-y">弱增</span></td></tr>
+      <tr><td>烟酒类</td><td class="pos">+13.2%</td><td><span class="tag tag-g">高增</span></td><td>日用品</td><td class="pos">+4.4%</td><td><span class="tag tag-g">稳健</span></td></tr>
+      <tr><td>粮油食品</td><td class="pos">+7.4%</td><td><span class="tag tag-g">稳健</span></td><td>化妆品</td><td class="pos">+6.3%</td><td><span class="tag tag-g">稳健</span></td></tr>
+      <tr><td>服装鞋帽</td><td class="pos">+6.7%</td><td><span class="tag tag-g">稳健</span></td><td>家电音像</td><td class="neg">-7.4%</td><td><span class="tag tag-r">承压</span></td></tr>
+      <tr><td>汽车类</td><td class="neg">-12.6%</td><td><span class="tag tag-r">大拖累</span></td><td>家具类</td><td class="neg">-3.7%</td><td><span class="tag tag-r">承压</span></td></tr>
+    </table>
+    <div class="src">数据来源：国家统计局 2026-07-15。注：汽车类 -12.6% 是最大拖累项，以旧换新政策透支效应显现</div>
+  </div>
+
+  <!-- 2. 业态分化 -->
+  <div class="card">
+    <h2>二、业态分化：超市逆势，百货转负</h2>
+    <p>按零售业态拆分，2026 上半年分化极为剧烈。便利店、超市作为刚需渠道保持正增长；而百货店、专业店、品牌专卖店三大业态全面转负，其中品牌专卖店 -8.7% 跌幅最深。</p>
+    <div class="toggle">
+      <button class="active" onclick="sw(this,'bar')">柱状图</button>
+      <button onclick="sw(this,'tbl2')">数据表</button>
+    </div>
+    <div id="bar" class="chart"></div>
+    <div id="tbl2" class="hide">
+      <table>
+        <tr><th>业态</th><th>2025H1 同比</th><th>2026H1 同比</th><th>变化</th><th>趋势</th></tr>
+        <tr><td>便利店</td><td>+7.5%</td><td class="pos">+6.6%</td><td>-0.9pct</td><td><span class="tag tag-g">正增长</span></td></tr>
+        <tr><td>超市</td><td>+5.4%</td><td class="pos">+3.8%</td><td>-1.6pct</td><td><span class="tag tag-g">正增长</span></td></tr>
+        <tr><td>专业店</td><td>+6.4%</td><td class="neg">-1.5%</td><td>-7.9pct</td><td><span class="tag tag-r">转负</span></td></tr>
+        <tr><td>百货店</td><td>+1.2%</td><td class="neg">-2.1%</td><td>-3.3pct</td><td><span class="tag tag-r">转负</span></td></tr>
+        <tr><td>品牌专卖店</td><td>+2.4%</td><td class="neg">-8.7%</td><td>-11.1pct</td><td><span class="tag tag-r">大跌</span></td></tr>
+      </table>
+    </div>
+    <div class="src">数据来源：国家统计局。业态分化直接映射到上市公司业绩：百货股（王府井、重百等）承压，超市股（永辉、家家悦）相对受益。</div>
+  </div>
+
+  <!-- 3. 龙头公司分析 -->
+  <div class="card">
+    <h2>三、龙头公司：普跌中藏分化，估值已至历史低位</h2>
+    <p>板块五大龙头 2026 年以来全面下跌，中免 -41% 跌幅最深。但从基本面看，分化远比股价反映的更明显 —— 小商品城净利率 21%、永辉扭亏，与百货股的微亏形成鲜明对比。</p>
+
+    <h3>估值与行情对比（2026-07-22 收盘）</h3>
+    <table>
+      <tr><th>公司</th><th>现价</th><th>当日</th><th>YTD</th><th>近20日</th><th>近60日</th><th>PE(TTM)</th><th>PB</th><th>52周区间</th></tr>
+      <tr><td>中国中免 <span class="tag tag-y">免税龙头</span></td><td>55.70</td><td class="pos">+3.0%</td><td class="neg">-40.8%</td><td class="pos">+2.8%</td><td class="neg">-15.4%</td><td>28.3</td><td>2.02</td><td>49.85-99.36</td></tr>
+      <tr><td>小商品城 <span class="tag tag-g">出海/跨境</span></td><td>11.90</td><td class="pos">+2.7%</td><td class="neg">-23.0%</td><td class="pos">+18.4%</td><td class="neg">-9.4%</td><td>14.9</td><td>3.09</td><td>9.46-22.90</td></tr>
+      <tr><td>永辉超市 <span class="tag tag-g">超市/调改</span></td><td>3.09</td><td class="neg">-1.0%</td><td class="neg">-34.1%</td><td class="pos">+4.0%</td><td class="neg">-20.2%</td><td>亏损</td><td>16.7</td><td>2.79-6.04</td></tr>
+      <tr><td>王府井 <span class="tag tag-r">百货</span></td><td>9.80</td><td class="pos">+0.2%</td><td class="neg">-36.9%</td><td class="pos">+2.4%</td><td class="neg">-20.7%</td><td>亏损</td><td class="neg">0.57</td><td>9.00-16.98</td></tr>
+      <tr><td>豫园股份 <span class="tag tag-r">多元化</span></td><td>4.41</td><td class="pos">+0.9%</td><td class="neg">-14.0%</td><td class="pos">+4.0%</td><td class="neg">-11.3%</td><td>亏损</td><td class="neg">0.57</td><td>4.02-6.41</td></tr>
+    </table>
+    <div class="src">数据来源：腾讯自选股行情（2026-07-22 收盘）。王府井、豫园股份 PB 0.57 已破净，反映市场对传统业态的极度悲观定价。</div>
+
+    <h3>财务质量对比（2026Q1 / TTM）</h3>
+    <div id="chart2" class="chart"></div>
+    <div class="src">数据来源：公司财报（腾讯自选股财务数据）。注：永辉 TTM 仍亏损 -24.1 亿（含历史亏损），但 2026Q1 已扭亏 2.9 亿。</div>
+
+    <div class="callout alpha">
+      <b>变异认知（核心 Alpha）：</b>市场用「消费不行」一刀切杀板块，但忽视了三点 —— ① 中国中免「增利不增收」（H1 归母 +19.5%）实为毛利率改善 + DFS 并表的结构优化，海南整体 +18.8% 说明需求在；② 超市业态逆势 +3.8%，永辉胖东来调改进入兑现期（H1 扭亏 2.5 亿）；③ 小商品城净利率 21% + 跨境出海，PE 仅 14.9，是被错杀的优质地。
+    </div>
+  </div>
+
+  <!-- 4. 重点公司拆解 -->
+  <div class="card">
+    <h2>四、重点公司拆解</h2>
+
+    <h3>① 中国中免（601888）— 超跌的免税龙头，等暑期数据验证</h3>
+    <p>2026H1 业绩快报：营收 275.9 亿（<b>-1.99%</b>），归母 31.1 亿（<b>+19.49%</b>），呈「增利不增收」。海南离岛免税 H1 整体 +18.8%，但中免收入反降，反映份额被海旅、海发等稀释 + 价格战。3 月完成 DFS 大中华区收购（2.94 亿美元），整合效果良好。Q1 主业毛利率 +0.73pct。</p>
+    <ul style="margin:8px 0 8px 20px;font-size:14px;">
+      <li><b>大摩观点：</b>维持「持股观望」，H 股目标价 77 港元（现 53.95 港元，隐含 +43%）。5 月海南免税增速放缓（3 月 +25%→4 月 +10%→5 月持平），短期承压。</li>
+      <li><b>催化：</b>暑期旺季客流、海南自贸港封关政策红利、DFS 完整季度并表。</li>
+      <li><b>风险：</b>美妆消费疲软、份额持续稀释、价格战。</li>
+    </ul>
+
+    <h3>② 永辉超市（601933）— 调改兑现，超市业态的 Alpha</h3>
+    <p>2026H1 预盈：归母 2.5 亿（扭亏，同比 +4.9 亿），扣非 0.3 亿（同比 +8.3 亿）。毛利率 +1.6pct，费用率 -1.8pct。截至 6/30 累计完成 331 家门店胖东来式调改，进入第二阶段。</p>
+    <div class="callout warn"><b>隐忧：</b>单季拆解 Q1 归母 2.87 亿 → Q2 单季亏损 3700 万，盈利动能再度走弱，转型远未到庆功时刻。后续增长依赖门店效率 + 商品力 + 供应链。</div>
+
+    <h3>③ 小商品城（600415）— 板块最优基本面，跨境出海受益</h3>
+    <p>2026Q1：营收 45.9 亿，归母 9.9 亿，<b>净利率 21.6%</b>（板块最高）。TTM 营收 213.6 亿，归母 43.9 亿。近 20 日反弹 +18.4%，资金开始关注。Yiwu 选品平台 + 跨境电商 + 出海产业带构成增长逻辑，PE 14.9 估值合理。</p>
+
+    <h3>④ 王府井（600859）— 破净百货，安全边际有但缺催化</h3>
+    <p>2025 年报微亏 -0.4 亿，2026Q1 微盈 0.5 亿。百货业态 H1 -2.1% 持续承压。PB 0.57 破净提供安全边际，但业态转型缓慢，缺乏短期催化。属「便宜但不知道何时涨」的标的。</p>
+  </div>
+
+  <!-- 5. 政策催化 -->
+  <div class="card">
+    <h2>五、政策催化：托底信号明确</h2>
+    <table>
+      <tr><th>政策</th><th>时间</th><th>影响</th><th>受益方向</th></tr>
+      <tr><td>《关于加快零售业创新发展的意见》（商务部等9部门）</td><td>2026-07-09</td><td>借鉴胖东来经验，鼓励百货「一店一策」改造</td><td><span class="tag tag-y">百货转型</span> <span class="tag tag-g">超市调改</span></td></tr>
+      <tr><td>消费品以旧换新延续</td><td>2026下半年</td><td>汽车报废最高补2万、家电1500、数码500</td><td><span class="tag tag-y">家电连锁</span> <span class="tag tag-r">汽车零售</span></td></tr>
+      <tr><td>海南自贸港全岛封关运作</td><td>2025年底启动</td><td>离岛免税政策红利，H1 +18.8%</td><td><span class="tag tag-g">免税</span></td></tr>
+      <tr><td>「跨境电商+产业带」活动</td><td>持续推进</td><td>支持企业出海拓市场</td><td><span class="tag tag-g">跨境电商</span></td></tr>
+    </table>
+    <div class="src">数据来源：商务部、河南省商务厅发布会（2026-07-21）等公开信息</div>
+    <div class="callout"><b>政策点评：</b>7/9 零售创新意见是近期最重要的板块级催化，首次从国家层面肯定「胖东来模式」，为永辉等调改企业背书。但政策传导至业绩需要 2-3 个季度，短期更多是情绪修复。</div>
+  </div>
+
+  <!-- 6. 投资逻辑与风险 -->
+  <div class="card">
+    <h2>六、投资逻辑与风险</h2>
+    <div class="grid2">
+      <div>
+        <h3 style="color:#2f855a;">多头逻辑</h3>
+        <ul style="font-size:14px;margin-left:18px;">
+          <li>板块龙头普跌 30-40%，估值已至历史低位区间，破净股增多（王府井、豫园 PB 0.57）</li>
+          <li>超市业态逆势 +3.8%，永辉调改兑现扭亏，是被错杀的 Alpha</li>
+          <li>海南离岛免税 +18.8%，中免 DFS 并表 + 毛利率改善，增利趋势明确</li>
+          <li>政策托底信号密集（零售创新意见 + 以旧换新 + 跨境电商）</li>
+          <li>小商品城净利率 21% + 跨境出海，PE 14.9 估值合理</li>
+        </ul>
+      </div>
+      <div>
+        <h3 style="color:#c53030;">空头逻辑</h3>
+        <ul style="font-size:14px;margin-left:18px;">
+          <li>社零增速断崖式放缓（5.0%→1.3%），限额以上负增长 -0.8%</li>
+          <li>百货 / 专业店 / 品牌专卖三大业态全面转负</li>
+          <li>汽车类 -12.6% 大拖累，以旧换新透支效应显现</li>
+          <li>中免份额被稀释，海南整体增但中免收入降，「增利不增收」持续性存疑</li>
+          <li>永辉 Q2 单季再度亏损，调改持续性待验证</li>
+          <li>美妆消费疲软（5 月海南美妆进口 -5%），压制免税弹性</li>
+        </ul>
+      </div>
+    </div>
+    <div class="callout risk">
+      <b>主要风险：</b>① 宏观消费持续低迷超预期；② 以旧换新政策退坡后家电/汽车零售进一步下滑；③ 海南免税价格战加剧；④ 百货业态转型不及预期；⑤ 跨境贸易摩擦。
+    </div>
+  </div>
+
+  <!-- 7. 配置建议 -->
+  <div class="card">
+    <h2>七、配置建议与评级</h2>
+    <table class="rec-tbl">
+      <tr><th>方向</th><th>标的</th><th>建议</th><th>逻辑</th><th>时间维度</th></tr>
+      <tr><td><span class="tag tag-g">超配</span></td><td>小商品城</td><td>加码</td><td>净利率 21% + 跨境出海 + PE 14.9 估值合理，板块最优基本面</td><td>6-12 月</td></tr>
+      <tr><td><span class="tag tag-g">超配</span></td><td>永辉超市</td><td>加仓</td><td>胖东来调改兑现扭亏 + 超市业态逆势 +3.8%，政策背书</td><td>6-12 月</td></tr>
+      <tr><td><span class="tag tag-y">标配/左侧</span></td><td>中国中免</td><td>观察名单</td><td>YTD -41% 超跌 + 海南封关催化，但需 Q3 暑期数据验证份额企稳</td><td>等待证据</td></tr>
+      <tr><td><span class="tag tag-r">低配</span></td><td>王府井等百货</td><td>回避</td><td>业态 -2.1% 负增长 + 转型慢，PB 破净有安全边际但缺催化</td><td>放弃/等待</td></tr>
+      <tr><td><span class="tag tag-y">主题关注</span></td><td>跨境电商链</td><td>观察名单</td><td>赛维时代、吉宏股份、焦点科技等，出海 + 政策支持</td><td>事件驱动</td></tr>
+    </table>
+
+    <div class="callout alpha">
+      <b>操作框架：</b>若社零增速连续两月回升至 +3% 以上，可上调板块评级至「标配」并加仓中免；若限额以上零售额连续三月负增长加深，则进一步降配。小商品城、永辉的调改/出海逻辑独立于宏观，可作底仓配置。
+    </div>
+
+    <h3>板块评级汇总</h3>
+    <table>
+      <tr><th>维度</th><th>判断</th><th>信号</th></tr>
+      <tr><td>基本面</td><td>社零放缓 + 限额以上负增长</td><td><span class="tag tag-r">偏空</span></td></tr>
+      <tr><td>估值</td><td>龙头普跌 30-40%，破净增多，历史低位</td><td><span class="tag tag-g">偏多</span></td></tr>
+      <tr><td>政策</td><td>零售创新意见 + 以旧换新 + 跨境支持</td><td><span class="tag tag-g">偏多</span></td></tr>
+      <tr><td>资金</td><td>近 20 日部分标的反弹，关注度回升</td><td><span class="tag tag-y">中性</span></td></tr>
+      <tr><td>催化</td><td>暑期旺季 + Q2 业绩 + 政策落地</td><td><span class="tag tag-y">待验证</span></td></tr>
+      <tr><td><b>综合评级</b></td><td><b>低配 / 中性偏谨慎</b></td><td><span class="badge b-low">低配</span></td></tr>
+    </table>
+  </div>
+
+  <div class="disclaimer">
+    <b>免责声明：</b>本报告由「研股股」基于公开数据（国家统计局、公司公告、腾讯自选股行情、公开新闻报道）分析整理，仅供研究参考，<b>不构成任何投资建议</b>。报告中涉及的具体标的仅为分析举例，不代表推荐买卖。投资有风险，决策需谨慎。数据截止 2026-07-22，部分财务数据为 2026Q1 / 2025 年报，可能存在时滞。<br><br>
+    数据来源：国家统计局（stats.gov.cn）、海口海关、腾讯自选股（westock-data）、华夏时报、澎湃新闻、腾讯新闻、大摩研报（via 新浪财经）、河南省商务厅。
+  </div>
+
+</div>
+
+<script>
+function sw(btn, id) {
+  document.querySelectorAll('.toggle button').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  document.getElementById('bar').classList.add('hide');
+  document.getElementById('tbl2').classList.add('hide');
+  document.getElementById(id).classList.remove('hide');
+  if (id === 'bar') { setTimeout(function(){echarts.getInstanceByDom(document.getElementById('bar'))&&echarts.getInstanceByDom(document.getElementById('bar')).resize();},50); }
+}
+
+// 图1: 社零增速对比
+echarts.init(document.getElementById('chart1')).setOption({
+  tooltip: { trigger: 'axis' },
+  legend: { data: ['社零增速(%)'] },
+  grid: { left: 50, right: 30, bottom: 40, top: 40 },
+  xAxis: { type: 'category', data: ['2024H1','2025H1','2026H1'], axisLabel:{fontSize:12} },
+  yAxis: { type: 'value', name: '同比增速(%)', axisLabel:{formatter:'{value}%'} },
+  series: [{
+    name: '社零增速(%)', type: 'bar', barWidth: '40%',
+    data: [
+      {value:3.7, itemStyle:{color:'#90cdf4'}},
+      {value:5.0, itemStyle:{color:'#63b3ed'}},
+      {value:1.3, itemStyle:{color:'#fc8181'}}
+    ],
+    label: { show:true, position:'top', formatter:'{c}%', fontSize:13, fontWeight:'bold' }
+  }]
+});
+
+// 图2: 业态分化柱状图
+echarts.init(document.getElementById('bar')).setOption({
+  tooltip: { trigger: 'axis', axisPointer:{type:'shadow'} },
+  legend: { data: ['2025H1','2026H1'] },
+  grid: { left: 50, right: 30, bottom: 40, top: 40 },
+  xAxis: { type: 'category', data: ['便利店','超市','专业店','百货店','品牌专卖店'], axisLabel:{fontSize:12} },
+  yAxis: { type: 'value', name: '同比增速(%)', axisLabel:{formatter:'{value}%'} },
+  series: [
+    { name:'2025H1', type:'bar', data:[7.5,5.4,6.4,1.2,2.4], itemStyle:{color:'#63b3ed'}, label:{show:true,position:'top',formatter:'{c}%',fontSize:10} },
+    { name:'2026H1', type:'bar', data:[
+      {value:6.6,itemStyle:{color:'#48bb78'}},
+      {value:3.8,itemStyle:{color:'#48bb78'}},
+      {value:-1.5,itemStyle:{color:'#fc8181'}},
+      {value:-2.1,itemStyle:{color:'#fc8181'}},
+      {value:-8.7,itemStyle:{color:'#f56565'}}
+    ], label:{show:true,position:'top',formatter:'{c}%',fontSize:10} }
+  ]
+});
+
+// 图3: 龙头财务质量雷达
+echarts.init(document.getElementById('chart2')).setOption({
+  tooltip: {},
+  legend: { data: ['中国中免','小商品城','永辉超市','王府井'], bottom: 0 },
+  radar: {
+    indicator: [
+      { name: '毛利率(%)', max: 45 },
+      { name: '净利率(%)', max: 25 },
+      { name: '营收规模(亿)', max: 180 },
+      { name: '归母净利(亿)', max: 25 },
+      { name: '增长稳健', max: 5 }
+    ]
+  },
+  series: [{
+    type: 'radar', areaStyle: { opacity: 0.1 },
+    data: [
+      { name:'中国中免', value:[33.6,13.9,169.1,23.5,3.5], itemStyle:{color:'#3182ce'} },
+      { name:'小商品城', value:[33.8,21.6,45.9,9.9,4.5], itemStyle:{color:'#38a169'} },
+      { name:'永辉超市', value:[22.8,2.1,133.7,2.9,2.5], itemStyle:{color:'#dd6b20'} },
+      { name:'王府井', value:[36.7,1.8,28.1,0.5,1.5], itemStyle:{color:'#e53e3e'} }
+    ]
+  }]
+});
+
+window.addEventListener('resize', function(){
+  ['chart1','bar','chart2'].forEach(function(id){
+    var el = document.getElementById(id);
+    if (el) { var c = echarts.getInstanceByDom(el); if (c) c.resize(); }
+  });
+});
+</script>
+</body>
+</html>
