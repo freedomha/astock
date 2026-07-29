@@ -25,7 +25,7 @@ Uses `westock-data` to fetch ETF K-line data, then runs an enhanced multi-dimens
 ```
 1. Ensure all_etfs_larggest.json exists in project root
 2. Run analyze.py → fetches K-line + scores + saves etf_bowl_results.json & etf_kline_data.json
-3. Run generate_report.py → etf_bowl_report.html
+3. Run generate_report.py → reports/etf/etf_bowl_report.html
 4. present_files the HTML report
 ```
 
@@ -54,7 +54,7 @@ $PYTHON .codebuddy/skills/etf-bowl-bottom-scanner/analyze.py
 $PYTHON .codebuddy/skills/etf-bowl-bottom-scanner/generate_report.py
 ```
 
-Produces `etf_bowl_report.html` with: summary cards, 120-day K-line sparklines for confirmed bowl-bottoms, TOP25 ranking table, detailed analysis cards. Present via `present_files`.
+Produces `reports/etf/etf_bowl_report.html` with: summary cards, 120-day K-line sparklines for confirmed bowl-bottoms, TOP25 ranking table, detailed analysis cards. Present via `present_files`.
 
 ## Enhanced Scoring Engine
 

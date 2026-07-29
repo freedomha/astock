@@ -27,7 +27,7 @@ Uses `westock-data` to fetch ETF K-line data, then runs a multi-dimension scorin
 ```
 1. Ensure all_etfs_larggest.json exists
 2. Run analyze.py → fetches K-line + detects HS patterns + scores → etf_hs_bottom_results.json & etf_kline_data.json
-3. Run generate_report.py → etf_hs_bottom_report.html
+3. Run generate_report.py → reports/etf/etf_hs_bottom_report.html
 4. present_files the HTML report
 ```
 
@@ -56,7 +56,7 @@ $PYTHON .codebuddy/skills/etf-head-shoulder-bottom-scanner/analyze.py
 $PYTHON .codebuddy/skills/etf-head-shoulder-bottom-scanner/generate_report.py
 ```
 
-Produces `etf_hs_bottom_report.html` with: summary cards, annotated 250-day K-line sparklines for confirmed patterns (LS/H/RS points marked + neckline), TOP25 ranking table, detailed analysis cards. Present via `present_files`.
+Produces `reports/etf/etf_hs_bottom_report.html` with: summary cards, annotated 250-day K-line sparklines for confirmed patterns (LS/H/RS points marked + neckline), TOP25 ranking table, detailed analysis cards. Present via `present_files`.
 
 ## Pattern Detection Algorithm
 

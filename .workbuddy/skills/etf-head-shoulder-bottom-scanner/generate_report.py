@@ -390,7 +390,9 @@ def main():
     cwd = os.getcwd()
     results_file = os.path.join(cwd, "etf_hs_bottom_results.json")
     kline_file = os.path.join(cwd, "etf_kline_data.json")
-    output = os.path.join(cwd, "etf_hs_bottom_report.html")
+    outdir = os.path.join(cwd, "reports", "etf")
+    os.makedirs(outdir, exist_ok=True)
+    output = os.path.join(outdir, "etf_hs_bottom_report.html")
 
     if not os.path.exists(results_file):
         print(f"ERROR: Results file not found: {results_file}")

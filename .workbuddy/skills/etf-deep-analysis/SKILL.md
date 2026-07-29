@@ -237,7 +237,69 @@ Must include:
 
 ### Step 9: Produce HTML Report
 
-Write a self-contained HTML file to the project root: `<ETF简称>ETF深度分析-YYYYMMDD.html`
+Write a self-contained HTML file to `reports/etf/`: `<ETF简称>ETF深度分析-YYYYMMDD.html` (create the directory if it doesn't exist).
+
+**Critical: HTML generation methodology.** Do NOT attempt to embed Python code inside a triple-quoted HTML string by closing/reopening the string — Python `print()` output goes to stdout, not back into the string variable. Use a **two-phase f-string approach** instead:
+
+**Phase 1** — Pre-compute all dynamic data as Python variables. This includes:
+- K-line data as JSON arrays (`json.dumps([[date, close, close, close, close], ...])`)
+- 60MA values as JSON arrays
+- High/low boundaries for chart axes
+- All metric values (pos120, score, label, etc.)
+
+**Phase 2** — Build the HTML as an f-string (triple-quoted with `f'''...'''`). Use `{{` / `}}` to escape literal curly braces in CSS and JS, and `{var}` to insert pre-computed values.
+
+```python
+import json
+
+# Phase 1: pre-compute all data
+with open('/tmp/etf_kline.json') as f:
+    data = json.load(f)
+bars = data if isinstance(data, list) else data.get('data', [])
+bars.sort(key=lambda b: b.get('date',''))
+closes = [float(b['last']) for b in bars]
+dates = [b['date'] for b in bars]
+h250 = max(float(b['high']) for b in bars)
+l250 = min(float(b['low']) for b in bars)
+close = closes[-1]
+
+ma60_vals = [
+    round(sum(closes[i-59:i+1])/60, 3) if i >= 59 else None
+    for i in range(len(closes))
+]
+kline_js = json.dumps([[d, c, c, c, c] for d, c in zip(dates, closes)])
+ma_js = json.dumps(ma60_vals)
+
+# Phase 2: f-string template with {{escaped}} curly braces
+html = f'''<!DOCTYPE html>
+<html>
+...
+<style>
+.card{{background:#fff;}} /* {{ }} become literal { } in the output */
+</style>
+<script>
+var rawData = {kline_js};   /* pre-computed value inserted here */
+var maData = {ma_js};
+var markLine = {{yAxis: {l250}}};
+var option = {{
+  yAxis: {{min: {round(l250*0.98,2)}, max: {round(h250*1.02,2)}}}
+}};
+</script>
+</html>'''
+
+import os
+os.makedirs('reports/etf', exist_ok=True)
+with open('reports/etf/XXXETF深度分析-YYYYMMDD.html', 'w', encoding='utf-8') as f:
+    f.write(html)
+```
+
+**Template escaping rules in f-strings:**
+- `{{` → literal `{` in output (for CSS selectors: `.card{{...}}`)
+- `{var}` → Python variable value
+- `{{b}}` → literal `{b}` in output (for JS template strings)
+- `{{function(v) {{ return v.slice(5); }}}}` → JS arrow function in output
+
+**HTML Structure** (sell-side ETF report style):
 
 **HTML Structure** (sell-side ETF report style):
 
@@ -301,6 +363,26 @@ If the ETF is near its 250-day low but the underlying index is NOT, the ETF is c
 
 ### Money Market / Bond ETFs
 Skip bowl-bottom analysis for money market ETFs (银华日利, etc.) and bond ETFs — the framework is designed for equity ETFs.
+
+## Troubleshooting
+
+### quote command returns empty `[]`
+The `quote --raw` command may return `[]` for some ETF codes. **Fallback:** use `kline --limit 1` to get the latest bar which contains `last` (close), `open`, `high`, `low`, `volume`, `amount`. This is reliable for all ETF codes.
+
+```bash
+$NODE $WD/scripts/index.js kline <code> --period day --limit 1 --raw
+```
+
+Similarly, for holding stock quotes: if `quote` returns empty data fields, use `kline --limit 1` per stock instead.
+
+### HTML report has broken/missing <script> tags
+This happens when attempting to embed Python code inside a triple-quoted HTML string using `print()`. `print()` writes to stdout, not into the string variable. Always use the two-phase f-string approach described in Step 9.
+
+### Multiple ETFs in one request
+The skill is designed for single-ETF analysis. If the user asks for multiple ETFs (e.g., "分析A和B"), process them **sequentially** — complete Step 1–9 for the first ETF, then the second. Web searches can be parallelized across both ETFs in Step 4-7 to save time.
+
+### Report output directory
+All reports must be saved to `reports/etf/`. Create the directory if it doesn't exist. This keeps the project root clean.
 
 ## Important Notes
 

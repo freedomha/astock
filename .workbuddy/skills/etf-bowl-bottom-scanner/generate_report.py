@@ -244,7 +244,9 @@ def main():
     cwd = os.getcwd()
     results_file = os.path.join(cwd, "etf_bowl_results.json")
     kline_file = os.path.join(cwd, "etf_kline_data.json")
-    output = os.path.join(cwd, "etf_bowl_report.html")
+    outdir = os.path.join(cwd, "reports", "etf")
+    os.makedirs(outdir, exist_ok=True)
+    output = os.path.join(outdir, "etf_bowl_report.html")
 
     with open(results_file) as f:
         results = json.load(f)
