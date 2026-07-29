@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A股ETF头肩底形态分析报告 · 2026-07-29</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif; background:#f5f6fa; color:#2c3e50; line-height:1.6; }
+.container { max-width:1280px; margin:0 auto; padding:20px; }
+.header { background:linear-gradient(135deg,#1a0a2e 0%,#2d1b69 50%,#6c3a9e 100%); color:#fff; padding:36px 30px; border-radius:12px; margin-bottom:24px; box-shadow:0 4px 20px rgba(0,0,0,0.15); }
+.header h1 { font-size:26px; margin-bottom:8px; }
+.header .subtitle { opacity:0.85; font-size:14px; }
+.header .meta { margin-top:14px; display:flex; gap:24px; font-size:13px; opacity:0.75; flex-wrap:wrap; }
+.summary-cards { display:grid; grid-template-columns:repeat(5,1fr); gap:14px; margin-bottom:28px; }
+.summary-card { background:#fff; border-radius:10px; padding:18px; text-align:center; box-shadow:0 2px 10px rgba(0,0,0,0.06); }
+.summary-card .number { font-size:30px; font-weight:700; }
+.summary-card .label { font-size:12px; color:#7f8c8d; margin-top:4px; }
+.c-green .number { color:#27ae60; }
+.c-blue .number { color:#2ecc71; }
+.c-orange .number { color:#f39c12; }
+.c-red .number { color:#e74c3c; }
+.c-gray .number { color:#7f8c8d; }
+.section-title { font-size:19px; font-weight:600; margin:28px 0 14px; padding-bottom:10px; border-bottom:2px solid #ecf0f1; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.section-title .count { font-size:13px; color:#7f8c8d; font-weight:400; }
+.legend { display:flex; gap:14px; font-size:12px; margin-left:auto; color:#7f8c8d; }
+.legend span { display:flex; align-items:center; gap:4px; }
+.legend .dot { width:10px; height:10px; border-radius:50%; display:inline-block; }
+.table-wrapper { background:#fff; border-radius:10px; overflow:hidden; box-shadow:0 2px 10px rgba(0,0,0,0.06); margin-bottom:28px; overflow-x:auto; }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+th { background:#f8f9fa; padding:11px 9px; text-align:left; font-weight:600; color:#5a6473; white-space:nowrap; border-bottom:2px solid #e8eaed; }
+td { padding:10px 9px; border-bottom:1px solid #f0f2f5; white-space:nowrap; }
+tr:hover td { background:#fafbfc; }
+.muted { color:#95a5a6; font-size:12px; }
+.pos { color:#e74c3c; font-weight:600; }
+.neg { color:#16a085; font-weight:600; }
+.low { color:#e67e22; font-weight:600; }
+.charts-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-bottom:28px; }
+.chart-card { background:#fff; border-radius:10px; padding:16px; box-shadow:0 2px 10px rgba(0,0,0,0.06); }
+.chart-card h4 { font-size:15px; margin-bottom:4px; display:flex; align-items:center; gap:8px; }
+.chart-card .sub { font-size:12px; color:#7f8c8d; margin-bottom:10px; }
+.chart-box { height:180px; position:relative; }
+.detail-card { background:#fff; border-radius:10px; padding:20px; margin-bottom:18px; box-shadow:0 2px 10px rgba(0,0,0,0.06); border-left:4px solid #6c3a9e; }
+.detail-head { display:flex; align-items:center; gap:12px; margin-bottom:14px; flex-wrap:wrap; }
+.detail-head .rank { background:#6c3a9e; color:#fff; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px; }
+.detail-head h3 { font-size:18px; }
+.badge { color:#fff; padding:3px 10px; border-radius:12px; font-size:12px; }
+.score-badge { background:#34495e; color:#fff; padding:3px 10px; border-radius:12px; font-size:12px; font-weight:600; }
+.detail-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:14px; }
+.metric { background:#f8f9fa; padding:9px 12px; border-radius:6px; }
+.metric .ml { font-size:12px; color:#7f8c8d; display:block; }
+.metric .mv { font-size:15px; font-weight:600; }
+.reasons { background:#f8f9fa; padding:12px 16px; border-radius:6px; }
+.reasons ul { list-style:none; margin-top:6px; }
+.reasons li { padding:2px 0; font-size:13px; }
+.note { background:#f3e8ff; border-left:4px solid #6c3a9e; padding:14px 18px; border-radius:6px; margin:20px 0; font-size:13px; }
+.disclaimer { background:#fdecea; border-radius:8px; padding:16px 20px; margin-top:28px; font-size:12px; color:#c0392b; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+  <h1> A股ETF头肩底形态分析报告</h1>
+  <div class="subtitle">各板块规模最大ETF的头肩底形态扫描 · 左肩→头部→右肩+颈线</div>
+  <div class="meta">
+    <span> 数据日期: 2026-07-29</span>
+    <span> 样本: 336 只ETF</span>
+    <span> K线周期: 日线 250 天</span>
+    <span> 算法: 局部极值 → 三谷验证 → 颈线拟合 → 多维度评分</span>
+  </div>
+</div>
+
+<div class="summary-cards">
+  <div class="summary-card c-blue"><div class="number">336</div><div class="label">分析ETF总数</div></div>
+  <div class="summary-card c-green"><div class="number">0</div><div class="label"> 头肩底确认</div></div>
+  <div class="summary-card c-blue"><div class="number">3</div><div class="label"> 头肩底形成中</div></div>
+  <div class="summary-card c-orange"><div class="number">0</div><div class="label"> 头肩底候选</div></div>
+  <div class="summary-card c-gray"><div class="number">333</div><div class="label"> 非头肩底</div></div>
+</div>
+
+<div class="note">
+  <b> 头肩底形态判定逻辑:</b> 头肩底是经典底部反转形态，由五部分组成: <b>左肩</b> → <b>颈线左高点</b> → <b>头部(最低)</b> → <b>颈线右高点</b> → <b>右肩</b>。
+  头必须是最低点，左右肩价差&lt;20%，颈线应大致水平，量能从左肩到右肩递减(卖压耗尽)。
+  <b>右肩接近颈线</b>时是最佳观察点，突破颈线则确认反转。
+  本算法通过寻找局部极值点，在250日K线中识别符合条件的头肩底结构。
+</div>
+
+<div class="section-title"> 头肩底确认/形成中ETF — K线形态缩略图 <span class="count">(展示前3名 250日走势 · 标注:  左肩 头部 右肩 ━颈线)</span>
+  <div class="legend">
+    <span><span class="dot" style="background:#3498db"></span>左肩</span>
+    <span><span class="dot" style="background:#e74c3c"></span>头部</span>
+    <span><span class="dot" style="background:#2ecc71"></span>右肩</span>
+    <span><span style="border-bottom:2px dashed #f39c12;display:inline-block;width:20px"></span>颈线</span>
+  </div>
+</div>
+<div class="charts-grid" id="chartsGrid"></div>
+
+<div class="section-title"> 综合得分排名 (TOP 25) <span class="count">颜色: 涨红跌绿 (A股惯例)</span></div>
+<div class="table-wrapper">
+<table>
+<thead><tr>
+<th>#</th><th>ETF名称</th><th>形态判定</th><th>得分</th><th>120日位</th><th>近20日</th><th>60日趋势</th><th>近10日</th><th>距60MA</th><th>形态信息</th>
+</tr></thead>
+<tbody>
+
+        <tr>
+          <td><b>1</b></td>
+          <td><b>信创ETF华夏</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#2ecc71;font-weight:600">🟢 头肩底形成中</span></td>
+          <td><b>68</b></td>
+          <td class="low">9.6%</td>
+          <td class="neg">-15.3%</td>
+          <td class="neg">-13.4%</td>
+          <td class="neg">-8.4%</td>
+          <td class="neg">-10.9%</td>
+          <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;font-size:11px">头深1.5% 颈斜-1.8% 距颈19.3%</td>
+        </tr>
+        <tr>
+          <td><b>2</b></td>
+          <td><b>科创新能源ETF鹏华</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#2ecc71;font-weight:600">🟢 头肩底形成中</span></td>
+          <td><b>63</b></td>
+          <td class="low">10.8%</td>
+          <td class="neg">-33.0%</td>
+          <td class="neg">-40.3%</td>
+          <td class="neg">-8.2%</td>
+          <td class="neg">-22.9%</td>
+          <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;font-size:11px">头深2.1% 颈斜+9.8% 距颈32.6%</td>
+        </tr>
+        <tr>
+          <td><b>3</b></td>
+          <td><b>人工智能ETF易方达</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#2ecc71;font-weight:600">🟢 头肩底形成中</span></td>
+          <td><b>59</b></td>
+          <td class="">40.7%</td>
+          <td class="neg">-13.8%</td>
+          <td class="neg">+1.3%</td>
+          <td class="neg">-12.7%</td>
+          <td class="neg">-11.0%</td>
+          <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;font-size:11px">头深2.2% 颈斜+7.6% 距颈27.1%</td>
+        </tr>
+        <tr>
+          <td><b>4</b></td>
+          <td><b>沪深300ETF华泰柏瑞</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#95a5a6;font-weight:600">⚪ 非头肩底</span></td>
+          <td><b>0</b></td>
+          <td class="">34.2%</td>
+          <td class="neg">-4.7%</td>
+          <td class="neg">-3.8%</td>
+          <td class="neg">-4.0%</td>
+          <td class="neg">-4.6%</td>
+          <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;font-size:11px">—</td>
+        </tr>
+        <tr>
+          <td><b>5</b></td>
+          <td><b>银华日利ETF</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#95a5a6;font-weight:600">⚪ 非头肩底</span></td>
+          <td><b>0</b></td>
+          <td class="">98.1%</td>
+          <td class="neg">+0.0%</td>
+          <td class="neg">+0.2%</td>
+          <td class="neg">+0.0%</td>
+          <td class="neg">+0.1%</td>
+          <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;font-size:11px">—</td>
+        </tr>
+        <tr>
+          <td><b>6</b></td>
+          <td><b>黄金ETF华安</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#95a5a6;font-weight:600">⚪ 非头肩底</span></td>
+          <td><b>0</b></td>
+          <td class="low">3.9%</td>
+          <td class="neg">-2.3%</td>
+          <td class="neg">-18.5%</td>
+          <td class="neg">-0.0%</td>
+          <td class="neg">-6.3%</td>
+          <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;font-size:11px">—</td>
+        </tr>
+        <tr>
+          <td><b>7</b></td>
+          <td><b>科创50ETF华夏</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#95a5a6;font-weight:600">⚪ 非头肩底</span></td>
+          <td><b>0</b></td>
+          <td class="">40.8%</td>
+          <td class="neg">-21.2%</td>
+          <td class="neg">+13.3%</td>
+          <td class="neg">-13.4%</td>
+          <td class="neg">-9.3%</td>
+          <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;font-size:11px">—</td>
+        </tr>
+        <tr>
+          <td><b>8</b></td>
+          <td><b>短融ETF海富通</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#95a5a6;font-weight:600">⚪ 非头肩底</span></td>
+          <td><b>0</b></td>
+          <td class="">99.5%</td>
+          <td class="pos">+0.1%</td>
+          <td class="neg">+0.3%</td>
+          <td class="neg">+0.0%</td>
+          <td class="neg">+0.1%</td>
+          <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;font-size:11px">—</td>
+        </tr>
+        <tr>
+          <td><b>9</b></td>
+          <td><b>华宝添益ETF</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#95a5a6;font-weight:600">⚪ 非头肩底</span></td>
+          <td><b>0</b></td>
+          <td class="">49.0%</td>
+          <td class="neg">-0.0%</td>
+          <td class="neg">-0.0%</td>
+          <td class="neg">-0.0%</td>
+          <td class="neg">-0.0%</td>
+          <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;font-size:11px">—</td>
+        </tr>
+        <tr>
+          <td><b>10</b></td>
+          <td><b>可转债ETF博时</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#95a5a6;font-weight:600">⚪ 非头肩底</span></td>
+          <td><b>0</b></td>
+          <td class="low">25.1%</td>
+          <td class="neg">-1.7%</td>
+          <td class="neg">-4.5%</td>
+          <td class="neg">-0.1%</td>
+          <td class="neg">-1.6%</td>
+          <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;font-size:11px">—</td>
+        </tr>
+        <tr>
+          <td><b>11</b></td>
+          <td><b>证券ETF国泰</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#95a5a6;font-weight:600">⚪ 非头肩底</span></td>
+          <td><b>0</b></td>
+          <td class="">51.4%</td>
+          <td class="neg">-4.1%</td>
+          <td class="neg">+7.5%</td>
+          <td class="neg">-2.4%</td>
+          <td class="neg">+1.7%</td>
+          <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;font-size:11px">—</td>
+        </tr>
+        <tr>
+          <td><b>12</b></td>
+          <td><b>创业板ETF易方达</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#95a5a6;font-weight:600">⚪ 非头肩底</span></td>
+          <td><b>0</b></td>
+          <td class="low">22.0%</td>
+          <td class="neg">-18.4%</td>
+          <td class="neg">-7.9%</td>
+          <td class="neg">-11.6%</td>
+          <td class="neg">-14.1%</td>
+          <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;font-size:11px">—</td>
+        </tr>
+        <tr>
+          <td><b>13</b></td>
+          <td><b>城投债ETF海富通</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#95a5a6;font-weight:600">⚪ 非头肩底</span></td>
+          <td><b>0</b></td>
+          <td class="">92.5%</td>
+          <td class="pos">+0.1%</td>
+          <td class="neg">+0.4%</td>
+          <td class="pos">+0.1%</td>
+          <td class="neg">+0.2%</td>
+          <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;font-size:11px">—</td>
+        </tr>
+        <tr>
+          <td><b>14</b></td>
+          <td><b>科创芯片ETF嘉实</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#95a5a6;font-weight:600">⚪ 非头肩底</span></td>
+          <td><b>0</b></td>
+          <td class="">42.4%</td>
+          <td class="neg">-28.2%</td>
+          <td class="neg">+21.2%</td>
+          <td class="neg">-16.7%</td>
+          <td class="neg">-11.1%</td>
+          <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;font-size:11px">—</td>
+        </tr>
+        <tr>
+          <td><b>15</b></td>
+          <td><b>中证500ETF南方</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#95a5a6;font-weight:600">⚪ 非头肩底</span></td>
+          <td><b>0</b></td>
+          <td class="low">14.3%</td>
+          <td class="neg">-18.3%</td>
+          <td class="neg">-8.5%</td>
+          <td class="neg">-7.9%</td>
+          <td class="neg">-10.3%</td>
+          <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;font-size:11px">—</td>
+        </tr>
+        <tr>
+          <td><b>16</b></td>
+          <td><b>通信ETF国泰</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#95a5a6;font-weight:600">⚪ 非头肩底</span></td>
+          <td><b>0</b></td>
+          <td class="low">22.3%</td>
+          <td class="neg">-27.9%</td>
+          <td class="neg">-7.6%</td>
+          <td class="neg">-21.3%</td>
+          <td class="neg">-23.3%</td>
+          <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;font-size:11px">—</td>
+        </tr>
+        <tr>
+          <td><b>17</b></td>
+          <td><b>政金债ETF富国</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#95a5a6;font-weight:600">⚪ 非头肩底</span></td>
+          <td><b>0</b></td>
+          <td class="">94.1%</td>
+          <td class="pos">+0.2%</td>
+          <td class="neg">+0.9%</td>
+          <td class="neg">-0.0%</td>
+          <td class="neg">+0.3%</td>
+          <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;font-size:11px">—</td>
+        </tr>
+        <tr>
+          <td><b>18</b></td>
+          <td><b>半导体设备ETF国泰</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#95a5a6;font-weight:600">⚪ 非头肩底</span></td>
+          <td><b>0</b></td>
+          <td class="">45.8%</td>
+          <td class="neg">-30.3%</td>
+          <td class="neg">+42.5%</td>
+          <td class="neg">-13.5%</td>
+          <td class="neg">-3.4%</td>
+          <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;font-size:11px">—</td>
+        </tr>
+        <tr>
+          <td><b>19</b></td>
+          <td><b>公司债ETF平安</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#95a5a6;font-weight:600">⚪ 非头肩底</span></td>
+          <td><b>0</b></td>
+          <td class="">96.4%</td>
+          <td class="pos">+0.1%</td>
+          <td class="neg">+0.4%</td>
+          <td class="pos">+0.1%</td>
+          <td class="neg">+0.2%</td>
+          <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;font-size:11px">—</td>
+        </tr>
+        <tr>
+          <td><b>20</b></td>
+          <td><b>港股通互联网ETF富国</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#95a5a6;font-weight:600">⚪ 非头肩底</span></td>
+          <td><b>0</b></td>
+          <td class="low">24.4%</td>
+          <td class="pos">+7.1%</td>
+          <td class="neg">-19.6%</td>
+          <td class="pos">+2.5%</td>
+          <td class="neg">+1.4%</td>
+          <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;font-size:11px">—</td>
+        </tr>
+        <tr>
+          <td><b>21</b></td>
+          <td><b>券商ETF华宝</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#95a5a6;font-weight:600">⚪ 非头肩底</span></td>
+          <td><b>0</b></td>
+          <td class="">51.8%</td>
+          <td class="neg">-3.7%</td>
+          <td class="neg">+7.6%</td>
+          <td class="neg">-2.4%</td>
+          <td class="neg">+1.6%</td>
+          <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;font-size:11px">—</td>
+        </tr>
+        <tr>
+          <td><b>22</b></td>
+          <td><b>科创半导体ETF华夏</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#95a5a6;font-weight:600">⚪ 非头肩底</span></td>
+          <td><b>0</b></td>
+          <td class="">46.2%</td>
+          <td class="neg">-33.0%</td>
+          <td class="neg">+48.2%</td>
+          <td class="neg">-14.8%</td>
+          <td class="neg">-2.5%</td>
+          <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;font-size:11px">—</td>
+        </tr>
+        <tr>
+          <td><b>23</b></td>
+          <td><b>A500ETF华泰柏瑞</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#95a5a6;font-weight:600">⚪ 非头肩底</span></td>
+          <td><b>0</b></td>
+          <td class="low">27.3%</td>
+          <td class="neg">-8.3%</td>
+          <td class="neg">-5.8%</td>
+          <td class="neg">-5.2%</td>
+          <td class="neg">-6.5%</td>
+          <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;font-size:11px">—</td>
+        </tr>
+        <tr>
+          <td><b>24</b></td>
+          <td><b>红利低波ETF华泰柏瑞</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#95a5a6;font-weight:600">⚪ 非头肩底</span></td>
+          <td><b>0</b></td>
+          <td class="">84.7%</td>
+          <td class="pos">+8.9%</td>
+          <td class="neg">-3.6%</td>
+          <td class="pos">+3.2%</td>
+          <td class="neg">+3.5%</td>
+          <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;font-size:11px">—</td>
+        </tr>
+        <tr>
+          <td><b>25</b></td>
+          <td><b>30年国债ETF鹏扬</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#95a5a6;font-weight:600">⚪ 非头肩底</span></td>
+          <td><b>0</b></td>
+          <td class="">92.6%</td>
+          <td class="pos">+1.1%</td>
+          <td class="neg">+1.2%</td>
+          <td class="pos">+1.1%</td>
+          <td class="neg">+1.1%</td>
+          <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;font-size:11px">—</td>
+        </tr>
+</tbody></table>
+</div>
+
+<div class="section-title"> 头肩底确认/形成中 ETF 详细分析</div>
+
+        <div class="detail-card">
+          <div class="detail-head">
+            <span class="rank">#1</span>
+            <h3>信创ETF华夏</h3>
+            <span class="badge" style="background:#2ecc71">🟢 头肩底形成中</span>
+            <span class="score-badge">得分 68/100</span>
+          </div>
+          <div class="detail-grid">
+            <div class="metric"><span class="ml">当前价格</span><span class="mv">1.31</span></div>
+            <div class="metric"><span class="ml">120日区间位</span><span class="mv">9.6%</span></div>
+            <div class="metric"><span class="ml">250日区间位</span><span class="mv">8.5%</span></div>
+            <div class="metric"><span class="ml">近5日</span><span class="mv neg">-5.8%</span></div>
+            <div class="metric"><span class="ml">近10日</span><span class="mv neg">-8.4%</span></div>
+            <div class="metric"><span class="ml">近20日</span><span class="mv neg">-14.9%</span></div>
+            <div class="metric"><span class="ml">60日趋势</span><span class="mv neg">-13.4%</span></div>
+            <div class="metric"><span class="ml">量比(20/60)</span><span class="mv">0.73</span></div>
+            
+            <div class="metric"><span class="ml">左肩价格</span><span class="mv">1.31</span></div>
+            <div class="metric"><span class="ml">头部价格</span><span class="mv neg">1.29</span></div>
+            <div class="metric"><span class="ml">右肩价格</span><span class="mv">1.36</span></div>
+            <div class="metric"><span class="ml">颈线(左)</span><span class="mv">1.66</span></div>
+            <div class="metric"><span class="ml">颈线(右)</span><span class="mv">1.63</span></div>
+            <div class="metric"><span class="ml">颈线斜率</span><span class="mv">-1.8%</span></div>
+            <div class="metric"><span class="ml">头部深度</span><span class="mv">1.5%</span></div>
+            <div class="metric"><span class="ml">肩部对称</span><span class="mv">96%</span></div>
+            <div class="metric"><span class="ml">时间对称</span><span class="mv">0.60</span></div>
+            <div class="metric"><span class="ml">量缩(RS/LS)</span><span class="mv">1.73</span></div>
+            <div class="metric"><span class="ml">右距颈线</span><span class="mv">19.3%</span></div>
+            
+          </div>
+          <div class="reasons"><b>判定依据:</b><ul><li>✅ 模式完整(5点确认)</li><li>🟡 头深一般(1.5%)</li><li>✅ 肩部对称(96%)</li><li>✅ 颈线平坦(斜率+1.8%)</li><li>❌ 量度放大(173%)</li><li>✅ 底部区间(5%)</li><li>✅ 时间对称(0.60)</li><li>❌ 右肩远离颈线(19.3%)</li><li>⚠️ 近20日暴跌(-15.3%)</li></ul></div>
+        </div>
+        <div class="detail-card">
+          <div class="detail-head">
+            <span class="rank">#2</span>
+            <h3>科创新能源ETF鹏华</h3>
+            <span class="badge" style="background:#2ecc71">🟢 头肩底形成中</span>
+            <span class="score-badge">得分 63/100</span>
+          </div>
+          <div class="detail-grid">
+            <div class="metric"><span class="ml">当前价格</span><span class="mv">1.16</span></div>
+            <div class="metric"><span class="ml">120日区间位</span><span class="mv">10.8%</span></div>
+            <div class="metric"><span class="ml">250日区间位</span><span class="mv">10.1%</span></div>
+            <div class="metric"><span class="ml">近5日</span><span class="mv pos">+0.6%</span></div>
+            <div class="metric"><span class="ml">近10日</span><span class="mv neg">-8.2%</span></div>
+            <div class="metric"><span class="ml">近20日</span><span class="mv neg">-27.2%</span></div>
+            <div class="metric"><span class="ml">60日趋势</span><span class="mv neg">-40.3%</span></div>
+            <div class="metric"><span class="ml">量比(20/60)</span><span class="mv">0.97</span></div>
+            
+            <div class="metric"><span class="ml">左肩价格</span><span class="mv">1.4</span></div>
+            <div class="metric"><span class="ml">头部价格</span><span class="mv neg">1.37</span></div>
+            <div class="metric"><span class="ml">右肩价格</span><span class="mv">1.47</span></div>
+            <div class="metric"><span class="ml">颈线(左)</span><span class="mv">1.64</span></div>
+            <div class="metric"><span class="ml">颈线(右)</span><span class="mv">1.8</span></div>
+            <div class="metric"><span class="ml">颈线斜率</span><span class="mv">+9.8%</span></div>
+            <div class="metric"><span class="ml">头部深度</span><span class="mv">2.1%</span></div>
+            <div class="metric"><span class="ml">肩部对称</span><span class="mv">95%</span></div>
+            <div class="metric"><span class="ml">时间对称</span><span class="mv">0.60</span></div>
+            <div class="metric"><span class="ml">量缩(RS/LS)</span><span class="mv">1.09</span></div>
+            <div class="metric"><span class="ml">右距颈线</span><span class="mv">32.6%</span></div>
+            
+          </div>
+          <div class="reasons"><b>判定依据:</b><ul><li>✅ 模式完整(5点确认)</li><li>✅ 头部深度充分(2.1%)</li><li>✅ 肩部对称(95%)</li><li>❌ 颈线陡峭(斜率+9.8%)</li><li>❌ 量度放大(109%)</li><li>✅ 底部区间(5%)</li><li>✅ 时间对称(0.60)</li><li>❌ 右肩远离颈线(32.6%)</li><li>⚠️ 近20日暴跌(-33.0%)</li></ul></div>
+        </div>
+        <div class="detail-card">
+          <div class="detail-head">
+            <span class="rank">#3</span>
+            <h3>人工智能ETF易方达</h3>
+            <span class="badge" style="background:#2ecc71">🟢 头肩底形成中</span>
+            <span class="score-badge">得分 59/100</span>
+          </div>
+          <div class="detail-grid">
+            <div class="metric"><span class="ml">当前价格</span><span class="mv">1.77</span></div>
+            <div class="metric"><span class="ml">120日区间位</span><span class="mv">40.7%</span></div>
+            <div class="metric"><span class="ml">250日区间位</span><span class="mv">60.5%</span></div>
+            <div class="metric"><span class="ml">近5日</span><span class="mv neg">-10.5%</span></div>
+            <div class="metric"><span class="ml">近10日</span><span class="mv neg">-12.7%</span></div>
+            <div class="metric"><span class="ml">近20日</span><span class="mv neg">-18.7%</span></div>
+            <div class="metric"><span class="ml">60日趋势</span><span class="mv neg">+1.3%</span></div>
+            <div class="metric"><span class="ml">量比(20/60)</span><span class="mv">1.01</span></div>
+            
+            <div class="metric"><span class="ml">左肩价格</span><span class="mv">1.38</span></div>
+            <div class="metric"><span class="ml">头部价格</span><span class="mv neg">1.35</span></div>
+            <div class="metric"><span class="ml">右肩价格</span><span class="mv">1.43</span></div>
+            <div class="metric"><span class="ml">颈线(左)</span><span class="mv">1.58</span></div>
+            <div class="metric"><span class="ml">颈线(右)</span><span class="mv">1.7</span></div>
+            <div class="metric"><span class="ml">颈线斜率</span><span class="mv">+7.6%</span></div>
+            <div class="metric"><span class="ml">头部深度</span><span class="mv">2.2%</span></div>
+            <div class="metric"><span class="ml">肩部对称</span><span class="mv">97%</span></div>
+            <div class="metric"><span class="ml">时间对称</span><span class="mv">0.30</span></div>
+            <div class="metric"><span class="ml">量缩(RS/LS)</span><span class="mv">0.43</span></div>
+            <div class="metric"><span class="ml">右距颈线</span><span class="mv">27.1%</span></div>
+            
+          </div>
+          <div class="reasons"><b>判定依据:</b><ul><li>✅ 模式完整(5点确认)</li><li>✅ 头部深度充分(2.2%)</li><li>✅ 肩部对称(97%)</li><li>🟡 颈线倾斜(斜率+7.6%)</li><li>✅ 量度萎缩(43%)</li><li>❌ 中高位(100%)</li><li>❌ 时间不对(0.30)</li><li>❌ 右肩远离颈线(27.1%)</li><li>⚠️ 近20日暴跌(-13.8%)</li></ul></div>
+        </div>
+
+<div class="disclaimer">
+  ⚠️ <b>风险提示:</b> 本报告仅基于历史价格形态的客观量化分析，不构成任何投资建议。头肩底形态识别属于技术分析方法，存在误判可能；
+  形态可能在颈线突破前失败，或在突破后出现回踩。底部形态的完成不等于立即上涨。投资有风险，决策需谨慎。
+  请结合基本面、资金面、宏观环境综合判断。数据来源: 腾讯自选股行情接口，可能存在延迟，以交易所官方数据为准。
+</div>
+
+</div>
+
+<script>
+const chartData = [{"name": "信创ETF华夏", "type": "ETF", "score": 68, "label": "🟢 头肩底形成中", "closes": [1.31, 1.31, 1.29, 1.29, 1.31, 1.33, 1.32, 1.34, 1.32, 1.34, 1.34, 1.35, 1.35, 1.36, 1.36, 1.32, 1.34, 1.34, 1.35, 1.34, 1.36, 1.4, 1.39, 1.42, 1.42, 1.51, 1.54, 1.53, 1.51, 1.55, 1.53, 1.54, 1.48, 1.43, 1.37, 1.4, 1.4, 1.37, 1.39, 1.46, 1.46, 1.46, 1.49, 1.49, 1.48, 1.46, 1.5, 1.47, 1.51, 1.55, 1.49, 1.5, 1.52, 1.56, 1.49, 1.51, 1.45, 1.47, 1.45, 1.4, 1.4, 1.42, 1.42, 1.42, 1.45, 1.47, 1.47, 1.48, 1.47, 1.49, 1.5, 1.48, 1.46, 1.48, 1.45, 1.45, 1.43, 1.41, 1.43, 1.4, 1.42, 1.43, 1.42, 1.4, 1.35, 1.39, 1.4, 1.4, 1.39, 1.4, 1.41, 1.38, 1.36, 1.36, 1.37, 1.39, 1.38, 1.36, 1.34, 1.35, 1.33, 1.31, 1.33, 1.32, 1.32, 1.34, 1.33, 1.35, 1.36, 1.37, 1.36, 1.37, 1.38, 1.43, 1.45, 1.44, 1.46, 1.51, 1.62, 1.57, 1.66, 1.63, 1.63, 1.59, 1.58, 1.6, 1.63, 1.64, 1.62, 1.63, 1.61, 1.61, 1.57, 1.5, 1.53, 1.5, 1.47, 1.46, 1.51, 1.52, 1.52, 1.56, 1.55, 1.5, 1.5, 1.5, 1.53, 1.48, 1.4, 1.4, 1.43, 1.46, 1.5, 1.52, 1.51, 1.49, 1.46, 1.47, 1.43, 1.48, 1.45, 1.39, 1.31, 1.35, 1.38, 1.34, 1.35, 1.34, 1.31, 1.34, 1.3, 1.29, 1.3, 1.39, 1.36, 1.39, 1.41, 1.45, 1.44, 1.46, 1.45, 1.47, 1.45, 1.48, 1.46, 1.46, 1.48, 1.44, 1.45, 1.46, 1.57, 1.57, 1.57, 1.62, 1.59, 1.63, 1.57, 1.53, 1.56, 1.58, 1.56, 1.5, 1.53, 1.56, 1.53, 1.5, 1.5, 1.46, 1.47, 1.47, 1.46, 1.46, 1.42, 1.36, 1.4, 1.39, 1.37, 1.38, 1.43, 1.43, 1.46, 1.48, 1.51, 1.47, 1.49, 1.52, 1.48, 1.51, 1.56, 1.54, 1.47, 1.46, 1.48, 1.44, 1.49, 1.55, 1.53, 1.47, 1.46, 1.43, 1.42, 1.32, 1.33, 1.4, 1.39, 1.35, 1.31, 1.34, 1.31, 1.31], "dates": ["2025-07-18", "2025-07-21", "2025-07-22", "2025-07-23", "2025-07-24", "2025-07-25", "2025-07-28", "2025-07-29", "2025-07-30", "2025-07-31", "2025-08-01", "2025-08-04", "2025-08-05", "2025-08-06", "2025-08-07", "2025-08-08", "2025-08-11", "2025-08-12", "2025-08-13", "2025-08-14", "2025-08-15", "2025-08-18", "2025-08-19", "2025-08-20", "2025-08-21", "2025-08-22", "2025-08-25", "2025-08-26", "2025-08-27", "2025-08-28", "2025-08-29", "2025-09-01", "2025-09-02", "2025-09-03", "2025-09-04", "2025-09-05", "2025-09-08", "2025-09-09", "2025-09-10", "2025-09-11", "2025-09-12", "2025-09-15", "2025-09-16", "2025-09-17", "2025-09-18", "2025-09-19", "2025-09-22", "2025-09-23", "2025-09-24", "2025-09-25", "2025-09-26", "2025-09-29", "2025-09-30", "2025-10-09", "2025-10-10", "2025-10-13", "2025-10-14", "2025-10-15", "2025-10-16", "2025-10-17", "2025-10-20", "2025-10-21", "2025-10-22", "2025-10-23", "2025-10-24", "2025-10-27", "2025-10-28", "2025-10-29", "2025-10-30", "2025-10-31", "2025-11-03", "2025-11-04", "2025-11-05", "2025-11-06", "2025-11-07", "2025-11-10", "2025-11-11", "2025-11-12", "2025-11-13", "2025-11-14", "2025-11-17", "2025-11-18", "2025-11-19", "2025-11-20", "2025-11-21", "2025-11-24", "2025-11-25", "2025-11-26", "2025-11-27", "2025-11-28", "2025-12-01", "2025-12-02", "2025-12-03", "2025-12-04", "2025-12-05", "2025-12-08", "2025-12-09", "2025-12-10", "2025-12-11", "2025-12-12", "2025-12-15", "2025-12-16", "2025-12-17", "2025-12-18", "2025-12-19", "2025-12-22", "2025-12-23", "2025-12-24", "2025-12-25", "2025-12-26", "2025-12-29", "2025-12-30", "2025-12-31", "2026-01-05", "2026-01-06", "2026-01-07", "2026-01-08", "2026-01-09", "2026-01-12", "2026-01-13", "2026-01-14", "2026-01-15", "2026-01-16", "2026-01-19", "2026-01-20", "2026-01-21", "2026-01-22", "2026-01-23", "2026-01-26", "2026-01-27", "2026-01-28", "2026-01-29", "2026-01-30", "2026-02-02", "2026-02-03", "2026-02-04", "2026-02-05", "2026-02-06", "2026-02-09", "2026-02-10", "2026-02-11", "2026-02-12", "2026-02-13", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02", "2026-04-03", "2026-04-07", "2026-04-08", "2026-04-09", "2026-04-10", "2026-04-13", "2026-04-14", "2026-04-15", "2026-04-16", "2026-04-17", "2026-04-20", "2026-04-21", "2026-04-22", "2026-04-23", "2026-04-24", "2026-04-27", "2026-04-28", "2026-04-29", "2026-04-30", "2026-05-06", "2026-05-07", "2026-05-08", "2026-05-11", "2026-05-12", "2026-05-13", "2026-05-14", "2026-05-15", "2026-05-18", "2026-05-19", "2026-05-20", "2026-05-21", "2026-05-22", "2026-05-25", "2026-05-26", "2026-05-27", "2026-05-28", "2026-05-29", "2026-06-01", "2026-06-02", "2026-06-03", "2026-06-04", "2026-06-05", "2026-06-08", "2026-06-09", "2026-06-10", "2026-06-11", "2026-06-12", "2026-06-15", "2026-06-16", "2026-06-17", "2026-06-18", "2026-06-22", "2026-06-23", "2026-06-24", "2026-06-25", "2026-06-26", "2026-06-29", "2026-06-30", "2026-07-01", "2026-07-02", "2026-07-03", "2026-07-06", "2026-07-07", "2026-07-08", "2026-07-09", "2026-07-10", "2026-07-13", "2026-07-14", "2026-07-15", "2026-07-16", "2026-07-17", "2026-07-20", "2026-07-21", "2026-07-22", "2026-07-23", "2026-07-24", "2026-07-27", "2026-07-28", "2026-07-29"], "v1_idx": 101, "v2_idx": 171, "v3_idx": 213, "pk1_idx": 120, "pk2_idx": 195, "v1_price": 1.31, "v2_price": 1.29, "v3_price": 1.36, "peak1_price": 1.66, "peak2_price": 1.63, "neckline": [{"x": 120, "y": 1.66}, {"x": 121, "y": 1.66}, {"x": 122, "y": 1.66}, {"x": 123, "y": 1.66}, {"x": 124, "y": 1.66}, {"x": 125, "y": 1.66}, {"x": 126, "y": 1.66}, {"x": 127, "y": 1.66}, {"x": 128, "y": 1.66}, {"x": 129, "y": 1.66}, {"x": 130, "y": 1.66}, {"x": 131, "y": 1.66}, {"x": 132, "y": 1.66}, {"x": 133, "y": 1.65}, {"x": 134, "y": 1.65}, {"x": 135, "y": 1.65}, {"x": 136, "y": 1.65}, {"x": 137, "y": 1.65}, {"x": 138, "y": 1.65}, {"x": 139, "y": 1.65}, {"x": 140, "y": 1.65}, {"x": 141, "y": 1.65}, {"x": 142, "y": 1.65}, {"x": 143, "y": 1.65}, {"x": 144, "y": 1.65}, {"x": 145, "y": 1.65}, {"x": 146, "y": 1.65}, {"x": 147, "y": 1.65}, {"x": 148, "y": 1.65}, {"x": 149, "y": 1.65}, {"x": 150, "y": 1.65}, {"x": 151, "y": 1.65}, {"x": 152, "y": 1.65}, {"x": 153, "y": 1.65}, {"x": 154, "y": 1.65}, {"x": 155, "y": 1.65}, {"x": 156, "y": 1.65}, {"x": 157, "y": 1.65}, {"x": 158, "y": 1.64}, {"x": 159, "y": 1.64}, {"x": 160, "y": 1.64}, {"x": 161, "y": 1.64}, {"x": 162, "y": 1.64}, {"x": 163, "y": 1.64}, {"x": 164, "y": 1.64}, {"x": 165, "y": 1.64}, {"x": 166, "y": 1.64}, {"x": 167, "y": 1.64}, {"x": 168, "y": 1.64}, {"x": 169, "y": 1.64}, {"x": 170, "y": 1.64}, {"x": 171, "y": 1.64}, {"x": 172, "y": 1.64}, {"x": 173, "y": 1.64}, {"x": 174, "y": 1.64}, {"x": 175, "y": 1.64}, {"x": 176, "y": 1.64}, {"x": 177, "y": 1.64}, {"x": 178, "y": 1.64}, {"x": 179, "y": 1.64}, {"x": 180, "y": 1.64}, {"x": 181, "y": 1.64}, {"x": 182, "y": 1.64}, {"x": 183, "y": 1.63}, {"x": 184, "y": 1.63}, {"x": 185, "y": 1.63}, {"x": 186, "y": 1.63}, {"x": 187, "y": 1.63}, {"x": 188, "y": 1.63}, {"x": 189, "y": 1.63}, {"x": 190, "y": 1.63}, {"x": 191, "y": 1.63}, {"x": 192, "y": 1.63}, {"x": 193, "y": 1.63}, {"x": 194, "y": 1.63}, {"x": 195, "y": 1.63}, {"x": 196, "y": 1.63}, {"x": 197, "y": 1.63}, {"x": 198, "y": 1.63}, {"x": 199, "y": 1.63}, {"x": 200, "y": 1.63}, {"x": 201, "y": 1.63}, {"x": 202, "y": 1.63}, {"x": 203, "y": 1.63}, {"x": 204, "y": 1.63}, {"x": 205, "y": 1.63}, {"x": 206, "y": 1.63}, {"x": 207, "y": 1.63}, {"x": 208, "y": 1.62}, {"x": 209, "y": 1.62}, {"x": 210, "y": 1.62}, {"x": 211, "y": 1.62}, {"x": 212, "y": 1.62}, {"x": 213, "y": 1.62}, {"x": 214, "y": 1.62}, {"x": 215, "y": 1.62}, {"x": 216, "y": 1.62}, {"x": 217, "y": 1.62}, {"x": 218, "y": 1.62}, {"x": 219, "y": 1.62}, {"x": 220, "y": 1.62}, {"x": 221, "y": 1.62}, {"x": 222, "y": 1.62}, {"x": 223, "y": 1.62}, {"x": 224, "y": 1.62}, {"x": 225, "y": 1.62}, {"x": 226, "y": 1.62}, {"x": 227, "y": 1.62}, {"x": 228, "y": 1.62}, {"x": 229, "y": 1.62}, {"x": 230, "y": 1.62}, {"x": 231, "y": 1.62}, {"x": 232, "y": 1.62}, {"x": 233, "y": 1.61}, {"x": 234, "y": 1.61}, {"x": 235, "y": 1.61}, {"x": 236, "y": 1.61}, {"x": 237, "y": 1.61}, {"x": 238, "y": 1.61}, {"x": 239, "y": 1.61}, {"x": 240, "y": 1.61}, {"x": 241, "y": 1.61}, {"x": 242, "y": 1.61}, {"x": 243, "y": 1.61}, {"x": 244, "y": 1.61}, {"x": 245, "y": 1.61}, {"x": 246, "y": 1.61}, {"x": 247, "y": 1.61}, {"x": 248, "y": 1.61}, {"x": 249, "y": 1.61}], "head_depth": 1.53, "neck_slope": -1.81, "rs_to_neck_pct": 19.32, "pos120": 9.6}, {"name": "科创新能源ETF鹏华", "type": "ETF", "score": 63, "label": "🟢 头肩底形成中", "closes": [1.15, 1.16, 1.19, 1.18, 1.21, 1.2, 1.22, 1.24, 1.21, 1.18, 1.19, 1.19, 1.2, 1.22, 1.21, 1.21, 1.24, 1.24, 1.25, 1.22, 1.27, 1.29, 1.28, 1.3, 1.27, 1.31, 1.32, 1.33, 1.29, 1.32, 1.35, 1.39, 1.36, 1.36, 1.36, 1.49, 1.51, 1.49, 1.47, 1.5, 1.48, 1.47, 1.47, 1.48, 1.46, 1.45, 1.45, 1.44, 1.51, 1.5, 1.48, 1.54, 1.58, 1.58, 1.5, 1.49, 1.46, 1.49, 1.48, 1.4, 1.41, 1.43, 1.41, 1.41, 1.44, 1.45, 1.44, 1.52, 1.52, 1.52, 1.54, 1.51, 1.58, 1.59, 1.61, 1.6, 1.62, 1.55, 1.61, 1.63, 1.64, 1.59, 1.56, 1.51, 1.41, 1.43, 1.45, 1.44, 1.46, 1.48, 1.47, 1.44, 1.42, 1.41, 1.43, 1.46, 1.46, 1.44, 1.42, 1.43, 1.42, 1.37, 1.42, 1.39, 1.4, 1.41, 1.44, 1.48, 1.49, 1.5, 1.49, 1.48, 1.46, 1.51, 1.56, 1.57, 1.59, 1.59, 1.63, 1.61, 1.62, 1.65, 1.66, 1.68, 1.61, 1.62, 1.65, 1.8, 1.75, 1.75, 1.72, 1.67, 1.63, 1.58, 1.69, 1.74, 1.66, 1.69, 1.73, 1.7, 1.7, 1.71, 1.68, 1.68, 1.72, 1.72, 1.73, 1.7, 1.65, 1.63, 1.63, 1.63, 1.65, 1.69, 1.73, 1.74, 1.71, 1.69, 1.64, 1.63, 1.61, 1.64, 1.58, 1.59, 1.61, 1.58, 1.61, 1.58, 1.52, 1.55, 1.5, 1.47, 1.48, 1.55, 1.52, 1.56, 1.58, 1.61, 1.59, 1.61, 1.65, 1.65, 1.66, 1.66, 1.62, 1.62, 1.62, 1.61, 1.69, 1.7, 1.74, 1.75, 1.73, 1.76, 1.75, 1.78, 1.73, 1.69, 1.71, 1.72, 1.76, 1.67, 1.71, 1.68, 1.65, 1.63, 1.65, 1.58, 1.56, 1.53, 1.52, 1.52, 1.49, 1.42, 1.48, 1.46, 1.46, 1.48, 1.54, 1.58, 1.6, 1.6, 1.62, 1.55, 1.55, 1.56, 1.5, 1.53, 1.61, 1.59, 1.52, 1.49, 1.46, 1.45, 1.39, 1.42, 1.37, 1.27, 1.29, 1.26, 1.22, 1.15, 1.12, 1.18, 1.15, 1.19, 1.14, 1.18, 1.15, 1.16], "dates": ["2025-07-18", "2025-07-21", "2025-07-22", "2025-07-23", "2025-07-24", "2025-07-25", "2025-07-28", "2025-07-29", "2025-07-30", "2025-07-31", "2025-08-01", "2025-08-04", "2025-08-05", "2025-08-06", "2025-08-07", "2025-08-08", "2025-08-11", "2025-08-12", "2025-08-13", "2025-08-14", "2025-08-15", "2025-08-18", "2025-08-19", "2025-08-20", "2025-08-21", "2025-08-22", "2025-08-25", "2025-08-26", "2025-08-27", "2025-08-28", "2025-08-29", "2025-09-01", "2025-09-02", "2025-09-03", "2025-09-04", "2025-09-05", "2025-09-08", "2025-09-09", "2025-09-10", "2025-09-11", "2025-09-12", "2025-09-15", "2025-09-16", "2025-09-17", "2025-09-18", "2025-09-19", "2025-09-22", "2025-09-23", "2025-09-24", "2025-09-25", "2025-09-26", "2025-09-29", "2025-09-30", "2025-10-09", "2025-10-10", "2025-10-13", "2025-10-14", "2025-10-15", "2025-10-16", "2025-10-17", "2025-10-20", "2025-10-21", "2025-10-22", "2025-10-23", "2025-10-24", "2025-10-27", "2025-10-28", "2025-10-29", "2025-10-30", "2025-10-31", "2025-11-03", "2025-11-04", "2025-11-05", "2025-11-06", "2025-11-07", "2025-11-10", "2025-11-11", "2025-11-12", "2025-11-13", "2025-11-14", "2025-11-17", "2025-11-18", "2025-11-19", "2025-11-20", "2025-11-21", "2025-11-24", "2025-11-25", "2025-11-26", "2025-11-27", "2025-11-28", "2025-12-01", "2025-12-02", "2025-12-03", "2025-12-04", "2025-12-05", "2025-12-08", "2025-12-09", "2025-12-10", "2025-12-11", "2025-12-12", "2025-12-15", "2025-12-16", "2025-12-17", "2025-12-18", "2025-12-19", "2025-12-22", "2025-12-23", "2025-12-24", "2025-12-25", "2025-12-26", "2025-12-29", "2025-12-30", "2025-12-31", "2026-01-05", "2026-01-06", "2026-01-07", "2026-01-08", "2026-01-09", "2026-01-12", "2026-01-13", "2026-01-14", "2026-01-15", "2026-01-16", "2026-01-19", "2026-01-20", "2026-01-21", "2026-01-22", "2026-01-23", "2026-01-26", "2026-01-27", "2026-01-28", "2026-01-29", "2026-01-30", "2026-02-02", "2026-02-03", "2026-02-04", "2026-02-05", "2026-02-06", "2026-02-09", "2026-02-10", "2026-02-11", "2026-02-12", "2026-02-13", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02", "2026-04-03", "2026-04-07", "2026-04-08", "2026-04-09", "2026-04-10", "2026-04-13", "2026-04-14", "2026-04-15", "2026-04-16", "2026-04-17", "2026-04-20", "2026-04-21", "2026-04-22", "2026-04-23", "2026-04-24", "2026-04-27", "2026-04-28", "2026-04-29", "2026-04-30", "2026-05-06", "2026-05-07", "2026-05-08", "2026-05-11", "2026-05-12", "2026-05-13", "2026-05-14", "2026-05-15", "2026-05-18", "2026-05-19", "2026-05-20", "2026-05-21", "2026-05-22", "2026-05-25", "2026-05-26", "2026-05-27", "2026-05-28", "2026-05-29", "2026-06-01", "2026-06-02", "2026-06-03", "2026-06-04", "2026-06-05", "2026-06-08", "2026-06-09", "2026-06-10", "2026-06-11", "2026-06-12", "2026-06-15", "2026-06-16", "2026-06-17", "2026-06-18", "2026-06-22", "2026-06-23", "2026-06-24", "2026-06-25", "2026-06-26", "2026-06-29", "2026-06-30", "2026-07-01", "2026-07-02", "2026-07-03", "2026-07-06", "2026-07-07", "2026-07-08", "2026-07-09", "2026-07-10", "2026-07-13", "2026-07-14", "2026-07-15", "2026-07-16", "2026-07-17", "2026-07-20", "2026-07-21", "2026-07-22", "2026-07-23", "2026-07-24", "2026-07-27", "2026-07-28", "2026-07-29"], "v1_idx": 59, "v2_idx": 101, "v3_idx": 171, "pk1_idx": 80, "pk2_idx": 127, "v1_price": 1.4, "v2_price": 1.37, "v3_price": 1.47, "peak1_price": 1.64, "peak2_price": 1.8, "neckline": [{"x": 80, "y": 1.64}, {"x": 81, "y": 1.64}, {"x": 82, "y": 1.65}, {"x": 83, "y": 1.65}, {"x": 84, "y": 1.65}, {"x": 85, "y": 1.66}, {"x": 86, "y": 1.66}, {"x": 87, "y": 1.66}, {"x": 88, "y": 1.67}, {"x": 89, "y": 1.67}, {"x": 90, "y": 1.67}, {"x": 91, "y": 1.68}, {"x": 92, "y": 1.68}, {"x": 93, "y": 1.68}, {"x": 94, "y": 1.69}, {"x": 95, "y": 1.69}, {"x": 96, "y": 1.69}, {"x": 97, "y": 1.7}, {"x": 98, "y": 1.7}, {"x": 99, "y": 1.7}, {"x": 100, "y": 1.71}, {"x": 101, "y": 1.71}, {"x": 102, "y": 1.71}, {"x": 103, "y": 1.72}, {"x": 104, "y": 1.72}, {"x": 105, "y": 1.73}, {"x": 106, "y": 1.73}, {"x": 107, "y": 1.73}, {"x": 108, "y": 1.74}, {"x": 109, "y": 1.74}, {"x": 110, "y": 1.74}, {"x": 111, "y": 1.75}, {"x": 112, "y": 1.75}, {"x": 113, "y": 1.75}, {"x": 114, "y": 1.76}, {"x": 115, "y": 1.76}, {"x": 116, "y": 1.76}, {"x": 117, "y": 1.77}, {"x": 118, "y": 1.77}, {"x": 119, "y": 1.77}, {"x": 120, "y": 1.78}, {"x": 121, "y": 1.78}, {"x": 122, "y": 1.78}, {"x": 123, "y": 1.79}, {"x": 124, "y": 1.79}, {"x": 125, "y": 1.79}, {"x": 126, "y": 1.8}, {"x": 127, "y": 1.8}, {"x": 128, "y": 1.8}, {"x": 129, "y": 1.81}, {"x": 130, "y": 1.81}, {"x": 131, "y": 1.81}, {"x": 132, "y": 1.82}, {"x": 133, "y": 1.82}, {"x": 134, "y": 1.82}, {"x": 135, "y": 1.83}, {"x": 136, "y": 1.83}, {"x": 137, "y": 1.83}, {"x": 138, "y": 1.84}, {"x": 139, "y": 1.84}, {"x": 140, "y": 1.84}, {"x": 141, "y": 1.85}, {"x": 142, "y": 1.85}, {"x": 143, "y": 1.85}, {"x": 144, "y": 1.86}, {"x": 145, "y": 1.86}, {"x": 146, "y": 1.86}, {"x": 147, "y": 1.87}, {"x": 148, "y": 1.87}, {"x": 149, "y": 1.87}, {"x": 150, "y": 1.88}, {"x": 151, "y": 1.88}, {"x": 152, "y": 1.89}, {"x": 153, "y": 1.89}, {"x": 154, "y": 1.89}, {"x": 155, "y": 1.9}, {"x": 156, "y": 1.9}, {"x": 157, "y": 1.9}, {"x": 158, "y": 1.91}, {"x": 159, "y": 1.91}, {"x": 160, "y": 1.91}, {"x": 161, "y": 1.92}, {"x": 162, "y": 1.92}, {"x": 163, "y": 1.92}, {"x": 164, "y": 1.93}, {"x": 165, "y": 1.93}, {"x": 166, "y": 1.93}, {"x": 167, "y": 1.94}, {"x": 168, "y": 1.94}, {"x": 169, "y": 1.94}, {"x": 170, "y": 1.95}, {"x": 171, "y": 1.95}, {"x": 172, "y": 1.95}, {"x": 173, "y": 1.96}, {"x": 174, "y": 1.96}, {"x": 175, "y": 1.96}, {"x": 176, "y": 1.97}, {"x": 177, "y": 1.97}, {"x": 178, "y": 1.97}, {"x": 179, "y": 1.98}, {"x": 180, "y": 1.98}, {"x": 181, "y": 1.98}, {"x": 182, "y": 1.99}, {"x": 183, "y": 1.99}, {"x": 184, "y": 1.99}, {"x": 185, "y": 2.0}, {"x": 186, "y": 2.0}, {"x": 187, "y": 2.0}, {"x": 188, "y": 2.01}, {"x": 189, "y": 2.01}, {"x": 190, "y": 2.01}, {"x": 191, "y": 2.02}, {"x": 192, "y": 2.02}, {"x": 193, "y": 2.02}, {"x": 194, "y": 2.03}, {"x": 195, "y": 2.03}, {"x": 196, "y": 2.03}, {"x": 197, "y": 2.04}, {"x": 198, "y": 2.04}, {"x": 199, "y": 2.05}, {"x": 200, "y": 2.05}, {"x": 201, "y": 2.05}, {"x": 202, "y": 2.06}, {"x": 203, "y": 2.06}, {"x": 204, "y": 2.06}, {"x": 205, "y": 2.07}, {"x": 206, "y": 2.07}, {"x": 207, "y": 2.07}, {"x": 208, "y": 2.08}, {"x": 209, "y": 2.08}, {"x": 210, "y": 2.08}, {"x": 211, "y": 2.09}, {"x": 212, "y": 2.09}, {"x": 213, "y": 2.09}, {"x": 214, "y": 2.1}, {"x": 215, "y": 2.1}, {"x": 216, "y": 2.1}, {"x": 217, "y": 2.11}, {"x": 218, "y": 2.11}, {"x": 219, "y": 2.11}, {"x": 220, "y": 2.12}, {"x": 221, "y": 2.12}, {"x": 222, "y": 2.12}, {"x": 223, "y": 2.13}, {"x": 224, "y": 2.13}, {"x": 225, "y": 2.13}, {"x": 226, "y": 2.14}, {"x": 227, "y": 2.14}, {"x": 228, "y": 2.14}, {"x": 229, "y": 2.15}, {"x": 230, "y": 2.15}, {"x": 231, "y": 2.15}, {"x": 232, "y": 2.16}, {"x": 233, "y": 2.16}, {"x": 234, "y": 2.16}, {"x": 235, "y": 2.17}, {"x": 236, "y": 2.17}, {"x": 237, "y": 2.17}, {"x": 238, "y": 2.18}, {"x": 239, "y": 2.18}, {"x": 240, "y": 2.18}, {"x": 241, "y": 2.19}, {"x": 242, "y": 2.19}, {"x": 243, "y": 2.19}, {"x": 244, "y": 2.2}, {"x": 245, "y": 2.2}, {"x": 246, "y": 2.21}, {"x": 247, "y": 2.21}, {"x": 248, "y": 2.21}, {"x": 249, "y": 2.22}], "head_depth": 2.14, "neck_slope": 9.76, "rs_to_neck_pct": 32.64, "pos120": 10.8}, {"name": "人工智能ETF易方达", "type": "ETF", "score": 59, "label": "🟢 头肩底形成中", "closes": [1.02, 1.02, 1.02, 1.02, 1.02, 1.05, 1.05, 1.08, 1.06, 1.07, 1.06, 1.06, 1.07, 1.08, 1.07, 1.05, 1.07, 1.11, 1.15, 1.14, 1.15, 1.2, 1.2, 1.23, 1.23, 1.32, 1.38, 1.35, 1.38, 1.48, 1.46, 1.5, 1.44, 1.43, 1.32, 1.38, 1.36, 1.33, 1.37, 1.46, 1.47, 1.46, 1.48, 1.48, 1.48, 1.47, 1.5, 1.5, 1.53, 1.57, 1.52, 1.54, 1.54, 1.56, 1.48, 1.48, 1.4, 1.43, 1.42, 1.38, 1.41, 1.47, 1.47, 1.46, 1.53, 1.57, 1.57, 1.58, 1.54, 1.49, 1.49, 1.48, 1.46, 1.51, 1.48, 1.46, 1.43, 1.44, 1.44, 1.4, 1.41, 1.42, 1.42, 1.41, 1.35, 1.36, 1.39, 1.44, 1.43, 1.44, 1.47, 1.46, 1.45, 1.46, 1.46, 1.51, 1.53, 1.53, 1.49, 1.51, 1.48, 1.44, 1.49, 1.47, 1.48, 1.51, 1.51, 1.52, 1.53, 1.52, 1.53, 1.55, 1.53, 1.58, 1.59, 1.59, 1.59, 1.62, 1.7, 1.66, 1.68, 1.68, 1.68, 1.65, 1.62, 1.65, 1.68, 1.67, 1.65, 1.68, 1.67, 1.65, 1.67, 1.62, 1.63, 1.58, 1.55, 1.53, 1.59, 1.6, 1.57, 1.6, 1.6, 1.6, 1.59, 1.62, 1.61, 1.6, 1.54, 1.51, 1.55, 1.55, 1.54, 1.57, 1.56, 1.54, 1.52, 1.54, 1.5, 1.55, 1.53, 1.52, 1.45, 1.47, 1.51, 1.48, 1.47, 1.47, 1.43, 1.48, 1.44, 1.45, 1.46, 1.57, 1.56, 1.6, 1.61, 1.64, 1.63, 1.68, 1.71, 1.74, 1.72, 1.78, 1.76, 1.73, 1.76, 1.72, 1.74, 1.79, 1.85, 1.9, 1.89, 1.95, 1.96, 2.03, 2.0, 1.94, 1.96, 1.99, 2.0, 1.93, 1.98, 2.06, 2.04, 2.01, 2.04, 1.97, 1.92, 1.97, 2.04, 2.02, 1.95, 1.88, 1.94, 1.9, 1.85, 1.85, 1.95, 1.96, 2.01, 2.11, 2.13, 2.05, 2.1, 2.18, 2.08, 2.11, 2.23, 2.18, 2.03, 2.04, 2.02, 2.02, 2.05, 2.19, 2.12, 2.05, 2.09, 2.03, 1.98, 1.82, 1.86, 2.01, 1.98, 1.93, 1.89, 1.92, 1.79, 1.77], "dates": ["2025-07-18", "2025-07-21", "2025-07-22", "2025-07-23", "2025-07-24", "2025-07-25", "2025-07-28", "2025-07-29", "2025-07-30", "2025-07-31", "2025-08-01", "2025-08-04", "2025-08-05", "2025-08-06", "2025-08-07", "2025-08-08", "2025-08-11", "2025-08-12", "2025-08-13", "2025-08-14", "2025-08-15", "2025-08-18", "2025-08-19", "2025-08-20", "2025-08-21", "2025-08-22", "2025-08-25", "2025-08-26", "2025-08-27", "2025-08-28", "2025-08-29", "2025-09-01", "2025-09-02", "2025-09-03", "2025-09-04", "2025-09-05", "2025-09-08", "2025-09-09", "2025-09-10", "2025-09-11", "2025-09-12", "2025-09-15", "2025-09-16", "2025-09-17", "2025-09-18", "2025-09-19", "2025-09-22", "2025-09-23", "2025-09-24", "2025-09-25", "2025-09-26", "2025-09-29", "2025-09-30", "2025-10-09", "2025-10-10", "2025-10-13", "2025-10-14", "2025-10-15", "2025-10-16", "2025-10-17", "2025-10-20", "2025-10-21", "2025-10-22", "2025-10-23", "2025-10-24", "2025-10-27", "2025-10-28", "2025-10-29", "2025-10-30", "2025-10-31", "2025-11-03", "2025-11-04", "2025-11-05", "2025-11-06", "2025-11-07", "2025-11-10", "2025-11-11", "2025-11-12", "2025-11-13", "2025-11-14", "2025-11-17", "2025-11-18", "2025-11-19", "2025-11-20", "2025-11-21", "2025-11-24", "2025-11-25", "2025-11-26", "2025-11-27", "2025-11-28", "2025-12-01", "2025-12-02", "2025-12-03", "2025-12-04", "2025-12-05", "2025-12-08", "2025-12-09", "2025-12-10", "2025-12-11", "2025-12-12", "2025-12-15", "2025-12-16", "2025-12-17", "2025-12-18", "2025-12-19", "2025-12-22", "2025-12-23", "2025-12-24", "2025-12-25", "2025-12-26", "2025-12-29", "2025-12-30", "2025-12-31", "2026-01-05", "2026-01-06", "2026-01-07", "2026-01-08", "2026-01-09", "2026-01-12", "2026-01-13", "2026-01-14", "2026-01-15", "2026-01-16", "2026-01-19", "2026-01-20", "2026-01-21", "2026-01-22", "2026-01-23", "2026-01-26", "2026-01-27", "2026-01-28", "2026-01-29", "2026-01-30", "2026-02-02", "2026-02-03", "2026-02-04", "2026-02-05", "2026-02-06", "2026-02-09", "2026-02-10", "2026-02-11", "2026-02-12", "2026-02-13", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02", "2026-04-03", "2026-04-07", "2026-04-08", "2026-04-09", "2026-04-10", "2026-04-13", "2026-04-14", "2026-04-15", "2026-04-16", "2026-04-17", "2026-04-20", "2026-04-21", "2026-04-22", "2026-04-23", "2026-04-24", "2026-04-27", "2026-04-28", "2026-04-29", "2026-04-30", "2026-05-06", "2026-05-07", "2026-05-08", "2026-05-11", "2026-05-12", "2026-05-13", "2026-05-14", "2026-05-15", "2026-05-18", "2026-05-19", "2026-05-20", "2026-05-21", "2026-05-22", "2026-05-25", "2026-05-26", "2026-05-27", "2026-05-28", "2026-05-29", "2026-06-01", "2026-06-02", "2026-06-03", "2026-06-04", "2026-06-05", "2026-06-08", "2026-06-09", "2026-06-10", "2026-06-11", "2026-06-12", "2026-06-15", "2026-06-16", "2026-06-17", "2026-06-18", "2026-06-22", "2026-06-23", "2026-06-24", "2026-06-25", "2026-06-26", "2026-06-29", "2026-06-30", "2026-07-01", "2026-07-02", "2026-07-03", "2026-07-06", "2026-07-07", "2026-07-08", "2026-07-09", "2026-07-10", "2026-07-13", "2026-07-14", "2026-07-15", "2026-07-16", "2026-07-17", "2026-07-20", "2026-07-21", "2026-07-22", "2026-07-23", "2026-07-24", "2026-07-27", "2026-07-28", "2026-07-29"], "v1_idx": 59, "v2_idx": 84, "v3_idx": 168, "pk1_idx": 67, "pk2_idx": 118, "v1_price": 1.38, "v2_price": 1.35, "v3_price": 1.43, "peak1_price": 1.58, "peak2_price": 1.7, "neckline": [{"x": 67, "y": 1.58}, {"x": 68, "y": 1.58}, {"x": 69, "y": 1.58}, {"x": 70, "y": 1.59}, {"x": 71, "y": 1.59}, {"x": 72, "y": 1.59}, {"x": 73, "y": 1.59}, {"x": 74, "y": 1.6}, {"x": 75, "y": 1.6}, {"x": 76, "y": 1.6}, {"x": 77, "y": 1.6}, {"x": 78, "y": 1.61}, {"x": 79, "y": 1.61}, {"x": 80, "y": 1.61}, {"x": 81, "y": 1.61}, {"x": 82, "y": 1.62}, {"x": 83, "y": 1.62}, {"x": 84, "y": 1.62}, {"x": 85, "y": 1.62}, {"x": 86, "y": 1.62}, {"x": 87, "y": 1.63}, {"x": 88, "y": 1.63}, {"x": 89, "y": 1.63}, {"x": 90, "y": 1.63}, {"x": 91, "y": 1.64}, {"x": 92, "y": 1.64}, {"x": 93, "y": 1.64}, {"x": 94, "y": 1.64}, {"x": 95, "y": 1.65}, {"x": 96, "y": 1.65}, {"x": 97, "y": 1.65}, {"x": 98, "y": 1.65}, {"x": 99, "y": 1.66}, {"x": 100, "y": 1.66}, {"x": 101, "y": 1.66}, {"x": 102, "y": 1.66}, {"x": 103, "y": 1.66}, {"x": 104, "y": 1.67}, {"x": 105, "y": 1.67}, {"x": 106, "y": 1.67}, {"x": 107, "y": 1.67}, {"x": 108, "y": 1.68}, {"x": 109, "y": 1.68}, {"x": 110, "y": 1.68}, {"x": 111, "y": 1.68}, {"x": 112, "y": 1.69}, {"x": 113, "y": 1.69}, {"x": 114, "y": 1.69}, {"x": 115, "y": 1.69}, {"x": 116, "y": 1.7}, {"x": 117, "y": 1.7}, {"x": 118, "y": 1.7}, {"x": 119, "y": 1.7}, {"x": 120, "y": 1.7}, {"x": 121, "y": 1.71}, {"x": 122, "y": 1.71}, {"x": 123, "y": 1.71}, {"x": 124, "y": 1.71}, {"x": 125, "y": 1.72}, {"x": 126, "y": 1.72}, {"x": 127, "y": 1.72}, {"x": 128, "y": 1.72}, {"x": 129, "y": 1.73}, {"x": 130, "y": 1.73}, {"x": 131, "y": 1.73}, {"x": 132, "y": 1.73}, {"x": 133, "y": 1.74}, {"x": 134, "y": 1.74}, {"x": 135, "y": 1.74}, {"x": 136, "y": 1.74}, {"x": 137, "y": 1.74}, {"x": 138, "y": 1.75}, {"x": 139, "y": 1.75}, {"x": 140, "y": 1.75}, {"x": 141, "y": 1.75}, {"x": 142, "y": 1.76}, {"x": 143, "y": 1.76}, {"x": 144, "y": 1.76}, {"x": 145, "y": 1.76}, {"x": 146, "y": 1.77}, {"x": 147, "y": 1.77}, {"x": 148, "y": 1.77}, {"x": 149, "y": 1.77}, {"x": 150, "y": 1.78}, {"x": 151, "y": 1.78}, {"x": 152, "y": 1.78}, {"x": 153, "y": 1.78}, {"x": 154, "y": 1.78}, {"x": 155, "y": 1.79}, {"x": 156, "y": 1.79}, {"x": 157, "y": 1.79}, {"x": 158, "y": 1.79}, {"x": 159, "y": 1.8}, {"x": 160, "y": 1.8}, {"x": 161, "y": 1.8}, {"x": 162, "y": 1.8}, {"x": 163, "y": 1.81}, {"x": 164, "y": 1.81}, {"x": 165, "y": 1.81}, {"x": 166, "y": 1.81}, {"x": 167, "y": 1.82}, {"x": 168, "y": 1.82}, {"x": 169, "y": 1.82}, {"x": 170, "y": 1.82}, {"x": 171, "y": 1.82}, {"x": 172, "y": 1.83}, {"x": 173, "y": 1.83}, {"x": 174, "y": 1.83}, {"x": 175, "y": 1.83}, {"x": 176, "y": 1.84}, {"x": 177, "y": 1.84}, {"x": 178, "y": 1.84}, {"x": 179, "y": 1.84}, {"x": 180, "y": 1.85}, {"x": 181, "y": 1.85}, {"x": 182, "y": 1.85}, {"x": 183, "y": 1.85}, {"x": 184, "y": 1.86}, {"x": 185, "y": 1.86}, {"x": 186, "y": 1.86}, {"x": 187, "y": 1.86}, {"x": 188, "y": 1.86}, {"x": 189, "y": 1.87}, {"x": 190, "y": 1.87}, {"x": 191, "y": 1.87}, {"x": 192, "y": 1.87}, {"x": 193, "y": 1.88}, {"x": 194, "y": 1.88}, {"x": 195, "y": 1.88}, {"x": 196, "y": 1.88}, {"x": 197, "y": 1.89}, {"x": 198, "y": 1.89}, {"x": 199, "y": 1.89}, {"x": 200, "y": 1.89}, {"x": 201, "y": 1.9}, {"x": 202, "y": 1.9}, {"x": 203, "y": 1.9}, {"x": 204, "y": 1.9}, {"x": 205, "y": 1.9}, {"x": 206, "y": 1.91}, {"x": 207, "y": 1.91}, {"x": 208, "y": 1.91}, {"x": 209, "y": 1.91}, {"x": 210, "y": 1.92}, {"x": 211, "y": 1.92}, {"x": 212, "y": 1.92}, {"x": 213, "y": 1.92}, {"x": 214, "y": 1.93}, {"x": 215, "y": 1.93}, {"x": 216, "y": 1.93}, {"x": 217, "y": 1.93}, {"x": 218, "y": 1.94}, {"x": 219, "y": 1.94}, {"x": 220, "y": 1.94}, {"x": 221, "y": 1.94}, {"x": 222, "y": 1.94}, {"x": 223, "y": 1.95}, {"x": 224, "y": 1.95}, {"x": 225, "y": 1.95}, {"x": 226, "y": 1.95}, {"x": 227, "y": 1.96}, {"x": 228, "y": 1.96}, {"x": 229, "y": 1.96}, {"x": 230, "y": 1.96}, {"x": 231, "y": 1.97}, {"x": 232, "y": 1.97}, {"x": 233, "y": 1.97}, {"x": 234, "y": 1.97}, {"x": 235, "y": 1.98}, {"x": 236, "y": 1.98}, {"x": 237, "y": 1.98}, {"x": 238, "y": 1.98}, {"x": 239, "y": 1.98}, {"x": 240, "y": 1.99}, {"x": 241, "y": 1.99}, {"x": 242, "y": 1.99}, {"x": 243, "y": 1.99}, {"x": 244, "y": 2.0}, {"x": 245, "y": 2.0}, {"x": 246, "y": 2.0}, {"x": 247, "y": 2.0}, {"x": 248, "y": 2.01}, {"x": 249, "y": 2.01}], "head_depth": 2.17, "neck_slope": 7.59, "rs_to_neck_pct": 27.11, "pos120": 40.7}];
+const colors = ['#6c3a9e','#e74c3c','#2980b9','#16a085','#e67e22','#8e44ad','#2c3e50','#d35400','#1abc9c'];
+const grid = document.getElementById('chartsGrid');
+
+chartData.forEach((c, idx) => {
+  const card = document.createElement('div');
+  card.className = 'chart-card';
+  card.innerHTML = `
+    <h4><span style="color:${colors[idx%colors.length]}">●</span> ${c.name}</h4>
+    <div class="sub">得分${c.score} · ${c.label} · 头深${(c.head_depth||0).toFixed(1)}% · 颈斜${(c.neck_slope||0).toFixed(1)}% · 右距颈${(c.rs_to_neck_pct||99).toFixed(1)}%</div>
+    <div class="chart-box"><canvas></canvas></div>
+  `;
+  grid.appendChild(card);
+  
+  const ctx = card.querySelector('canvas');
+  const datasets = [{
+    data: c.closes,
+    borderColor: colors[idx%colors.length],
+    backgroundColor: colors[idx%colors.length] + '15',
+    borderWidth: 1.8,
+    pointRadius: 0,
+    fill: true,
+    tension: 0.35,
+    label: '价格'
+  }];
+
+  // Add neckline if available
+  if (c.neckline && c.neckline.length) {
+    datasets.push({
+      data: c.neckline.map(p => p.y),
+      borderColor: '#f39c12',
+      borderWidth: 1.5,
+      borderDash: [6, 3],
+      pointRadius: 0,
+      fill: false,
+      tension: 0,
+      label: '颈线',
+      order: 1
+    });
+  }
+
+  // Mark LS, Head, RS as scatter points
+  const annotations = [];
+  if (c.v1_idx !== null && c.v2_idx !== null && c.v3_idx !== null &&
+      c.v1_idx >= 0 && c.v2_idx >= 0 && c.v3_idx >= 0 &&
+      c.v1_idx < c.closes.length && c.v2_idx < c.closes.length && c.v3_idx < c.closes.length) {
+    const lsData = new Array(c.closes.length).fill(null);
+    lsData[c.v1_idx] = c.closes[c.v1_idx];
+    datasets.push({
+      data: lsData,
+      borderColor: '#3498db',
+      backgroundColor: '#3498db',
+      pointRadius: 6,
+      pointHoverRadius: 8,
+      pointStyle: 'rect',
+      showLine: false,
+      label: '左肩',
+      order: 0
+    });
+
+    const headData = new Array(c.closes.length).fill(null);
+    headData[c.v2_idx] = c.closes[c.v2_idx];
+    datasets.push({
+      data: headData,
+      borderColor: '#e74c3c',
+      backgroundColor: '#e74c3c',
+      pointRadius: 7,
+      pointHoverRadius: 9,
+      pointStyle: 'triangle',
+      showLine: false,
+      label: '头部',
+      order: 0
+    });
+
+    const rsData = new Array(c.closes.length).fill(null);
+    rsData[c.v3_idx] = c.closes[c.v3_idx];
+    datasets.push({
+      data: rsData,
+      borderColor: '#2ecc71',
+      backgroundColor: '#2ecc71',
+      pointRadius: 6,
+      pointHoverRadius: 8,
+      pointStyle: 'rectRot',
+      showLine: false,
+      label: '右肩',
+      order: 0
+    });
+  }
+
+  new Chart(ctx, {
+    type: 'line',
+    data: { labels: c.dates, datasets: datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            title: (items) => {
+              const idx2 = items[0].dataIndex;
+              const name = items[0].dataset.label || '';
+              return (name ? name + ' · ' : '') + c.dates[idx2] + ' · ¥' + items[0].parsed.y;
+            }
+          }
+        }
+      },
+      scales: {
+        x: { display: false },
+        y: { display: true, position: 'right', ticks: { font: {size:9}, color: '#95a5a6', maxTicksLimit: 5 }, grid: { color: '#f0f2f5' } }
+      }
+    }
+  });
+});
+</script>
+</body>
+</html>
