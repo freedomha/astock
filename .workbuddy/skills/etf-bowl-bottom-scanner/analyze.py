@@ -397,7 +397,8 @@ def main():
 
     # Save raw kline data
     cwd = os.getcwd()
-    kline_file = os.path.join(cwd, "etf_kline_data.json")
+    skill_dir = os.path.dirname(os.path.abspath(__file__))
+    kline_file = os.path.join(skill_dir, "etf_kline_data.json")
     with open(kline_file, "w") as f:
         json.dump(kline_data, f, ensure_ascii=False)
     print(f"K线数据已保存: {kline_file}")
@@ -414,7 +415,7 @@ def main():
             results.append(r)
     results.sort(key=lambda x: x["score"], reverse=True)
 
-    results_file = os.path.join(cwd, "etf_bowl_results.json")
+    results_file = os.path.join(skill_dir, "etf_bowl_results.json")
     with open(results_file, "w") as f:
         json.dump(results, f, ensure_ascii=False, indent=2)
     print(f"分析结果已保存: {results_file}")
