@@ -22,7 +22,7 @@ NODE_BIN = "/Users/aldiadmin/.workbuddy/binaries/node/versions/22.22.2/bin/node"
 
 KLINE_DAYS = 250
 MAX_WORKERS = 8
-EXTREMA_WINDOW = 20  # bars on each side for local extrema detection
+EXTREMA_WINDOW = 10  # bars on each side for local extrema detection
 
 
 def run_westock(*args):
@@ -32,7 +32,10 @@ def run_westock(*args):
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
         if result.returncode != 0:
             return None
-        return json.loads(result.stdout)
+        data = json.loads(result.stdout)
+        if isinstance(data, dict) and data.get("success") is False:
+            return None
+        return data
     except Exception as e:
         print(f"  Error: {e}", file=sys.stderr)
         return None
@@ -152,8 +155,8 @@ def find_head_shoulder_pattern(lows, highs, closes, volumes):
         if shoulder_max > 0 and (shoulder_max - shoulder_min) / shoulder_min > 0.20:
             continue
         
-        # Minimum time between shoulders and head (at least 15 bars)
-        if v2_idx - v1_idx < 15 or v3_idx - v2_idx < 15:
+        # Minimum time between shoulders and head (at least 10 bars)
+        if v2_idx - v1_idx < 10 or v3_idx - v2_idx < 10:
             continue
         
         # Find peaks between valleys for neckline
@@ -174,6 +177,10 @@ def find_head_shoulder_pattern(lows, highs, closes, volumes):
         # Neckline slope (%)
         neck_slope = (peak2_price - peak1_price) / peak1_price * 100 if peak1_price > 0 else 0
         
+        # Hard filter: neckline must be roughly horizontal (±8% max, per SKILL.md "steep slope = invalid")
+        if abs(neck_slope) > 8:
+            continue
+        
         # Volume analysis
         vol_ls = _avg_volume(volumes, v1_idx - 10, v1_idx + 10)
         vol_head = _avg_volume(volumes, v2_idx - 10, v2_idx + 10)
@@ -191,6 +198,10 @@ def find_head_shoulder_pattern(lows, highs, closes, volumes):
         head_depth_ls = (v1_price - v2_price) / v1_price * 100 if v1_price > 0 else 0
         head_depth_rs = (v3_price - v2_price) / v3_price * 100 if v3_price > 0 else 0
         head_depth = min(head_depth_ls, head_depth_rs)
+        
+        # Hard filter: head must be significantly lower than shoulders (≥0.5%)
+        if head_depth < 0.5:
+            continue
         
         # Shoulder symmetry
         shoulder_sym = 1.0 - abs(v1_price - v3_price) / max(v1_price, v3_price) if max(v1_price, v3_price) > 0 else 0
@@ -272,11 +283,8 @@ def score_pattern(p, closes, lows, highs):
         score += 15
         reasons.append(f"✅ 头部深度充分({hd:.1f}%)")
     elif hd >= 1.0:
-        score += 10
+        score += 8
         reasons.append(f"🟡 头深一般({hd:.1f}%)")
-    elif hd >= 0.5:
-        score += 5
-        reasons.append(f"🟡 头深浅({hd:.1f}%)")
     else:
         reasons.append(f"❌ 头深不足({hd:.1f}%)")
     
@@ -324,8 +332,8 @@ def score_pattern(p, closes, lows, highs):
     
     # ---- 6. Range position (max 10) ----
     n120 = min(120, n)
-    hi120, lo120 = max([p["v1_price"], p.get("peak1_price", 0), p["v2_price"], p.get("peak2_price", 0), p["v3_price"], cur]), \
-                     min(closes[-n120:])
+    hi120 = max(closes[-n120:])
+    lo120 = min(closes[-n120:])
     pos120 = (cur - lo120) / (hi120 - lo120) if hi120 > lo120 else 0.5
     
     if pos120 <= 0.30:
@@ -339,10 +347,10 @@ def score_pattern(p, closes, lows, highs):
     
     # ---- 7. Time symmetry (max 8) ----
     ts = p.get("time_sym", 0)
-    if 0.60 <= ts <= 1.50:
+    if ts >= 0.60:
         score += 8
         reasons.append(f"✅ 时间对称({ts:.2f})")
-    elif 0.40 <= ts <= 2.50:
+    elif ts >= 0.40:
         score += 4
         reasons.append(f"🟡 时间偏斜({ts:.2f})")
     else:
@@ -365,12 +373,25 @@ def score_pattern(p, closes, lows, highs):
     # ---- Penalties ----
     # Recent crash
     t20 = lin_slope(closes[-20:], 20) if n >= 20 else 0
-    if t20 < -8:
-        score -= 10
+    if t20 < -15:
+        score -= 20
         reasons.append(f"⚠️ 近20日暴跌({t20:+.1f}%)")
+    elif t20 < -8:
+        score -= 10
+        reasons.append(f"⚠️ 近20日下跌({t20:+.1f}%)")
+    
+    # Volume expansion (contradicts selling exhaustion thesis)
+    if vr > 1.3:
+        score -= 15
+        reasons.append(f"⚠️ 量度异常放大({vr:.0%})")
+    
+    # RS too far from neckline (pattern not developing)
+    if rtn > 20:
+        score -= 10
+        reasons.append(f"⚠️ 右肩远离颈线({rtn:.1f}%)")
     
     # Too many extrema (messy pattern)
-    if len(lows) > 12 or len(highs) > 12:
+    if len(lows) > 15 or len(highs) > 15:
         score -= 10
         reasons.append(f"⚠️ 走势杂乱(谷{len(lows)}/峰{len(highs)})")
     
@@ -491,6 +512,7 @@ def analyze_hs_bottom(code, name, etype, kline_data):
     base["v3_price"] = pattern.get("v3_price")
     base["peak1_price"] = pattern.get("peak1_price")
     base["peak2_price"] = pattern.get("peak2_price")
+    base["rs_rising"] = pattern.get("rs_rising", False)
     
     # Label
     score = pattern["score"]
@@ -499,7 +521,7 @@ def analyze_hs_bottom(code, name, etype, kline_data):
     
     if score >= 70 and rtn <= 5:
         base["label"] = "🟢 头肩底确认"
-    elif score >= 55:
+    elif score >= 55 and rtn <= 15:
         base["label"] = "🟢 头肩底形成中"
     elif score >= 40:
         base["label"] = "🟡 头肩底候选"

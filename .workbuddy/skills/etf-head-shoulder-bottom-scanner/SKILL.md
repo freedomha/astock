@@ -83,10 +83,10 @@ Price
 
 ### Detection Steps
 
-1. **Find local extrema** — Identify significant peaks and valleys over the 250-day window (minimum 20-bar separation)
+1. **Find local extrema** — Identify significant peaks and valleys over the 250-day window (minimum 10-bar separation)
 2. **Walk through valleys** — Look for 3 consecutive valleys where the middle is lowest (v1 ≈ LS, v2 = Head, v3 ≈ RS)
 3. **Verify peaks** — Find the highest peaks between v1-v2 and v2-v3 to define the neckline
-4. **Validate geometry** — Check: Head < LS, Head < RS, shoulders within ±15% of each other
+4. **Validate geometry** — Hard filters: Head < LS, Head < RS, shoulders within ±20% of each other, neckline slope ≤±8% (steeper = invalid), head depth ≥0.5% (shallower = invalid)
 5. **Score quality** — Rate pattern on 8 dimensions (see below)
 
 ### Key Metrics
@@ -95,7 +95,7 @@ Price
 |--------|-----------------|----------------|
 | **肩部对称性** | LS vs RS price ratio | Ideal: LS ≈ RS; asymmetry weakens pattern |
 | **头部深度** | Head vs shoulders | Head must be significantly lower (≥2%) |
-| **颈线斜率** | Slope of Peak1→Peak2 line | Should be horizontal (±5%); steep slope = invalid |
+| **颈线斜率** | Slope of Peak1→Peak2 line | Should be horizontal (±5% ideal); slope >±8% invalidates pattern |
 | **量度萎缩** | Volume during LS vs Head vs RS | Declining volume = selling exhaustion |
 | **时间对称性** | LS→Head vs Head→RS days | Should be roughly equal (0.4–2.5x) |
 | **右肩位置** | RS vs neckline distance | RS approaching neckline = imminent breakout |
@@ -105,7 +105,7 @@ Price
 | Dimension | Max | Criteria |
 |-----------|-----|----------|
 | Pattern completeness (5 points) | 30 | All 5 points found in correct order |
-| Head depth vs shoulders | 15 | Head ≥2% below both shoulders = 15; ≥1% = 10 |
+| Head depth vs shoulders | 15 | Head ≥2% below both shoulders = 15; ≥1% = 8; <1% = 0 |
 | Shoulder symmetry (LS vs RS) | 10 | LS/RS within ±5% = 10; ±10% = 7; ±15% = 4 |
 | Neckline quality (flatness) | 10 | Slope < ±3% = 10; < ±5% = 7; < ±8% = 4 |
 | Volume contraction (LS→RS) | 10 | Vol_RS < 0.7×Vol_LS = 10; < 0.85 = 7 |
@@ -113,14 +113,16 @@ Price
 | Time symmetry (LS→H vs H→RS) | 8 | Ratio 0.6–1.5 = 8; 0.4–2.5 = 4 |
 | RS recovery trend | 7 | RS rising (5d > 0) or near neckline = 7 |
 
-**Penalties:** Head not lowest = -30; pattern too messy (>8 local extrema) = -10; recent crash (20d < -8%) = -10.
+**Hard invalidation:** Neckline slope >±8% or head depth <0.5% → pattern rejected entirely.
+
+**Penalties:** Head not lowest = -30; recent crash (20d < -15%) = -20, (20d < -8%) = -10; volume expansion (RS/LS > 1.3) = -15; RS far from neckline (>20%) = -10; pattern too messy (>15 local extrema) = -10.
 
 ### Label Grading System
 
 | Label | Criteria | Meaning |
 |-------|----------|---------|
 | 🟢 头肩底确认 | Full pattern + score≥70 + RS approaching neckline | Complete reversal pattern, high confidence |
-| 🟢 头肩底形成中 | 4+ points identified + score≥55 | Pattern nearly complete, monitor for confirmation |
+| 🟢 头肩底形成中 | 4+ points + score≥55 + RS within 15% of neckline | Pattern nearly complete, monitor for confirmation |
 | 🟡 头肩底候选 | 3-4 points + score≥40 | Partial pattern forming, needs more development |
 | ⚪ 非头肩底 | No clear pattern or score<40 | Not a head-shoulder-bottom |
 
