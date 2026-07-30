@@ -33,7 +33,10 @@ def run_westock(*args):
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
         if result.returncode != 0:
             return None
-        return json.loads(result.stdout)
+        data = json.loads(result.stdout)
+        if isinstance(data, dict) and data.get("success") is False:
+            return None
+        return data
     except Exception as e:
         print(f"  Error: {e}", file=sys.stderr)
         return None
@@ -107,13 +110,23 @@ def quadratic_fit(prices):
     return a, b, vx
 
 
-def atr(prices, window):
-    """Average True Range (simplified, using close-to-close)."""
+def atr(highs, lows, closes, window):
+    """Average True Range over last `window` bars."""
+    n = len(closes)
+    if n < 2 or window <= 0:
+        return 0
+    start = max(1, n - window)
     s = 0
-    for i in range(len(prices) - window, len(prices)):
-        if i > 0:
-            s += abs(prices[i] - prices[i - 1])
-    return s / window if window else 0
+    count = 0
+    for i in range(start, n):
+        tr = max(
+            highs[i] - lows[i],
+            abs(highs[i] - closes[i - 1]),
+            abs(lows[i] - closes[i - 1]),
+        )
+        s += tr
+        count += 1
+    return s / count if count else 0
 
 
 def analyze_bowl_bottom(code, name, etype, kline_data):
@@ -170,7 +183,7 @@ def analyze_bowl_bottom(code, name, etype, kline_data):
     # ---- Deceleration ratio ----
     t20_rate = t20
     t_prior_rate20 = t_prior / 2.0
-    if t_prior_rate20 < -1:
+    if t_prior_rate20 < -0.1:
         decel_ratio = t20_rate / t_prior_rate20
     else:
         decel_ratio = 1.0
@@ -189,8 +202,8 @@ def analyze_bowl_bottom(code, name, etype, kline_data):
     vol20 = sum(vols[-20:]) / 20
     vol60 = sum(vols[-60:]) / 60
     vol_ratio = vol20 / vol60 if vol60 > 0 else 1
-    atr20 = atr(closes, 20)
-    atr60 = atr(closes, 60)
+    atr20 = atr(highs, lows, closes, 20)
+    atr60 = atr(highs, lows, closes, 60)
     atr_ratio = atr20 / atr60 if atr60 > 0 else 1
 
     # ---- MA distances ----
