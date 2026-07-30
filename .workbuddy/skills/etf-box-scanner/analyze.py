@@ -83,13 +83,22 @@ def lin_slope(arr, win):
     return s * win / ym * 100 if ym else 0
 
 
-def atr(prices, window):
-    """Average True Range (simplified, using close-to-close)."""
-    s = 0
-    for i in range(len(prices) - window, len(prices)):
+def atr(highs, lows, closes, window):
+    """Average True Range using True Range: max(H-L, |H-prev_C|, |L-prev_C|)."""
+    n = len(closes)
+    if n < window + 1:
+        return 0
+    tr_sum = 0
+    start = n - window
+    for i in range(start, n):
         if i > 0:
-            s += abs(prices[i] - prices[i - 1])
-    return s / window if window else 0
+            tr = max(
+                highs[i] - lows[i],
+                abs(highs[i] - closes[i - 1]),
+                abs(lows[i] - closes[i - 1]),
+            )
+            tr_sum += tr
+    return tr_sum / window if window else 0
 
 
 def detect_box_bounces(highs, lows, closes, window_days):
@@ -235,8 +244,8 @@ def analyze_box_consolidation(code, name, etype, kline_data):
     total_bounces_90 = support_touches_90 + resist_touches_90
     
     # ---- ATR and volume ----
-    atr20 = atr(closes, 20)
-    atr90_val = atr(closes, 90)
+    atr20 = atr(highs, lows, closes, 20)
+    atr90_val = atr(highs, lows, closes, 90)
     atr_ratio = atr20 / atr90_val if atr90_val > 0 else 1
     
     vol20 = sum(vols[-20:]) / 20
@@ -376,6 +385,14 @@ def analyze_box_consolidation(code, name, etype, kline_data):
     else:
         reasons.append(f"❌ 量能异动({vol_ratio:.0%})")
     
+    # 8. MA convergence bonus (均线粘合) — max +3
+    if ma_spread < 2:
+        score += 3
+        reasons.append(f"✅ 均线粘合({ma_spread:.1f}%) +3pt")
+    elif ma_spread < 4:
+        score += 1
+        reasons.append(f"🟡 均线趋合({ma_spread:.1f}%) +1pt")
+    
     # ---- Penalties ----
     # Strong trend
     if abs_t40 > 8:
@@ -399,12 +416,15 @@ def analyze_box_consolidation(code, name, etype, kline_data):
     
     # ---- Consolidation label ----
     is_box_40 = range40_pct >= 5 and abs_t40 < 5 and total_bounces_40 >= 4
-    is_box_90 = range90_pct >= 8 and abs(t90) < 6
+    is_box_90 = range90_pct >= 8 and abs(t90) < 6 and total_bounces_90 >= 4
     is_narrow = range40_pct < 8 and range40_pct >= 3 and abs_t40 < 4
     is_wide = range40_pct > 20 and abs_t40 < 5
     is_downtrend = t40 < -8
-    
-    if is_box_40 and is_box_90 and score >= 70:
+    near_top = pos40 > 0.75
+
+    if near_top and is_box_40 and score >= 45:
+        label = "🟡 箱顶观望"
+    elif is_box_40 and is_box_90 and score >= 70:
         label = "🟢 确认箱体(中长)"
     elif is_box_40 and score >= 60:
         label = "🟢 确认箱体(中期)"
@@ -501,7 +521,7 @@ def main():
     # Save raw kline data
     cwd = os.getcwd()
     skill_dir = os.path.dirname(os.path.abspath(__file__))
-    kline_file = os.path.join(skill_dir, "etf_concussion_kline_data.json")
+    kline_file = os.path.join(skill_dir, "etf_box_kline_data.json")
     with open(kline_file, "w") as f:
         json.dump(kline_data, f, ensure_ascii=False)
     print(f"K-line data saved: {kline_file}")
@@ -518,7 +538,7 @@ def main():
             results.append(r)
     results.sort(key=lambda x: x["score"], reverse=True)
     
-    results_file = os.path.join(skill_dir, "etf_concussion_results.json")
+    results_file = os.path.join(skill_dir, "etf_box_results.json")
     with open(results_file, "w") as f:
         json.dump(results, f, ensure_ascii=False, indent=2)
     print(f"Results saved: {results_file}")
@@ -526,6 +546,7 @@ def main():
     # Step 4: Summary
     box_long = [r for r in results if "中长" in r["label"]]
     box_medium = [r for r in results if "中期" in r["label"] and "中长" not in r["label"]]
+    box_top = [r for r in results if r["label"].startswith("🟡 箱顶")]
     narrow = [r for r in results if r["label"].startswith("🟡 窄幅")]
     wide = [r for r in results if r["label"].startswith("🟡 宽幅")]
     downtrend = [r for r in results if r["label"].startswith("🔴")]
@@ -536,6 +557,7 @@ def main():
     print("=" * 60)
     print(f"  🟢 确认箱体(中长): {len(box_long)}")
     print(f"  🟢 确认箱体(中期): {len(box_medium)}")
+    print(f"  🟡 箱顶观望: {len(box_top)}")
     print(f"  🟡 窄幅收敛: {len(narrow)}")
     print(f"  🟡 宽幅震荡: {len(wide)}")
     print(f"  🔴 下跌趋势: {len(downtrend)}")

@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A股ETF箱体震荡形态分析报告 · 2026-07-30</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif; background:#f5f6fa; color:#2c3e50; line-height:1.6; }
+.container { max-width:1280px; margin:0 auto; padding:20px; }
+.header { background:linear-gradient(135deg,#0f2027 0%,#203a43 50%,#2c5364 100%); color:#fff; padding:36px 30px; border-radius:12px; margin-bottom:24px; box-shadow:0 4px 20px rgba(0,0,0,0.15); }
+.header h1 { font-size:26px; margin-bottom:8px; }
+.header .subtitle { opacity:0.85; font-size:14px; }
+.header .meta { margin-top:14px; display:flex; gap:24px; font-size:13px; opacity:0.75; flex-wrap:wrap; }
+.summary-cards { display:grid; grid-template-columns:repeat(6,1fr); gap:14px; margin-bottom:28px; }
+.summary-card { background:#fff; border-radius:10px; padding:18px; text-align:center; box-shadow:0 2px 10px rgba(0,0,0,0.06); }
+.summary-card .number { font-size:30px; font-weight:700; }
+.summary-card .label { font-size:12px; color:#7f8c8d; margin-top:4px; }
+.c-green .number { color:#27ae60; }
+.c-orange .number { color:#e67e22; }
+.c-red .number { color:#e74c3c; }
+.c-blue .number { color:#2980b9; }
+.c-gray .number { color:#7f8c8d; }
+.section-title { font-size:19px; font-weight:600; margin:28px 0 14px; padding-bottom:10px; border-bottom:2px solid #ecf0f1; display:flex; align-items:center; gap:8px; }
+.section-title .count { font-size:13px; color:#7f8c8d; font-weight:400; }
+.table-wrapper { background:#fff; border-radius:10px; overflow:hidden; box-shadow:0 2px 10px rgba(0,0,0,0.06); margin-bottom:28px; overflow-x:auto; }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+th { background:#f8f9fa; padding:11px 9px; text-align:left; font-weight:600; color:#5a6473; white-space:nowrap; border-bottom:2px solid #e8eaed; }
+td { padding:10px 9px; border-bottom:1px solid #f0f2f5; white-space:nowrap; }
+tr:hover td { background:#fafbfc; }
+.muted { color:#95a5a6; font-size:12px; }
+.pos { color:#e74c3c; font-weight:600; }
+.neg { color:#16a085; font-weight:600; }
+.low { color:#e67e22; font-weight:600; }
+.tag-green { background:#e8f8f0; color:#27ae60; padding:2px 6px; border-radius:4px; font-size:11px; }
+.tag-red { background:#fdecea; color:#e74c3c; padding:2px 6px; border-radius:4px; font-size:11px; }
+.charts-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-bottom:28px; }
+.chart-card { background:#fff; border-radius:10px; padding:16px; box-shadow:0 2px 10px rgba(0,0,0,0.06); }
+.chart-card h4 { font-size:15px; margin-bottom:4px; display:flex; align-items:center; gap:8px; }
+.chart-card .sub { font-size:12px; color:#7f8c8d; margin-bottom:10px; }
+.chart-box { height:150px; position:relative; }
+.detail-card { background:#fff; border-radius:10px; padding:20px; margin-bottom:18px; box-shadow:0 2px 10px rgba(0,0,0,0.06); border-left:4px solid #27ae60; }
+.detail-head { display:flex; align-items:center; gap:12px; margin-bottom:14px; flex-wrap:wrap; }
+.detail-head .rank { background:#27ae60; color:#fff; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px; }
+.detail-head h3 { font-size:18px; }
+.badge { color:#fff; padding:3px 10px; border-radius:12px; font-size:12px; }
+.score-badge { background:#34495e; color:#fff; padding:3px 10px; border-radius:12px; font-size:12px; font-weight:600; }
+.detail-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:14px; }
+.metric { background:#f8f9fa; padding:9px 12px; border-radius:6px; }
+.metric .ml { font-size:12px; color:#7f8c8d; display:block; }
+.metric .mv { font-size:15px; font-weight:600; }
+.reasons { background:#f8f9fa; padding:12px 16px; border-radius:6px; }
+.reasons ul { list-style:none; margin-top:6px; }
+.reasons li { padding:2px 0; font-size:13px; }
+.note { background:#e8f5e9; border-left:4px solid #27ae60; padding:14px 18px; border-radius:6px; margin:20px 0; font-size:13px; }
+.disclaimer { background:#fdecea; border-radius:8px; padding:16px 20px; margin-top:28px; font-size:12px; color:#c0392b; }
+.sr-line { margin:8px 0; }
+.sr-line .sup { color:#16a085; font-weight:600; }
+.sr-line .res { color:#e74c3c; font-weight:600; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+  <h1>📦 A股ETF箱体震荡形态分析报告</h1>
+  <div class="subtitle">各板块规模最大ETF的箱体震荡扫描 · 适用于中线差价操作 · 来自 all_etfs_larggest.json</div>
+  <div class="meta">
+    <span>📅 数据日期: 2026-07-30</span>
+    <span>📊 样本: 329 只ETF</span>
+    <span>📈 K线周期: 日线 250 天</span>
+    <span>🎯 算法: 箱体振幅 + 趋势平坦度 + 支撑阻力触及 × 位置优势</span>
+  </div>
+</div>
+
+<div class="summary-cards">
+  <div class="summary-card c-blue"><div class="number">329</div><div class="label">分析ETF总数</div></div>
+  <div class="summary-card c-green"><div class="number">39</div><div class="label">🟢 确认箱体（中长+中期）</div></div>
+  <div class="summary-card c-orange"><div class="number">59</div><div class="label">🟡 箱顶观望</div></div>
+  <div class="summary-card c-orange"><div class="number">12</div><div class="label">🟡 窄幅/宽幅震荡</div></div>
+  <div class="summary-card c-red"><div class="number">100</div><div class="label">🔴 下跌趋势</div></div>
+  <div class="summary-card c-gray"><div class="number">119</div><div class="label">⚪ 趋势行情</div></div>
+</div>
+
+<div class="note">
+  <b>📌 箱体震荡判定逻辑 (差价版):</b> 可做中線差价的箱体 = ① 40日振幅 8-20% (差价空间充足) + ② 趋势平坦 (|40日斜率|<5%) + ③ 箱体确认 (支撑阻力多次触及) + ④ 位置有利 (近箱底买入)。
+  <b>箱体质量</b> = 支撑触及次数 + 阻力触及次数，更多触及 = 更可靠的箱体边界。
+  本算法会排除单边趋势 (上升或下跌)，只筛选真正的震荡盘整。
+</div>
+
+<div class="section-title">📈 确认箱体ETF — 90日K线 <span class="count">(前9名，含箱体边界线)</span></div>
+<div class="charts-grid" id="chartsGrid"></div>
+
+<div class="section-title">📊 综合得分排名 (TOP 25) <span class="count">颜色: 涨红跌绿 (A股惯例)</span></div>
+<div class="table-wrapper">
+<table>
+<thead><tr>
+<th>#</th><th>ETF名称</th><th>形态判定</th><th>得分</th><th>40日振幅</th><th>90日振幅</th><th>40日趋势</th><th>S/R触及</th><th>区间位置</th><th>ATR比</th><th>均线粘合</th>
+</tr></thead>
+<tbody>
+
+        <tr>
+          <td><b>1</b></td>
+          <td><b>中国A50ETF汇添富</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#27ae60;font-weight:600">🟢 确认箱体(中期)</span></td>
+          <td><b>95</b></td>
+          <td>9.8%</td>
+          <td>18.1%</td>
+          <td class="neg">-1.7%</td>
+          <td>11触/8触</td>
+          <td class="">27.3%</td>
+          <td>1.14</td>
+          <td>1.9%</td>
+        </tr>
+        <tr>
+          <td><b>2</b></td>
+          <td><b>可持续发展ETF博时</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#27ae60;font-weight:600">🟢 确认箱体(中期)</span></td>
+          <td><b>95</b></td>
+          <td>12.7%</td>
+          <td>15.7%</td>
+          <td class="neg">-0.1%</td>
+          <td>6触/5触</td>
+          <td class="">35.0%</td>
+          <td>1.13</td>
+          <td>1.3%</td>
+        </tr>
+        <tr>
+          <td><b>3</b></td>
+          <td><b>沪深300指增ETF华宝</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#27ae60;font-weight:600">🟢 确认箱体(中期)</span></td>
+          <td><b>93</b></td>
+          <td>9.4%</td>
+          <td>14.4%</td>
+          <td class="neg">-2.6%</td>
+          <td>6触/11触</td>
+          <td class="pos">23.0% (箱底)</td>
+          <td>1.39</td>
+          <td>1.6%</td>
+        </tr>
+        <tr>
+          <td><b>4</b></td>
+          <td><b>上证180ETF华安</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#27ae60;font-weight:600">🟢 确认箱体(中长)</span></td>
+          <td><b>92</b></td>
+          <td>8.7%</td>
+          <td>11.7%</td>
+          <td class="neg">-1.6%</td>
+          <td>3触/8触</td>
+          <td class="">29.7%</td>
+          <td>1.23</td>
+          <td>0.7%</td>
+        </tr>
+        <tr>
+          <td><b>5</b></td>
+          <td><b>180ESGETF工银</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#27ae60;font-weight:600">🟢 确认箱体(中长)</span></td>
+          <td><b>92</b></td>
+          <td>8.6%</td>
+          <td>12.5%</td>
+          <td class="neg">-0.4%</td>
+          <td>14触/8触</td>
+          <td class="">53.3%</td>
+          <td>1.11</td>
+          <td>0.4%</td>
+        </tr>
+        <tr>
+          <td><b>6</b></td>
+          <td><b>中证A50增强ETF易方达</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#27ae60;font-weight:600">🟢 确认箱体(中长)</span></td>
+          <td><b>88</b></td>
+          <td>8.0%</td>
+          <td>11.6%</td>
+          <td class="pos">+0.7%</td>
+          <td>13触/14触</td>
+          <td class="">68.9%</td>
+          <td>1.22</td>
+          <td>0.3%</td>
+        </tr>
+        <tr>
+          <td><b>7</b></td>
+          <td><b>价值ETF富国</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#f39c12;font-weight:600">🟡 箱顶观望</span></td>
+          <td><b>87</b></td>
+          <td>9.4%</td>
+          <td>12.4%</td>
+          <td class="neg">-0.5%</td>
+          <td>7触/4触</td>
+          <td class="">92.7%</td>
+          <td>1.19</td>
+          <td>2.7%</td>
+        </tr>
+        <tr>
+          <td><b>8</b></td>
+          <td><b>央企50ETF易方达</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#27ae60;font-weight:600">🟢 确认箱体(中期)</span></td>
+          <td><b>87</b></td>
+          <td>8.4%</td>
+          <td>13.6%</td>
+          <td class="neg">-2.7%</td>
+          <td>16触/7触</td>
+          <td class="">45.6%</td>
+          <td>0.93</td>
+          <td>3.3%</td>
+        </tr>
+        <tr>
+          <td><b>9</b></td>
+          <td><b>ESGETF浦银</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#27ae60;font-weight:600">🟢 确认箱体(中期)</span></td>
+          <td><b>87</b></td>
+          <td>12.7%</td>
+          <td>19.8%</td>
+          <td class="neg">-3.1%</td>
+          <td>7触/3触</td>
+          <td class="pos">3.3% (箱底)</td>
+          <td>1.13</td>
+          <td>1.8%</td>
+        </tr>
+        <tr>
+          <td><b>10</b></td>
+          <td><b>沪深300ETF华泰柏瑞</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#27ae60;font-weight:600">🟢 确认箱体(中长)</span></td>
+          <td><b>86</b></td>
+          <td>11.7%</td>
+          <td>14.4%</td>
+          <td class="neg">-4.9%</td>
+          <td>3触/3触</td>
+          <td class="pos">12.2% (箱底)</td>
+          <td>1.27</td>
+          <td>1.6%</td>
+        </tr>
+        <tr>
+          <td><b>11</b></td>
+          <td><b>港股低波红利ETF摩根</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#f39c12;font-weight:600">🟡 箱顶观望</span></td>
+          <td><b>86</b></td>
+          <td>13.6%</td>
+          <td>16.8%</td>
+          <td class="pos">+1.4%</td>
+          <td>3触/3触</td>
+          <td class="">93.3%</td>
+          <td>1.06</td>
+          <td>4.2%</td>
+        </tr>
+        <tr>
+          <td><b>12</b></td>
+          <td><b>中证红利ETF招商</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#f39c12;font-weight:600">🟡 箱顶观望</span></td>
+          <td><b>86</b></td>
+          <td>12.6%</td>
+          <td>14.9%</td>
+          <td class="neg">-0.8%</td>
+          <td>4触/4触</td>
+          <td class="">93.2%</td>
+          <td>1.23</td>
+          <td>2.6%</td>
+        </tr>
+        <tr>
+          <td><b>13</b></td>
+          <td><b>央企改革ETF华夏</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#27ae60;font-weight:600">🟢 确认箱体(中长)</span></td>
+          <td><b>86</b></td>
+          <td>11.7%</td>
+          <td>13.6%</td>
+          <td class="neg">-4.6%</td>
+          <td>4触/4触</td>
+          <td class="pos">17.2% (箱底)</td>
+          <td>1.28</td>
+          <td>1.9%</td>
+        </tr>
+        <tr>
+          <td><b>14</b></td>
+          <td><b>央企结构调整ETF博时</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#27ae60;font-weight:600">🟢 确认箱体(中长)</span></td>
+          <td><b>86</b></td>
+          <td>12.1%</td>
+          <td>14.8%</td>
+          <td class="neg">-4.3%</td>
+          <td>7触/3触</td>
+          <td class="pos">19.4% (箱底)</td>
+          <td>1.31</td>
+          <td>1.8%</td>
+        </tr>
+        <tr>
+          <td><b>15</b></td>
+          <td><b>标普A股红利ETF华宝</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#f39c12;font-weight:600">🟡 箱顶观望</span></td>
+          <td><b>86</b></td>
+          <td>12.0%</td>
+          <td>16.0%</td>
+          <td class="pos">+0.4%</td>
+          <td>9触/5触</td>
+          <td class="">98.6%</td>
+          <td>1.13</td>
+          <td>4.3%</td>
+        </tr>
+        <tr>
+          <td><b>16</b></td>
+          <td><b>香港科技ETF兴银</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#27ae60;font-weight:600">🟢 确认箱体(中期)</span></td>
+          <td><b>86</b></td>
+          <td>14.4%</td>
+          <td>19.9%</td>
+          <td class="pos">+1.2%</td>
+          <td>5触/2触</td>
+          <td class="">64.4%</td>
+          <td>1.15</td>
+          <td>4.1%</td>
+        </tr>
+        <tr>
+          <td><b>17</b></td>
+          <td><b>沪深300增强ETF国泰</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#27ae60;font-weight:600">🟢 确认箱体(中长)</span></td>
+          <td><b>86</b></td>
+          <td>10.6%</td>
+          <td>14.5%</td>
+          <td class="neg">-4.5%</td>
+          <td>6触/7触</td>
+          <td class="pos">11.7% (箱底)</td>
+          <td>1.28</td>
+          <td>1.5%</td>
+        </tr>
+        <tr>
+          <td><b>18</b></td>
+          <td><b>MSCI中国A股ETF南方</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#27ae60;font-weight:600">🟢 确认箱体(中长)</span></td>
+          <td><b>86</b></td>
+          <td>11.4%</td>
+          <td>15.5%</td>
+          <td class="neg">-4.9%</td>
+          <td>6触/4触</td>
+          <td class="pos">11.2% (箱底)</td>
+          <td>1.22</td>
+          <td>1.6%</td>
+        </tr>
+        <tr>
+          <td><b>19</b></td>
+          <td><b>产业升级ETF南方</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#f39c12;font-weight:600">🟡 箱顶观望</span></td>
+          <td><b>86</b></td>
+          <td>11.6%</td>
+          <td>15.5%</td>
+          <td class="neg">-0.0%</td>
+          <td>5触/5触</td>
+          <td class="">98.0%</td>
+          <td>1.25</td>
+          <td>3.8%</td>
+        </tr>
+        <tr>
+          <td><b>20</b></td>
+          <td><b>沪深300ESGETF富国</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#27ae60;font-weight:600">🟢 确认箱体(中期)</span></td>
+          <td><b>86</b></td>
+          <td>12.1%</td>
+          <td>16.1%</td>
+          <td class="neg">-4.2%</td>
+          <td>7触/5触</td>
+          <td class="pos">13.1% (箱底)</td>
+          <td>1.24</td>
+          <td>1.8%</td>
+        </tr>
+        <tr>
+          <td><b>21</b></td>
+          <td><b>物流ETF富国</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#f39c12;font-weight:600">🟡 箱顶观望</span></td>
+          <td><b>86</b></td>
+          <td>9.8%</td>
+          <td>16.3%</td>
+          <td class="neg">-0.8%</td>
+          <td>13触/4触</td>
+          <td class="">80.0%</td>
+          <td>1.14</td>
+          <td>4.4%</td>
+        </tr>
+        <tr>
+          <td><b>22</b></td>
+          <td><b>中证500低波动ETF华安</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#27ae60;font-weight:600">🟢 确认箱体(中长)</span></td>
+          <td><b>86</b></td>
+          <td>11.8%</td>
+          <td>11.8%</td>
+          <td class="neg">-2.5%</td>
+          <td>6触/6触</td>
+          <td class="">42.6%</td>
+          <td>1.22</td>
+          <td>1.1%</td>
+        </tr>
+        <tr>
+          <td><b>23</b></td>
+          <td><b>300自由现金流ETF摩根</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#f39c12;font-weight:600">🟡 箱顶观望</span></td>
+          <td><b>85</b></td>
+          <td>14.4%</td>
+          <td>19.7%</td>
+          <td class="neg">-0.0%</td>
+          <td>3触/4触</td>
+          <td class="">91.2%</td>
+          <td>1.21</td>
+          <td>5.3%</td>
+        </tr>
+        <tr>
+          <td><b>24</b></td>
+          <td><b>交运ETF国泰</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#f39c12;font-weight:600">🟡 箱顶观望</span></td>
+          <td><b>84</b></td>
+          <td>11.5%</td>
+          <td>15.9%</td>
+          <td class="pos">+1.4%</td>
+          <td>9触/9触</td>
+          <td class="">98.1%</td>
+          <td>1.07</td>
+          <td>4.1%</td>
+        </tr>
+        <tr>
+          <td><b>25</b></td>
+          <td><b>国货ETF富国</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#27ae60;font-weight:600">🟢 确认箱体(中期)</span></td>
+          <td><b>83</b></td>
+          <td>13.7%</td>
+          <td>24.8%</td>
+          <td class="pos">+0.4%</td>
+          <td>5触/3触</td>
+          <td class="pos">14.7% (箱底)</td>
+          <td>1.36</td>
+          <td>4.3%</td>
+        </tr>
+</tbody></table>
+</div>
+
+<div class="section-title">📝 确认箱体ETF详细分析</div>
+
+        <div class="detail-card">
+          <div class="detail-head">
+            <span class="rank">#1</span>
+            <h3>上证180ETF华安</h3>
+            <span class="badge" style="background:#27ae60">🟢 确认箱体(中长)</span>
+            <span class="score-badge">得分 92/100</span>
+          </div>
+          <div class="detail-grid">
+            <div class="metric"><span class="ml">当前价格</span><span class="mv">3.92</span></div>
+            <div class="metric"><span class="ml">40日振幅</span><span class="mv">8.7%</span></div>
+            <div class="metric"><span class="ml">90日振幅</span><span class="mv">11.7%</span></div>
+            <div class="metric"><span class="ml">40日区间位</span><span class="mv">29.7%</span></div>
+            <div class="metric"><span class="ml">支撑(40d)</span><span class="mv">3.87 (3触)</span></div>
+            <div class="metric"><span class="ml">阻力(40d)</span><span class="mv">4.11 (8触)</span></div>
+            <div class="metric"><span class="ml">支撑(90d)</span><span class="mv">4.0 (10触)</span></div>
+            <div class="metric"><span class="ml">阻力(90d)</span><span class="mv">4.1 (14触)</span></div>
+            <div class="metric"><span class="ml">近5日</span><span class="mv neg">-2.4%</span></div>
+            <div class="metric"><span class="ml">近10日</span><span class="mv neg">-0.4%</span></div>
+            <div class="metric"><span class="ml">近20日</span><span class="mv neg">-2.6%</span></div>
+            <div class="metric"><span class="ml">趋势20d</span><span class="mv neg">-3.4%</span></div>
+            <div class="metric"><span class="ml">趋势40d</span><span class="mv neg">-1.6%</span></div>
+            <div class="metric"><span class="ml">趋势90d</span><span class="mv pos">+2.5%</span></div>
+            <div class="metric"><span class="ml">ATR比(20/90)</span><span class="mv">1.23</span></div>
+            <div class="metric"><span class="ml">量比(20/60)</span><span class="mv">0.64</span></div>
+            <div class="metric"><span class="ml">均线粘合度</span><span class="mv">0.7%</span></div>
+            <div class="metric"><span class="ml">距20MA</span><span class="mv neg">-1.6%</span></div>
+            <div class="metric"><span class="ml">距40MA</span><span class="mv neg">-2.2%</span></div>
+            <div class="metric"><span class="ml">距90MA</span><span class="mv neg">-2.1%</span></div>
+          </div>
+          <div class="reasons"><b>判定依据:</b><ul><li>✅ 40日振幅理想(8.7%) 适合差价</li><li>✅ 90日振幅理想(11.7%) 长线箱体</li><li>✅ 40日趋势平坦(-1.6%)</li><li>✅ 箱体确认: 支撑3触+阻力8触</li><li>🟡 箱中偏底(30%)</li><li>❌ 波幅放大(123%)</li><li>🟡 量能正常(64%)</li><li>✅ 均线粘合(0.7%) +3pt</li></ul></div>
+        </div>
+        <div class="detail-card">
+          <div class="detail-head">
+            <span class="rank">#2</span>
+            <h3>180ESGETF工银</h3>
+            <span class="badge" style="background:#27ae60">🟢 确认箱体(中长)</span>
+            <span class="score-badge">得分 92/100</span>
+          </div>
+          <div class="detail-grid">
+            <div class="metric"><span class="ml">当前价格</span><span class="mv">1.05</span></div>
+            <div class="metric"><span class="ml">40日振幅</span><span class="mv">8.6%</span></div>
+            <div class="metric"><span class="ml">90日振幅</span><span class="mv">12.5%</span></div>
+            <div class="metric"><span class="ml">40日区间位</span><span class="mv">53.3%</span></div>
+            <div class="metric"><span class="ml">支撑(40d)</span><span class="mv">1.02 (14触)</span></div>
+            <div class="metric"><span class="ml">阻力(40d)</span><span class="mv">1.06 (8触)</span></div>
+            <div class="metric"><span class="ml">支撑(90d)</span><span class="mv">1.03 (34触)</span></div>
+            <div class="metric"><span class="ml">阻力(90d)</span><span class="mv">1.05 (22触)</span></div>
+            <div class="metric"><span class="ml">近5日</span><span class="mv neg">-0.2%</span></div>
+            <div class="metric"><span class="ml">近10日</span><span class="mv pos">+2.7%</span></div>
+            <div class="metric"><span class="ml">近20日</span><span class="mv pos">+0.8%</span></div>
+            <div class="metric"><span class="ml">趋势20d</span><span class="mv neg">-0.7%</span></div>
+            <div class="metric"><span class="ml">趋势40d</span><span class="mv neg">-0.4%</span></div>
+            <div class="metric"><span class="ml">趋势90d</span><span class="mv pos">+2.5%</span></div>
+            <div class="metric"><span class="ml">ATR比(20/90)</span><span class="mv">1.11</span></div>
+            <div class="metric"><span class="ml">量比(20/60)</span><span class="mv">0.77</span></div>
+            <div class="metric"><span class="ml">均线粘合度</span><span class="mv">0.4%</span></div>
+            <div class="metric"><span class="ml">距20MA</span><span class="mv pos">+1.0%</span></div>
+            <div class="metric"><span class="ml">距40MA</span><span class="mv pos">+0.5%</span></div>
+            <div class="metric"><span class="ml">距90MA</span><span class="mv pos">+1.0%</span></div>
+          </div>
+          <div class="reasons"><b>判定依据:</b><ul><li>✅ 40日振幅理想(8.6%) 适合差价</li><li>✅ 90日振幅理想(12.5%) 长线箱体</li><li>✅ 40日趋势平坦(-0.4%)</li><li>✅ 箱体确认: 支撑14触+阻力8触</li><li>🟡 箱中震荡(53%)</li><li>🟡 波幅正常(111%)</li><li>✅ 量能稳定(77%)</li><li>✅ 均线粘合(0.4%) +3pt</li></ul></div>
+        </div>
+        <div class="detail-card">
+          <div class="detail-head">
+            <span class="rank">#3</span>
+            <h3>中证A50增强ETF易方达</h3>
+            <span class="badge" style="background:#27ae60">🟢 确认箱体(中长)</span>
+            <span class="score-badge">得分 88/100</span>
+          </div>
+          <div class="detail-grid">
+            <div class="metric"><span class="ml">当前价格</span><span class="mv">1.13</span></div>
+            <div class="metric"><span class="ml">40日振幅</span><span class="mv">8.0%</span></div>
+            <div class="metric"><span class="ml">90日振幅</span><span class="mv">11.6%</span></div>
+            <div class="metric"><span class="ml">40日区间位</span><span class="mv">68.9%</span></div>
+            <div class="metric"><span class="ml">支撑(40d)</span><span class="mv">1.09 (13触)</span></div>
+            <div class="metric"><span class="ml">阻力(40d)</span><span class="mv">1.14 (14触)</span></div>
+            <div class="metric"><span class="ml">支撑(90d)</span><span class="mv">1.11 (14触)</span></div>
+            <div class="metric"><span class="ml">阻力(90d)</span><span class="mv">1.14 (30触)</span></div>
+            <div class="metric"><span class="ml">近5日</span><span class="mv neg">-1.6%</span></div>
+            <div class="metric"><span class="ml">近10日</span><span class="mv pos">+1.1%</span></div>
+            <div class="metric"><span class="ml">近20日</span><span class="mv pos">+2.9%</span></div>
+            <div class="metric"><span class="ml">趋势20d</span><span class="mv pos">+3.6%</span></div>
+            <div class="metric"><span class="ml">趋势40d</span><span class="mv pos">+0.7%</span></div>
+            <div class="metric"><span class="ml">趋势90d</span><span class="mv pos">+1.9%</span></div>
+            <div class="metric"><span class="ml">ATR比(20/90)</span><span class="mv">1.22</span></div>
+            <div class="metric"><span class="ml">量比(20/60)</span><span class="mv">1.07</span></div>
+            <div class="metric"><span class="ml">均线粘合度</span><span class="mv">0.3%</span></div>
+            <div class="metric"><span class="ml">距20MA</span><span class="mv pos">+1.2%</span></div>
+            <div class="metric"><span class="ml">距40MA</span><span class="mv pos">+1.0%</span></div>
+            <div class="metric"><span class="ml">距90MA</span><span class="mv pos">+0.9%</span></div>
+          </div>
+          <div class="reasons"><b>判定依据:</b><ul><li>✅ 40日振幅理想(8.0%) 适合差价</li><li>✅ 90日振幅理想(11.6%) 长线箱体</li><li>✅ 40日趋势平坦(+0.7%)</li><li>✅ 箱体确认: 支撑13触+阻力14触</li><li>⚠️ 近箱顶(69%) 追高风险</li><li>❌ 波幅放大(122%)</li><li>✅ 量能稳定(107%)</li><li>✅ 均线粘合(0.3%) +3pt</li></ul></div>
+        </div>
+        <div class="detail-card">
+          <div class="detail-head">
+            <span class="rank">#4</span>
+            <h3>沪深300ETF华泰柏瑞</h3>
+            <span class="badge" style="background:#27ae60">🟢 确认箱体(中长)</span>
+            <span class="score-badge">得分 86/100</span>
+          </div>
+          <div class="detail-grid">
+            <div class="metric"><span class="ml">当前价格</span><span class="mv">4.61</span></div>
+            <div class="metric"><span class="ml">40日振幅</span><span class="mv">11.7%</span></div>
+            <div class="metric"><span class="ml">90日振幅</span><span class="mv">14.4%</span></div>
+            <div class="metric"><span class="ml">40日区间位</span><span class="mv">12.2%</span></div>
+            <div class="metric"><span class="ml">支撑(40d)</span><span class="mv">4.71 (3触)</span></div>
+            <div class="metric"><span class="ml">阻力(40d)</span><span class="mv">4.88 (3触)</span></div>
+            <div class="metric"><span class="ml">支撑(90d)</span><span class="mv">4.74 (6触)</span></div>
+            <div class="metric"><span class="ml">阻力(90d)</span><span class="mv">4.88 (8触)</span></div>
+            <div class="metric"><span class="ml">近5日</span><span class="mv neg">-3.9%</span></div>
+            <div class="metric"><span class="ml">近10日</span><span class="mv neg">-3.1%</span></div>
+            <div class="metric"><span class="ml">近20日</span><span class="mv neg">-5.1%</span></div>
+            <div class="metric"><span class="ml">趋势20d</span><span class="mv neg">-5.1%</span></div>
+            <div class="metric"><span class="ml">趋势40d</span><span class="mv neg">-4.9%</span></div>
+            <div class="metric"><span class="ml">趋势90d</span><span class="mv pos">+5.2%</span></div>
+            <div class="metric"><span class="ml">ATR比(20/90)</span><span class="mv">1.27</span></div>
+            <div class="metric"><span class="ml">量比(20/60)</span><span class="mv">1.16</span></div>
+            <div class="metric"><span class="ml">均线粘合度</span><span class="mv">1.6%</span></div>
+            <div class="metric"><span class="ml">距20MA</span><span class="mv neg">-3.3%</span></div>
+            <div class="metric"><span class="ml">距40MA</span><span class="mv neg">-4.8%</span></div>
+            <div class="metric"><span class="ml">距90MA</span><span class="mv neg">-3.9%</span></div>
+          </div>
+          <div class="reasons"><b>判定依据:</b><ul><li>✅ 40日振幅理想(11.7%) 适合差价</li><li>✅ 90日振幅理想(14.4%) 长线箱体</li><li>🟡 40日趋势微倾(-4.9%)</li><li>✅ 箱体确认: 支撑3触+阻力3触</li><li>✅ 近箱底(12%) 买入区</li><li>❌ 波幅放大(127%)</li><li>✅ 量能稳定(116%)</li><li>✅ 均线粘合(1.6%) +3pt</li></ul></div>
+        </div>
+        <div class="detail-card">
+          <div class="detail-head">
+            <span class="rank">#5</span>
+            <h3>央企改革ETF华夏</h3>
+            <span class="badge" style="background:#27ae60">🟢 确认箱体(中长)</span>
+            <span class="score-badge">得分 86/100</span>
+          </div>
+          <div class="detail-grid">
+            <div class="metric"><span class="ml">当前价格</span><span class="mv">1.47</span></div>
+            <div class="metric"><span class="ml">40日振幅</span><span class="mv">11.7%</span></div>
+            <div class="metric"><span class="ml">90日振幅</span><span class="mv">13.6%</span></div>
+            <div class="metric"><span class="ml">40日区间位</span><span class="mv">17.2%</span></div>
+            <div class="metric"><span class="ml">支撑(40d)</span><span class="mv">1.51 (4触)</span></div>
+            <div class="metric"><span class="ml">阻力(40d)</span><span class="mv">1.61 (4触)</span></div>
+            <div class="metric"><span class="ml">支撑(90d)</span><span class="mv">1.55 (12触)</span></div>
+            <div class="metric"><span class="ml">阻力(90d)</span><span class="mv">1.51 (7触)</span></div>
+            <div class="metric"><span class="ml">近5日</span><span class="mv neg">-2.6%</span></div>
+            <div class="metric"><span class="ml">近10日</span><span class="mv neg">-0.6%</span></div>
+            <div class="metric"><span class="ml">近20日</span><span class="mv neg">-5.1%</span></div>
+            <div class="metric"><span class="ml">趋势20d</span><span class="mv neg">-5.8%</span></div>
+            <div class="metric"><span class="ml">趋势40d</span><span class="mv neg">-4.6%</span></div>
+            <div class="metric"><span class="ml">趋势90d</span><span class="mv pos">+0.9%</span></div>
+            <div class="metric"><span class="ml">ATR比(20/90)</span><span class="mv">1.28</span></div>
+            <div class="metric"><span class="ml">量比(20/60)</span><span class="mv">0.86</span></div>
+            <div class="metric"><span class="ml">均线粘合度</span><span class="mv">1.9%</span></div>
+            <div class="metric"><span class="ml">距20MA</span><span class="mv neg">-2.8%</span></div>
+            <div class="metric"><span class="ml">距40MA</span><span class="mv neg">-4.2%</span></div>
+            <div class="metric"><span class="ml">距90MA</span><span class="mv neg">-4.6%</span></div>
+          </div>
+          <div class="reasons"><b>判定依据:</b><ul><li>✅ 40日振幅理想(11.7%) 适合差价</li><li>✅ 90日振幅理想(13.6%) 长线箱体</li><li>🟡 40日趋势微倾(-4.6%)</li><li>✅ 箱体确认: 支撑4触+阻力4触</li><li>✅ 近箱底(17%) 买入区</li><li>❌ 波幅放大(128%)</li><li>✅ 量能稳定(86%)</li><li>✅ 均线粘合(1.9%) +3pt</li></ul></div>
+        </div>
+        <div class="detail-card">
+          <div class="detail-head">
+            <span class="rank">#6</span>
+            <h3>央企结构调整ETF博时</h3>
+            <span class="badge" style="background:#27ae60">🟢 确认箱体(中长)</span>
+            <span class="score-badge">得分 86/100</span>
+          </div>
+          <div class="detail-grid">
+            <div class="metric"><span class="ml">当前价格</span><span class="mv">1.43</span></div>
+            <div class="metric"><span class="ml">40日振幅</span><span class="mv">12.1%</span></div>
+            <div class="metric"><span class="ml">90日振幅</span><span class="mv">14.8%</span></div>
+            <div class="metric"><span class="ml">40日区间位</span><span class="mv">19.4%</span></div>
+            <div class="metric"><span class="ml">支撑(40d)</span><span class="mv">1.46 (7触)</span></div>
+            <div class="metric"><span class="ml">阻力(40d)</span><span class="mv">1.48 (3触)</span></div>
+            <div class="metric"><span class="ml">支撑(90d)</span><span class="mv">1.47 (11触)</span></div>
+            <div class="metric"><span class="ml">阻力(90d)</span><span class="mv">1.45 (7触)</span></div>
+            <div class="metric"><span class="ml">近5日</span><span class="mv neg">-2.4%</span></div>
+            <div class="metric"><span class="ml">近10日</span><span class="mv neg">-0.3%</span></div>
+            <div class="metric"><span class="ml">近20日</span><span class="mv neg">-4.4%</span></div>
+            <div class="metric"><span class="ml">趋势20d</span><span class="mv neg">-5.6%</span></div>
+            <div class="metric"><span class="ml">趋势40d</span><span class="mv neg">-4.3%</span></div>
+            <div class="metric"><span class="ml">趋势90d</span><span class="mv pos">+1.2%</span></div>
+            <div class="metric"><span class="ml">ATR比(20/90)</span><span class="mv">1.31</span></div>
+            <div class="metric"><span class="ml">量比(20/60)</span><span class="mv">0.72</span></div>
+            <div class="metric"><span class="ml">均线粘合度</span><span class="mv">1.8%</span></div>
+            <div class="metric"><span class="ml">距20MA</span><span class="mv neg">-2.6%</span></div>
+            <div class="metric"><span class="ml">距40MA</span><span class="mv neg">-4.0%</span></div>
+            <div class="metric"><span class="ml">距90MA</span><span class="mv neg">-4.3%</span></div>
+          </div>
+          <div class="reasons"><b>判定依据:</b><ul><li>✅ 40日振幅理想(12.1%) 适合差价</li><li>✅ 90日振幅理想(14.8%) 长线箱体</li><li>🟡 40日趋势微倾(-4.3%)</li><li>✅ 箱体确认: 支撑7触+阻力3触</li><li>✅ 近箱底(19%) 买入区</li><li>❌ 波幅放大(131%)</li><li>✅ 量能稳定(72%)</li><li>✅ 均线粘合(1.8%) +3pt</li></ul></div>
+        </div>
+        <div class="detail-card">
+          <div class="detail-head">
+            <span class="rank">#7</span>
+            <h3>沪深300增强ETF国泰</h3>
+            <span class="badge" style="background:#27ae60">🟢 确认箱体(中长)</span>
+            <span class="score-badge">得分 86/100</span>
+          </div>
+          <div class="detail-grid">
+            <div class="metric"><span class="ml">当前价格</span><span class="mv">1.0</span></div>
+            <div class="metric"><span class="ml">40日振幅</span><span class="mv">10.6%</span></div>
+            <div class="metric"><span class="ml">90日振幅</span><span class="mv">14.5%</span></div>
+            <div class="metric"><span class="ml">40日区间位</span><span class="mv">11.7%</span></div>
+            <div class="metric"><span class="ml">支撑(40d)</span><span class="mv">1.01 (6触)</span></div>
+            <div class="metric"><span class="ml">阻力(40d)</span><span class="mv">1.06 (7触)</span></div>
+            <div class="metric"><span class="ml">支撑(90d)</span><span class="mv">1.01 (14触)</span></div>
+            <div class="metric"><span class="ml">阻力(90d)</span><span class="mv">1.08 (14触)</span></div>
+            <div class="metric"><span class="ml">近5日</span><span class="mv neg">-4.6%</span></div>
+            <div class="metric"><span class="ml">近10日</span><span class="mv neg">-2.7%</span></div>
+            <div class="metric"><span class="ml">近20日</span><span class="mv neg">-4.6%</span></div>
+            <div class="metric"><span class="ml">趋势20d</span><span class="mv neg">-4.6%</span></div>
+            <div class="metric"><span class="ml">趋势40d</span><span class="mv neg">-4.5%</span></div>
+            <div class="metric"><span class="ml">趋势90d</span><span class="mv pos">+5.8%</span></div>
+            <div class="metric"><span class="ml">ATR比(20/90)</span><span class="mv">1.28</span></div>
+            <div class="metric"><span class="ml">量比(20/60)</span><span class="mv">1.05</span></div>
+            <div class="metric"><span class="ml">均线粘合度</span><span class="mv">1.5%</span></div>
+            <div class="metric"><span class="ml">距20MA</span><span class="mv neg">-2.9%</span></div>
+            <div class="metric"><span class="ml">距40MA</span><span class="mv neg">-4.3%</span></div>
+            <div class="metric"><span class="ml">距90MA</span><span class="mv neg">-3.1%</span></div>
+          </div>
+          <div class="reasons"><b>判定依据:</b><ul><li>✅ 40日振幅理想(10.6%) 适合差价</li><li>✅ 90日振幅理想(14.5%) 长线箱体</li><li>🟡 40日趋势微倾(-4.5%)</li><li>✅ 箱体确认: 支撑6触+阻力7触</li><li>✅ 近箱底(12%) 买入区</li><li>❌ 波幅放大(128%)</li><li>✅ 量能稳定(105%)</li><li>✅ 均线粘合(1.5%) +3pt</li></ul></div>
+        </div>
+        <div class="detail-card">
+          <div class="detail-head">
+            <span class="rank">#8</span>
+            <h3>MSCI中国A股ETF南方</h3>
+            <span class="badge" style="background:#27ae60">🟢 确认箱体(中长)</span>
+            <span class="score-badge">得分 86/100</span>
+          </div>
+          <div class="detail-grid">
+            <div class="metric"><span class="ml">当前价格</span><span class="mv">1.49</span></div>
+            <div class="metric"><span class="ml">40日振幅</span><span class="mv">11.4%</span></div>
+            <div class="metric"><span class="ml">90日振幅</span><span class="mv">15.5%</span></div>
+            <div class="metric"><span class="ml">40日区间位</span><span class="mv">11.2%</span></div>
+            <div class="metric"><span class="ml">支撑(40d)</span><span class="mv">1.5 (6触)</span></div>
+            <div class="metric"><span class="ml">阻力(40d)</span><span class="mv">1.64 (4触)</span></div>
+            <div class="metric"><span class="ml">支撑(90d)</span><span class="mv">1.51 (10触)</span></div>
+            <div class="metric"><span class="ml">阻力(90d)</span><span class="mv">1.62 (11触)</span></div>
+            <div class="metric"><span class="ml">近5日</span><span class="mv neg">-3.2%</span></div>
+            <div class="metric"><span class="ml">近10日</span><span class="mv neg">-2.5%</span></div>
+            <div class="metric"><span class="ml">近20日</span><span class="mv neg">-5.6%</span></div>
+            <div class="metric"><span class="ml">趋势20d</span><span class="mv neg">-6.2%</span></div>
+            <div class="metric"><span class="ml">趋势40d</span><span class="mv neg">-4.9%</span></div>
+            <div class="metric"><span class="ml">趋势90d</span><span class="mv pos">+6.0%</span></div>
+            <div class="metric"><span class="ml">ATR比(20/90)</span><span class="mv">1.22</span></div>
+            <div class="metric"><span class="ml">量比(20/60)</span><span class="mv">0.81</span></div>
+            <div class="metric"><span class="ml">均线粘合度</span><span class="mv">1.6%</span></div>
+            <div class="metric"><span class="ml">距20MA</span><span class="mv neg">-3.1%</span></div>
+            <div class="metric"><span class="ml">距40MA</span><span class="mv neg">-4.7%</span></div>
+            <div class="metric"><span class="ml">距90MA</span><span class="mv neg">-3.5%</span></div>
+          </div>
+          <div class="reasons"><b>判定依据:</b><ul><li>✅ 40日振幅理想(11.4%) 适合差价</li><li>✅ 90日振幅理想(15.5%) 长线箱体</li><li>🟡 40日趋势微倾(-4.9%)</li><li>✅ 箱体确认: 支撑6触+阻力4触</li><li>✅ 近箱底(11%) 买入区</li><li>❌ 波幅放大(122%)</li><li>✅ 量能稳定(81%)</li><li>✅ 均线粘合(1.6%) +3pt</li></ul></div>
+        </div>
+        <div class="detail-card">
+          <div class="detail-head">
+            <span class="rank">#9</span>
+            <h3>中证500低波动ETF华安</h3>
+            <span class="badge" style="background:#27ae60">🟢 确认箱体(中长)</span>
+            <span class="score-badge">得分 86/100</span>
+          </div>
+          <div class="detail-grid">
+            <div class="metric"><span class="ml">当前价格</span><span class="mv">1.93</span></div>
+            <div class="metric"><span class="ml">40日振幅</span><span class="mv">11.8%</span></div>
+            <div class="metric"><span class="ml">90日振幅</span><span class="mv">11.8%</span></div>
+            <div class="metric"><span class="ml">40日区间位</span><span class="mv">42.6%</span></div>
+            <div class="metric"><span class="ml">支撑(40d)</span><span class="mv">1.87 (6触)</span></div>
+            <div class="metric"><span class="ml">阻力(40d)</span><span class="mv">2.03 (6触)</span></div>
+            <div class="metric"><span class="ml">支撑(90d)</span><span class="mv">1.88 (11触)</span></div>
+            <div class="metric"><span class="ml">阻力(90d)</span><span class="mv">2.03 (12触)</span></div>
+            <div class="metric"><span class="ml">近5日</span><span class="mv neg">-0.1%</span></div>
+            <div class="metric"><span class="ml">近10日</span><span class="mv pos">+0.4%</span></div>
+            <div class="metric"><span class="ml">近20日</span><span class="mv neg">-3.1%</span></div>
+            <div class="metric"><span class="ml">趋势20d</span><span class="mv neg">-4.3%</span></div>
+            <div class="metric"><span class="ml">趋势40d</span><span class="mv neg">-2.5%</span></div>
+            <div class="metric"><span class="ml">趋势90d</span><span class="mv pos">+1.0%</span></div>
+            <div class="metric"><span class="ml">ATR比(20/90)</span><span class="mv">1.22</span></div>
+            <div class="metric"><span class="ml">量比(20/60)</span><span class="mv">1.19</span></div>
+            <div class="metric"><span class="ml">均线粘合度</span><span class="mv">1.1%</span></div>
+            <div class="metric"><span class="ml">距20MA</span><span class="mv neg">-0.2%</span></div>
+            <div class="metric"><span class="ml">距40MA</span><span class="mv neg">-1.0%</span></div>
+            <div class="metric"><span class="ml">距90MA</span><span class="mv neg">-1.2%</span></div>
+          </div>
+          <div class="reasons"><b>判定依据:</b><ul><li>✅ 40日振幅理想(11.8%) 适合差价</li><li>✅ 90日振幅理想(11.8%) 长线箱体</li><li>✅ 40日趋势平缓(-2.5%)</li><li>✅ 箱体确认: 支撑6触+阻力6触</li><li>🟡 箱中震荡(43%)</li><li>❌ 波幅放大(122%)</li><li>✅ 量能稳定(119%)</li><li>✅ 均线粘合(1.1%) +3pt</li></ul></div>
+        </div>
+        <div class="detail-card">
+          <div class="detail-head">
+            <span class="rank">#10</span>
+            <h3>中证A50ETF易方达</h3>
+            <span class="badge" style="background:#27ae60">🟢 确认箱体(中长)</span>
+            <span class="score-badge">得分 82/100</span>
+          </div>
+          <div class="detail-grid">
+            <div class="metric"><span class="ml">当前价格</span><span class="mv">1.39</span></div>
+            <div class="metric"><span class="ml">40日振幅</span><span class="mv">7.9%</span></div>
+            <div class="metric"><span class="ml">90日振幅</span><span class="mv">13.0%</span></div>
+            <div class="metric"><span class="ml">40日区间位</span><span class="mv">52.7%</span></div>
+            <div class="metric"><span class="ml">支撑(40d)</span><span class="mv">1.35 (7触)</span></div>
+            <div class="metric"><span class="ml">阻力(40d)</span><span class="mv">1.41 (12触)</span></div>
+            <div class="metric"><span class="ml">支撑(90d)</span><span class="mv">1.37 (17触)</span></div>
+            <div class="metric"><span class="ml">阻力(90d)</span><span class="mv">1.42 (20触)</span></div>
+            <div class="metric"><span class="ml">近5日</span><span class="mv neg">-1.6%</span></div>
+            <div class="metric"><span class="ml">近10日</span><span class="mv pos">+1.3%</span></div>
+            <div class="metric"><span class="ml">近20日</span><span class="mv pos">+0.6%</span></div>
+            <div class="metric"><span class="ml">趋势20d</span><span class="mv pos">+1.3%</span></div>
+            <div class="metric"><span class="ml">趋势40d</span><span class="mv neg">-1.3%</span></div>
+            <div class="metric"><span class="ml">趋势90d</span><span class="mv pos">+4.0%</span></div>
+            <div class="metric"><span class="ml">ATR比(20/90)</span><span class="mv">1.11</span></div>
+            <div class="metric"><span class="ml">量比(20/60)</span><span class="mv">1.05</span></div>
+            <div class="metric"><span class="ml">均线粘合度</span><span class="mv">0.5%</span></div>
+            <div class="metric"><span class="ml">距20MA</span><span class="mv pos">+0.3%</span></div>
+            <div class="metric"><span class="ml">距40MA</span><span class="mv neg">-0.3%</span></div>
+            <div class="metric"><span class="ml">距90MA</span><span class="mv pos">+0.1%</span></div>
+          </div>
+          <div class="reasons"><b>判定依据:</b><ul><li>🟡 40日振幅适中(7.9%) 差价空间略小</li><li>✅ 90日振幅理想(13.0%) 长线箱体</li><li>✅ 40日趋势平坦(-1.3%)</li><li>✅ 箱体确认: 支撑7触+阻力12触</li><li>🟡 箱中震荡(53%)</li><li>🟡 波幅正常(111%)</li><li>✅ 量能稳定(105%)</li><li>✅ 均线粘合(0.5%) +3pt</li></ul></div>
+        </div>
+        <div class="detail-card">
+          <div class="detail-head">
+            <span class="rank">#11</span>
+            <h3>富时A50ETF嘉实</h3>
+            <span class="badge" style="background:#27ae60">🟢 确认箱体(中长)</span>
+            <span class="score-badge">得分 82/100</span>
+          </div>
+          <div class="detail-grid">
+            <div class="metric"><span class="ml">当前价格</span><span class="mv">1.81</span></div>
+            <div class="metric"><span class="ml">40日振幅</span><span class="mv">9.7%</span></div>
+            <div class="metric"><span class="ml">90日振幅</span><span class="mv">13.6%</span></div>
+            <div class="metric"><span class="ml">40日区间位</span><span class="mv">27.8%</span></div>
+            <div class="metric"><span class="ml">支撑(40d)</span><span class="mv">1.82 (8触)</span></div>
+            <div class="metric"><span class="ml">阻力(40d)</span><span class="mv">1.89 (7触)</span></div>
+            <div class="metric"><span class="ml">支撑(90d)</span><span class="mv">1.84 (18触)</span></div>
+            <div class="metric"><span class="ml">阻力(90d)</span><span class="mv">1.88 (15触)</span></div>
+            <div class="metric"><span class="ml">近5日</span><span class="mv neg">-2.7%</span></div>
+            <div class="metric"><span class="ml">近10日</span><span class="mv neg">-1.1%</span></div>
+            <div class="metric"><span class="ml">近20日</span><span class="mv neg">-0.5%</span></div>
+            <div class="metric"><span class="ml">趋势20d</span><span class="mv neg">-0.1%</span></div>
+            <div class="metric"><span class="ml">趋势40d</span><span class="mv neg">-3.8%</span></div>
+            <div class="metric"><span class="ml">趋势90d</span><span class="mv pos">+4.5%</span></div>
+            <div class="metric"><span class="ml">ATR比(20/90)</span><span class="mv">1.26</span></div>
+            <div class="metric"><span class="ml">量比(20/60)</span><span class="mv">0.9</span></div>
+            <div class="metric"><span class="ml">均线粘合度</span><span class="mv">1.3%</span></div>
+            <div class="metric"><span class="ml">距20MA</span><span class="mv neg">-1.3%</span></div>
+            <div class="metric"><span class="ml">距40MA</span><span class="mv neg">-2.6%</span></div>
+            <div class="metric"><span class="ml">距90MA</span><span class="mv neg">-1.9%</span></div>
+          </div>
+          <div class="reasons"><b>判定依据:</b><ul><li>✅ 40日振幅理想(9.7%) 适合差价</li><li>✅ 90日振幅理想(13.6%) 长线箱体</li><li>🟡 40日趋势微倾(-3.8%)</li><li>✅ 箱体确认: 支撑8触+阻力7触</li><li>🟡 箱中偏底(28%)</li><li>❌ 波幅放大(126%)</li><li>✅ 量能稳定(90%)</li><li>✅ 均线粘合(1.3%) +3pt</li></ul></div>
+        </div>
+        <div class="detail-card">
+          <div class="detail-head">
+            <span class="rank">#12</span>
+            <h3>沪港深500ETF汇添富</h3>
+            <span class="badge" style="background:#27ae60">🟢 确认箱体(中长)</span>
+            <span class="score-badge">得分 82/100</span>
+          </div>
+          <div class="detail-grid">
+            <div class="metric"><span class="ml">当前价格</span><span class="mv">0.99</span></div>
+            <div class="metric"><span class="ml">40日振幅</span><span class="mv">7.0%</span></div>
+            <div class="metric"><span class="ml">90日振幅</span><span class="mv">10.9%</span></div>
+            <div class="metric"><span class="ml">40日区间位</span><span class="mv">48.6%</span></div>
+            <div class="metric"><span class="ml">支撑(40d)</span><span class="mv">0.98 (16触)</span></div>
+            <div class="metric"><span class="ml">阻力(40d)</span><span class="mv">1.01 (14触)</span></div>
+            <div class="metric"><span class="ml">支撑(90d)</span><span class="mv">0.97 (18触)</span></div>
+            <div class="metric"><span class="ml">阻力(90d)</span><span class="mv">1.01 (26触)</span></div>
+            <div class="metric"><span class="ml">近5日</span><span class="mv neg">-1.6%</span></div>
+            <div class="metric"><span class="ml">近10日</span><span class="mv neg">-0.6%</span></div>
+            <div class="metric"><span class="ml">近20日</span><span class="mv pos">+1.4%</span></div>
+            <div class="metric"><span class="ml">趋势20d</span><span class="mv pos">-0.0%</span></div>
+            <div class="metric"><span class="ml">趋势40d</span><span class="mv neg">-0.9%</span></div>
+            <div class="metric"><span class="ml">趋势90d</span><span class="mv pos">+0.6%</span></div>
+            <div class="metric"><span class="ml">ATR比(20/90)</span><span class="mv">1.12</span></div>
+            <div class="metric"><span class="ml">量比(20/60)</span><span class="mv">0.72</span></div>
+            <div class="metric"><span class="ml">均线粘合度</span><span class="mv">0.8%</span></div>
+            <div class="metric"><span class="ml">距20MA</span><span class="mv neg">-0.3%</span></div>
+            <div class="metric"><span class="ml">距40MA</span><span class="mv neg">-0.5%</span></div>
+            <div class="metric"><span class="ml">距90MA</span><span class="mv neg">-1.1%</span></div>
+          </div>
+          <div class="reasons"><b>判定依据:</b><ul><li>🟡 40日振幅适中(7.0%) 差价空间略小</li><li>✅ 90日振幅理想(10.9%) 长线箱体</li><li>✅ 40日趋势平坦(-0.9%)</li><li>✅ 箱体确认: 支撑16触+阻力14触</li><li>🟡 箱中震荡(49%)</li><li>🟡 波幅正常(112%)</li><li>✅ 量能稳定(72%)</li><li>✅ 均线粘合(0.8%) +3pt</li></ul></div>
+        </div>
+
+<div class="disclaimer">
+  ⚠️ <b>风险提示:</b> 本报告仅基于历史价格形态的客观量化分析，不构成任何投资建议。箱体震荡识别属于技术分析方法，存在假突破风险；
+  箱体底部可能被跌破，形成下行趋势。投资有风险，决策需谨慎。请结合基本面、资金面、宏观环境综合判断。
+  数据来源: 腾讯自选股行情接口，可能存在延迟，以交易所官方数据为准。
+</div>
+
+</div>
+
+<script>
+const chartData = [{"name": "上证180ETF华安", "type": "ETF", "score": 92, "label": "🟢 确认箱体(中长)", "closes": [3.91, 3.78, 3.84, 3.89, 3.84, 3.86, 3.85, 3.83, 3.89, 3.86, 3.83, 3.82, 3.94, 3.91, 3.94, 3.93, 3.97, 3.97, 3.99, 3.97, 3.99, 4.0, 4.01, 4.01, 4.01, 4.02, 4.02, 4.05, 4.06, 4.13, 4.14, 4.12, 4.19, 4.18, 4.21, 4.13, 4.07, 4.06, 4.09, 4.1, 4.04, 4.07, 4.12, 4.15, 4.09, 4.06, 4.06, 4.02, 4.05, 4.06, 4.03, 3.98, 3.89, 3.94, 3.94, 3.93, 3.98, 4.05, 4.03, 4.06, 4.07, 4.17, 4.06, 4.09, 4.13, 4.05, 4.12, 4.13, 4.13, 4.03, 4.06, 4.08, 4.03, 4.0, 4.08, 4.06, 3.97, 4.02, 4.03, 3.94, 3.84, 3.9, 3.99, 4.01, 4.02, 3.96, 3.97, 3.92, 3.94, 3.92], "dates": ["2026-03-20", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02", "2026-04-03", "2026-04-07", "2026-04-08", "2026-04-09", "2026-04-10", "2026-04-13", "2026-04-14", "2026-04-15", "2026-04-16", "2026-04-17", "2026-04-20", "2026-04-21", "2026-04-22", "2026-04-23", "2026-04-24", "2026-04-27", "2026-04-28", "2026-04-29", "2026-04-30", "2026-05-06", "2026-05-07", "2026-05-08", "2026-05-11", "2026-05-12", "2026-05-13", "2026-05-14", "2026-05-15", "2026-05-18", "2026-05-19", "2026-05-20", "2026-05-21", "2026-05-22", "2026-05-25", "2026-05-26", "2026-05-27", "2026-05-28", "2026-05-29", "2026-06-01", "2026-06-02", "2026-06-03", "2026-06-04", "2026-06-05", "2026-06-08", "2026-06-09", "2026-06-10", "2026-06-11", "2026-06-12", "2026-06-15", "2026-06-16", "2026-06-17", "2026-06-18", "2026-06-22", "2026-06-23", "2026-06-24", "2026-06-25", "2026-06-26", "2026-06-29", "2026-06-30", "2026-07-01", "2026-07-02", "2026-07-03", "2026-07-06", "2026-07-07", "2026-07-08", "2026-07-09", "2026-07-10", "2026-07-13", "2026-07-14", "2026-07-15", "2026-07-16", "2026-07-17", "2026-07-20", "2026-07-21", "2026-07-22", "2026-07-23", "2026-07-24", "2026-07-27", "2026-07-28", "2026-07-29", "2026-07-30"], "range40": 8.7, "t40": -1.6, "sup_touch": 3, "res_touch": 8, "sup_level": 3.87, "res_level": 4.11, "highs": [3.97, 3.87, 3.84, 3.89, 3.89, 3.86, 3.85, 3.89, 3.9, 3.9, 3.87, 3.84, 3.94, 3.92, 3.96, 3.94, 3.98, 4.01, 4.0, 3.98, 4.0, 4.01, 4.01, 4.03, 4.01, 4.02, 4.04, 4.05, 4.06, 4.14, 4.15, 4.13, 4.19, 4.19, 4.21, 4.23, 4.14, 4.08, 4.09, 4.11, 4.16, 4.07, 4.12, 4.15, 4.15, 4.09, 4.09, 4.06, 4.07, 4.09, 4.05, 4.04, 3.96, 3.94, 3.95, 3.93, 4.01, 4.05, 4.07, 4.06, 4.09, 4.17, 4.17, 4.09, 4.15, 4.12, 4.14, 4.13, 4.16, 4.11, 4.09, 4.11, 4.07, 4.05, 4.09, 4.14, 4.05, 4.03, 4.05, 4.0, 3.94, 3.92, 4.0, 4.04, 4.04, 4.0, 3.98, 3.95, 3.96, 3.954], "lows": [3.9, 3.76, 3.78, 3.85, 3.83, 3.8, 3.81, 3.83, 3.85, 3.84, 3.82, 3.82, 3.86, 3.9, 3.92, 3.92, 3.94, 3.97, 3.97, 3.96, 3.96, 3.98, 3.99, 3.99, 3.98, 4.0, 4.01, 4.01, 4.04, 4.07, 4.12, 4.1, 4.13, 4.16, 4.15, 4.13, 4.05, 4.03, 4.03, 4.07, 4.03, 4.02, 4.07, 4.09, 4.07, 4.02, 4.04, 4.01, 4.0, 4.03, 4.02, 3.96, 3.87, 3.89, 3.91, 3.9, 3.94, 4.0, 4.01, 4.01, 4.04, 4.04, 4.04, 4.04, 4.08, 4.02, 4.04, 4.09, 4.09, 4.01, 4.02, 4.04, 4.01, 3.99, 3.98, 4.05, 3.95, 3.92, 4.01, 3.93, 3.82, 3.84, 3.88, 3.97, 4.0, 3.95, 3.93, 3.91, 3.89, 3.883]}, {"name": "180ESGETF工银", "type": "ETF", "score": 92, "label": "🟢 确认箱体(中长)", "closes": [1.03, 0.99, 1.0, 1.02, 1.01, 1.01, 1.01, 1.0, 1.02, 1.01, 1.0, 1.0, 1.03, 1.02, 1.03, 1.02, 1.03, 1.03, 1.04, 1.03, 1.04, 1.04, 1.04, 1.04, 1.04, 1.04, 1.04, 1.05, 1.04, 1.05, 1.06, 1.05, 1.06, 1.06, 1.07, 1.05, 1.05, 1.04, 1.04, 1.04, 1.03, 1.04, 1.05, 1.06, 1.05, 1.04, 1.04, 1.04, 1.05, 1.05, 1.04, 1.03, 1.01, 1.02, 1.03, 1.02, 1.04, 1.05, 1.05, 1.05, 1.05, 1.08, 1.05, 1.06, 1.07, 1.05, 1.07, 1.07, 1.06, 1.04, 1.05, 1.06, 1.04, 1.04, 1.05, 1.05, 1.02, 1.04, 1.05, 1.02, 1.0, 1.01, 1.03, 1.04, 1.05, 1.03, 1.04, 1.04, 1.05, 1.05], "dates": ["2026-03-20", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02", "2026-04-03", "2026-04-07", "2026-04-08", "2026-04-09", "2026-04-10", "2026-04-13", "2026-04-14", "2026-04-15", "2026-04-16", "2026-04-17", "2026-04-20", "2026-04-21", "2026-04-22", "2026-04-23", "2026-04-24", "2026-04-27", "2026-04-28", "2026-04-29", "2026-04-30", "2026-05-06", "2026-05-07", "2026-05-08", "2026-05-11", "2026-05-12", "2026-05-13", "2026-05-14", "2026-05-15", "2026-05-18", "2026-05-19", "2026-05-20", "2026-05-21", "2026-05-22", "2026-05-25", "2026-05-26", "2026-05-27", "2026-05-28", "2026-05-29", "2026-06-01", "2026-06-02", "2026-06-03", "2026-06-04", "2026-06-05", "2026-06-08", "2026-06-09", "2026-06-10", "2026-06-11", "2026-06-12", "2026-06-15", "2026-06-16", "2026-06-17", "2026-06-18", "2026-06-22", "2026-06-23", "2026-06-24", "2026-06-25", "2026-06-26", "2026-06-29", "2026-06-30", "2026-07-01", "2026-07-02", "2026-07-03", "2026-07-06", "2026-07-07", "2026-07-08", "2026-07-09", "2026-07-10", "2026-07-13", "2026-07-14", "2026-07-15", "2026-07-16", "2026-07-17", "2026-07-20", "2026-07-21", "2026-07-22", "2026-07-23", "2026-07-24", "2026-07-27", "2026-07-28", "2026-07-29", "2026-07-30"], "range40": 8.6, "t40": -0.4, "sup_touch": 14, "res_touch": 8, "sup_level": 1.02, "res_level": 1.06, "highs": [1.04, 1.01, 1.0, 1.02, 1.02, 1.01, 1.01, 1.02, 1.02, 1.02, 1.01, 1.01, 1.03, 1.11, 1.06, 1.02, 1.03, 1.04, 1.04, 1.03, 1.04, 1.04, 1.04, 1.05, 1.04, 1.04, 1.05, 1.05, 1.05, 1.06, 1.06, 1.06, 1.07, 1.09, 1.07, 1.08, 1.06, 1.04, 1.04, 1.05, 1.06, 1.04, 1.05, 1.06, 1.06, 1.04, 1.05, 1.05, 1.05, 1.06, 1.05, 1.05, 1.02, 1.02, 1.03, 1.02, 1.04, 1.05, 1.05, 1.05, 1.06, 1.08, 1.09, 1.06, 1.07, 1.07, 1.07, 1.07, 1.07, 1.08, 1.06, 1.06, 1.05, 1.05, 1.05, 1.06, 1.04, 1.04, 1.05, 1.04, 1.02, 1.02, 1.03, 1.05, 1.05, 1.04, 1.04, 1.05, 1.05, 1.052], "lows": [1.03, 0.98, 0.99, 1.01, 1.01, 1.0, 1.0, 1.0, 1.01, 1.01, 1.0, 1.0, 1.01, 1.02, 1.02, 1.02, 1.03, 1.03, 1.04, 1.03, 1.03, 1.04, 1.04, 1.04, 1.03, 1.04, 1.04, 1.04, 1.04, 1.04, 1.05, 1.05, 1.06, 1.06, 1.06, 1.05, 1.04, 1.04, 1.03, 1.04, 1.03, 1.03, 1.04, 1.05, 1.05, 1.04, 1.04, 1.04, 1.04, 1.05, 1.04, 1.03, 1.01, 1.01, 1.02, 1.02, 1.03, 1.04, 1.04, 1.04, 1.05, 1.05, 1.05, 1.05, 1.06, 1.04, 1.04, 1.06, 1.06, 1.04, 1.04, 1.04, 1.03, 1.03, 1.03, 1.05, 1.02, 1.02, 1.04, 1.02, 1.0, 1.0, 1.01, 1.03, 1.04, 1.03, 1.03, 1.04, 1.04, 1.037]}, {"name": "中证A50增强ETF易方达", "type": "ETF", "score": 88, "label": "🟢 确认箱体(中长)", "closes": [1.08, 1.07, 1.07, 1.07, 1.06, 1.08, 1.07, 1.07, 1.09, 1.08, 1.07, 1.08, 1.1, 1.1, 1.12, 1.12, 1.13, 1.13, 1.14, 1.13, 1.13, 1.14, 1.14, 1.15, 1.15, 1.14, 1.15, 1.16, 1.15, 1.16, 1.16, 1.14, 1.16, 1.17, 1.18, 1.16, 1.15, 1.14, 1.13, 1.13, 1.11, 1.12, 1.13, 1.14, 1.13, 1.13, 1.14, 1.12, 1.15, 1.16, 1.14, 1.12, 1.1, 1.12, 1.11, 1.09, 1.11, 1.13, 1.12, 1.12, 1.13, 1.15, 1.13, 1.13, 1.13, 1.12, 1.13, 1.13, 1.13, 1.1, 1.11, 1.11, 1.11, 1.1, 1.12, 1.09, 1.09, 1.11, 1.13, 1.12, 1.09, 1.11, 1.13, 1.13, 1.15, 1.13, 1.14, 1.13, 1.14, 1.13], "dates": ["2026-03-20", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02", "2026-04-03", "2026-04-07", "2026-04-08", "2026-04-09", "2026-04-10", "2026-04-13", "2026-04-14", "2026-04-15", "2026-04-16", "2026-04-17", "2026-04-20", "2026-04-21", "2026-04-22", "2026-04-23", "2026-04-24", "2026-04-27", "2026-04-28", "2026-04-29", "2026-04-30", "2026-05-06", "2026-05-07", "2026-05-08", "2026-05-11", "2026-05-12", "2026-05-13", "2026-05-14", "2026-05-15", "2026-05-18", "2026-05-19", "2026-05-20", "2026-05-21", "2026-05-22", "2026-05-25", "2026-05-26", "2026-05-27", "2026-05-28", "2026-05-29", "2026-06-01", "2026-06-02", "2026-06-03", "2026-06-04", "2026-06-05", "2026-06-08", "2026-06-09", "2026-06-10", "2026-06-11", "2026-06-12", "2026-06-15", "2026-06-16", "2026-06-17", "2026-06-18", "2026-06-22", "2026-06-23", "2026-06-24", "2026-06-25", "2026-06-26", "2026-06-29", "2026-06-30", "2026-07-01", "2026-07-02", "2026-07-03", "2026-07-06", "2026-07-07", "2026-07-08", "2026-07-09", "2026-07-10", "2026-07-13", "2026-07-14", "2026-07-15", "2026-07-16", "2026-07-17", "2026-07-20", "2026-07-21", "2026-07-22", "2026-07-23", "2026-07-24", "2026-07-27", "2026-07-28", "2026-07-29", "2026-07-30"], "range40": 8.0, "t40": 0.7, "sup_touch": 13, "res_touch": 14, "sup_level": 1.09, "res_level": 1.14, "highs": [1.09, 1.07, 1.07, 1.1, 1.08, 1.08, 1.07, 1.08, 1.09, 1.09, 1.08, 1.08, 1.1, 1.11, 1.13, 1.12, 1.13, 1.14, 1.14, 1.13, 1.13, 1.14, 1.14, 1.15, 1.15, 1.14, 1.15, 1.16, 1.16, 1.16, 1.16, 1.15, 1.17, 1.17, 1.18, 1.18, 1.16, 1.14, 1.13, 1.13, 1.15, 1.13, 1.13, 1.14, 1.14, 1.13, 1.15, 1.14, 1.15, 1.16, 1.16, 1.15, 1.12, 1.12, 1.11, 1.11, 1.12, 1.13, 1.13, 1.12, 1.13, 1.16, 1.15, 1.13, 1.14, 1.13, 1.13, 1.13, 1.14, 1.14, 1.12, 1.12, 1.12, 1.12, 1.12, 1.12, 1.1, 1.11, 1.14, 1.14, 1.11, 1.12, 1.14, 1.15, 1.15, 1.14, 1.15, 1.14, 1.14, 1.141], "lows": [1.08, 1.05, 1.05, 1.07, 1.06, 1.06, 1.06, 1.07, 1.07, 1.08, 1.07, 1.07, 1.09, 1.1, 1.11, 1.12, 1.12, 1.13, 1.14, 1.12, 1.12, 1.12, 1.13, 1.14, 1.14, 1.14, 1.14, 1.15, 1.15, 1.15, 1.15, 1.14, 1.14, 1.16, 1.16, 1.16, 1.14, 1.13, 1.12, 1.12, 1.11, 1.11, 1.12, 1.12, 1.13, 1.12, 1.13, 1.12, 1.11, 1.14, 1.14, 1.12, 1.07, 1.1, 1.1, 1.08, 1.08, 1.11, 1.12, 1.11, 1.11, 1.12, 1.12, 1.11, 1.12, 1.1, 1.1, 1.12, 1.12, 1.1, 1.1, 1.11, 1.11, 1.1, 1.09, 1.09, 1.08, 1.09, 1.12, 1.11, 1.08, 1.08, 1.12, 1.13, 1.14, 1.13, 1.13, 1.11, 1.11, 1.115]}, {"name": "沪深300ETF华泰柏瑞", "type": "ETF", "score": 86, "label": "🟢 确认箱体(中长)", "closes": [4.58, 4.43, 4.48, 4.54, 4.49, 4.51, 4.5, 4.46, 4.53, 4.49, 4.45, 4.45, 4.6, 4.57, 4.64, 4.65, 4.71, 4.69, 4.75, 4.74, 4.77, 4.78, 4.81, 4.8, 4.78, 4.78, 4.77, 4.82, 4.82, 4.89, 4.91, 4.89, 4.97, 4.96, 5.02, 4.94, 4.88, 4.85, 4.87, 4.87, 4.81, 4.86, 4.94, 4.97, 4.93, 4.93, 4.92, 4.87, 4.94, 4.97, 4.93, 4.84, 4.74, 4.83, 4.78, 4.75, 4.82, 4.92, 4.91, 4.96, 4.98, 5.09, 4.94, 4.97, 5.05, 4.91, 4.96, 5.02, 5.0, 4.85, 4.88, 4.88, 4.83, 4.8, 4.92, 4.83, 4.74, 4.84, 4.84, 4.75, 4.59, 4.65, 4.79, 4.77, 4.79, 4.7, 4.75, 4.63, 4.66, 4.61], "dates": ["2026-03-20", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02", "2026-04-03", "2026-04-07", "2026-04-08", "2026-04-09", "2026-04-10", "2026-04-13", "2026-04-14", "2026-04-15", "2026-04-16", "2026-04-17", "2026-04-20", "2026-04-21", "2026-04-22", "2026-04-23", "2026-04-24", "2026-04-27", "2026-04-28", "2026-04-29", "2026-04-30", "2026-05-06", "2026-05-07", "2026-05-08", "2026-05-11", "2026-05-12", "2026-05-13", "2026-05-14", "2026-05-15", "2026-05-18", "2026-05-19", "2026-05-20", "2026-05-21", "2026-05-22", "2026-05-25", "2026-05-26", "2026-05-27", "2026-05-28", "2026-05-29", "2026-06-01", "2026-06-02", "2026-06-03", "2026-06-04", "2026-06-05", "2026-06-08", "2026-06-09", "2026-06-10", "2026-06-11", "2026-06-12", "2026-06-15", "2026-06-16", "2026-06-17", "2026-06-18", "2026-06-22", "2026-06-23", "2026-06-24", "2026-06-25", "2026-06-26", "2026-06-29", "2026-06-30", "2026-07-01", "2026-07-02", "2026-07-03", "2026-07-06", "2026-07-07", "2026-07-08", "2026-07-09", "2026-07-10", "2026-07-13", "2026-07-14", "2026-07-15", "2026-07-16", "2026-07-17", "2026-07-20", "2026-07-21", "2026-07-22", "2026-07-23", "2026-07-24", "2026-07-27", "2026-07-28", "2026-07-29", "2026-07-30"], "range40": 11.7, "t40": -4.9, "sup_touch": 3, "res_touch": 3, "sup_level": 4.71, "res_level": 4.88, "highs": [4.64, 4.54, 4.48, 4.55, 4.55, 4.53, 4.51, 4.53, 4.54, 4.53, 4.51, 4.47, 4.6, 4.59, 4.66, 4.66, 4.71, 4.75, 4.75, 4.75, 4.78, 4.79, 4.81, 4.83, 4.8, 4.81, 4.79, 4.83, 4.84, 4.91, 4.91, 4.9, 4.98, 4.99, 5.02, 5.04, 4.95, 4.89, 4.87, 4.88, 4.95, 4.87, 4.94, 4.98, 4.99, 4.95, 4.98, 4.94, 4.96, 5.02, 4.96, 4.95, 4.81, 4.83, 4.81, 4.79, 4.85, 4.92, 4.93, 4.96, 5.0, 5.1, 5.1, 4.98, 5.06, 5.02, 4.97, 5.02, 5.05, 4.96, 4.93, 4.91, 4.88, 4.87, 4.93, 4.95, 4.82, 4.84, 4.87, 4.83, 4.73, 4.69, 4.79, 4.82, 4.8, 4.76, 4.76, 4.7, 4.69, 4.655], "lows": [4.57, 4.41, 4.41, 4.5, 4.48, 4.45, 4.45, 4.46, 4.5, 4.47, 4.45, 4.43, 4.52, 4.56, 4.59, 4.62, 4.66, 4.68, 4.7, 4.72, 4.73, 4.73, 4.76, 4.77, 4.75, 4.77, 4.76, 4.76, 4.81, 4.85, 4.88, 4.86, 4.9, 4.94, 4.94, 4.93, 4.85, 4.82, 4.79, 4.84, 4.8, 4.81, 4.87, 4.91, 4.91, 4.87, 4.9, 4.86, 4.86, 4.93, 4.91, 4.83, 4.71, 4.74, 4.75, 4.72, 4.79, 4.84, 4.89, 4.89, 4.94, 4.95, 4.92, 4.92, 4.97, 4.88, 4.87, 4.94, 4.96, 4.84, 4.83, 4.83, 4.8, 4.79, 4.78, 4.83, 4.72, 4.7, 4.82, 4.72, 4.55, 4.58, 4.62, 4.75, 4.76, 4.7, 4.67, 4.61, 4.57, 4.536]}, {"name": "央企改革ETF华夏", "type": "ETF", "score": 86, "label": "🟢 确认箱体(中长)", "closes": [1.52, 1.47, 1.49, 1.5, 1.48, 1.49, 1.49, 1.47, 1.48, 1.47, 1.46, 1.47, 1.5, 1.5, 1.51, 1.51, 1.52, 1.52, 1.53, 1.52, 1.54, 1.55, 1.55, 1.55, 1.54, 1.56, 1.56, 1.56, 1.56, 1.59, 1.59, 1.59, 1.63, 1.62, 1.64, 1.61, 1.59, 1.58, 1.59, 1.6, 1.57, 1.59, 1.61, 1.61, 1.58, 1.59, 1.58, 1.56, 1.56, 1.57, 1.56, 1.54, 1.51, 1.52, 1.5, 1.51, 1.52, 1.55, 1.55, 1.57, 1.57, 1.62, 1.57, 1.59, 1.6, 1.56, 1.58, 1.59, 1.59, 1.55, 1.56, 1.56, 1.54, 1.53, 1.57, 1.56, 1.52, 1.54, 1.52, 1.48, 1.45, 1.47, 1.5, 1.51, 1.51, 1.49, 1.51, 1.48, 1.49, 1.47], "dates": ["2026-03-20", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02", "2026-04-03", "2026-04-07", "2026-04-08", "2026-04-09", "2026-04-10", "2026-04-13", "2026-04-14", "2026-04-15", "2026-04-16", "2026-04-17", "2026-04-20", "2026-04-21", "2026-04-22", "2026-04-23", "2026-04-24", "2026-04-27", "2026-04-28", "2026-04-29", "2026-04-30", "2026-05-06", "2026-05-07", "2026-05-08", "2026-05-11", "2026-05-12", "2026-05-13", "2026-05-14", "2026-05-15", "2026-05-18", "2026-05-19", "2026-05-20", "2026-05-21", "2026-05-22", "2026-05-25", "2026-05-26", "2026-05-27", "2026-05-28", "2026-05-29", "2026-06-01", "2026-06-02", "2026-06-03", "2026-06-04", "2026-06-05", "2026-06-08", "2026-06-09", "2026-06-10", "2026-06-11", "2026-06-12", "2026-06-15", "2026-06-16", "2026-06-17", "2026-06-18", "2026-06-22", "2026-06-23", "2026-06-24", "2026-06-25", "2026-06-26", "2026-06-29", "2026-06-30", "2026-07-01", "2026-07-02", "2026-07-03", "2026-07-06", "2026-07-07", "2026-07-08", "2026-07-09", "2026-07-10", "2026-07-13", "2026-07-14", "2026-07-15", "2026-07-16", "2026-07-17", "2026-07-20", "2026-07-21", "2026-07-22", "2026-07-23", "2026-07-24", "2026-07-27", "2026-07-28", "2026-07-29", "2026-07-30"], "range40": 11.7, "t40": -4.6, "sup_touch": 4, "res_touch": 4, "sup_level": 1.51, "res_level": 1.61, "highs": [1.54, 1.51, 1.49, 1.51, 1.5, 1.5, 1.49, 1.49, 1.49, 1.49, 1.48, 1.47, 1.5, 1.51, 1.51, 1.51, 1.52, 1.54, 1.53, 1.53, 1.54, 1.55, 1.55, 1.56, 1.55, 1.56, 1.56, 1.56, 1.56, 1.59, 1.59, 1.59, 1.63, 1.63, 1.64, 1.65, 1.62, 1.59, 1.59, 1.6, 1.62, 1.59, 1.61, 1.62, 1.61, 1.59, 1.6, 1.58, 1.57, 1.57, 1.57, 1.56, 1.54, 1.52, 1.52, 1.51, 1.53, 1.55, 1.56, 1.57, 1.58, 1.62, 1.62, 1.59, 1.61, 1.6, 1.59, 1.59, 1.61, 1.58, 1.57, 1.57, 1.55, 1.55, 1.57, 1.59, 1.56, 1.54, 1.55, 1.53, 1.48, 1.49, 1.5, 1.52, 1.51, 1.51, 1.51, 1.5, 1.5, 1.49], "lows": [1.49, 1.47, 1.46, 1.49, 1.48, 1.46, 1.46, 1.47, 1.48, 1.47, 1.46, 1.46, 1.47, 1.49, 1.5, 1.49, 1.51, 1.51, 1.52, 1.52, 1.52, 1.53, 1.54, 1.54, 1.54, 1.54, 1.55, 1.55, 1.56, 1.57, 1.58, 1.58, 1.6, 1.61, 1.61, 1.61, 1.58, 1.57, 1.57, 1.59, 1.57, 1.57, 1.59, 1.59, 1.58, 1.57, 1.57, 1.56, 1.55, 1.56, 1.55, 1.53, 1.49, 1.5, 1.5, 1.5, 1.51, 1.52, 1.54, 1.55, 1.56, 1.58, 1.56, 1.57, 1.59, 1.55, 1.54, 1.56, 1.58, 1.55, 1.54, 1.54, 1.53, 1.52, 1.52, 1.56, 1.51, 1.5, 1.52, 1.48, 1.44, 1.45, 1.44, 1.48, 1.5, 1.49, 1.49, 1.48, 1.47, 1.463]}, {"name": "央企结构调整ETF博时", "type": "ETF", "score": 86, "label": "🟢 确认箱体(中长)", "closes": [1.46, 1.42, 1.44, 1.45, 1.43, 1.44, 1.44, 1.42, 1.43, 1.42, 1.41, 1.42, 1.45, 1.44, 1.46, 1.46, 1.47, 1.46, 1.47, 1.47, 1.49, 1.49, 1.5, 1.5, 1.49, 1.5, 1.5, 1.51, 1.51, 1.53, 1.54, 1.54, 1.57, 1.56, 1.58, 1.56, 1.53, 1.53, 1.54, 1.55, 1.52, 1.53, 1.56, 1.55, 1.53, 1.53, 1.52, 1.51, 1.51, 1.52, 1.5, 1.48, 1.45, 1.47, 1.46, 1.45, 1.47, 1.49, 1.5, 1.52, 1.52, 1.56, 1.55, 1.54, 1.55, 1.51, 1.53, 1.53, 1.54, 1.49, 1.5, 1.51, 1.49, 1.48, 1.52, 1.51, 1.47, 1.49, 1.47, 1.43, 1.41, 1.42, 1.46, 1.46, 1.46, 1.44, 1.46, 1.43, 1.44, 1.43], "dates": ["2026-03-20", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02", "2026-04-03", "2026-04-07", "2026-04-08", "2026-04-09", "2026-04-10", "2026-04-13", "2026-04-14", "2026-04-15", "2026-04-16", "2026-04-17", "2026-04-20", "2026-04-21", "2026-04-22", "2026-04-23", "2026-04-24", "2026-04-27", "2026-04-28", "2026-04-29", "2026-04-30", "2026-05-06", "2026-05-07", "2026-05-08", "2026-05-11", "2026-05-12", "2026-05-13", "2026-05-14", "2026-05-15", "2026-05-18", "2026-05-19", "2026-05-20", "2026-05-21", "2026-05-22", "2026-05-25", "2026-05-26", "2026-05-27", "2026-05-28", "2026-05-29", "2026-06-01", "2026-06-02", "2026-06-03", "2026-06-04", "2026-06-05", "2026-06-08", "2026-06-09", "2026-06-10", "2026-06-11", "2026-06-12", "2026-06-15", "2026-06-16", "2026-06-17", "2026-06-18", "2026-06-22", "2026-06-23", "2026-06-24", "2026-06-25", "2026-06-26", "2026-06-29", "2026-06-30", "2026-07-01", "2026-07-02", "2026-07-03", "2026-07-06", "2026-07-07", "2026-07-08", "2026-07-09", "2026-07-10", "2026-07-13", "2026-07-14", "2026-07-15", "2026-07-16", "2026-07-17", "2026-07-20", "2026-07-21", "2026-07-22", "2026-07-23", "2026-07-24", "2026-07-27", "2026-07-28", "2026-07-29", "2026-07-30"], "range40": 12.1, "t40": -4.3, "sup_touch": 7, "res_touch": 3, "sup_level": 1.46, "res_level": 1.48, "highs": [1.49, 1.48, 1.44, 1.45, 1.45, 1.44, 1.44, 1.44, 1.44, 1.44, 1.42, 1.42, 1.45, 1.45, 1.46, 1.46, 1.47, 1.48, 1.47, 1.48, 1.49, 1.49, 1.5, 1.5, 1.49, 1.51, 1.53, 1.51, 1.51, 1.54, 1.54, 1.54, 1.57, 1.57, 1.58, 1.61, 1.56, 1.54, 1.54, 1.55, 1.56, 1.53, 1.56, 1.56, 1.55, 1.54, 1.53, 1.52, 1.51, 1.52, 1.51, 1.51, 1.48, 1.47, 1.46, 1.46, 1.48, 1.5, 1.5, 1.52, 1.52, 1.57, 1.56, 1.54, 1.55, 1.54, 1.53, 1.54, 1.56, 1.54, 1.52, 1.52, 1.5, 1.5, 1.52, 1.54, 1.5, 1.49, 1.5, 1.46, 1.43, 1.45, 1.46, 1.47, 1.46, 1.46, 1.46, 1.45, 1.45, 1.437], "lows": [1.46, 1.41, 1.41, 1.44, 1.43, 1.42, 1.42, 1.42, 1.43, 1.42, 1.41, 1.41, 1.42, 1.44, 1.45, 1.45, 1.46, 1.46, 1.47, 1.47, 1.47, 1.48, 1.49, 1.49, 1.48, 1.49, 1.49, 1.5, 1.5, 1.52, 1.53, 1.52, 1.53, 1.56, 1.55, 1.56, 1.52, 1.52, 1.51, 1.53, 1.52, 1.52, 1.53, 1.54, 1.52, 1.52, 1.51, 1.5, 1.5, 1.51, 1.5, 1.48, 1.45, 1.45, 1.45, 1.45, 1.47, 1.47, 1.49, 1.5, 1.51, 1.52, 1.51, 1.52, 1.54, 1.5, 1.49, 1.51, 1.53, 1.49, 1.49, 1.49, 1.47, 1.48, 1.48, 1.51, 1.46, 1.45, 1.47, 1.43, 1.39, 1.4, 1.4, 1.44, 1.45, 1.44, 1.44, 1.43, 1.42, 1.413]}, {"name": "沪深300增强ETF国泰", "type": "ETF", "score": 86, "label": "🟢 确认箱体(中长)", "closes": [0.99, 0.97, 0.97, 0.99, 0.98, 0.98, 0.98, 0.97, 0.98, 0.97, 0.96, 0.96, 1.0, 0.98, 1.0, 1.0, 1.01, 1.01, 1.02, 1.01, 1.02, 1.03, 1.03, 1.02, 1.02, 1.02, 1.02, 1.03, 1.03, 1.05, 1.05, 1.05, 1.07, 1.07, 1.08, 1.06, 1.05, 1.05, 1.05, 1.05, 1.03, 1.05, 1.06, 1.08, 1.07, 1.07, 1.07, 1.05, 1.07, 1.08, 1.07, 1.05, 1.02, 1.04, 1.03, 1.03, 1.04, 1.08, 1.06, 1.07, 1.08, 1.1, 1.07, 1.08, 1.09, 1.06, 1.07, 1.08, 1.08, 1.05, 1.06, 1.06, 1.04, 1.04, 1.06, 1.05, 1.02, 1.05, 1.05, 1.03, 0.99, 1.0, 1.04, 1.03, 1.05, 1.02, 1.03, 1.01, 1.01, 1.0], "dates": ["2026-03-20", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02", "2026-04-03", "2026-04-07", "2026-04-08", "2026-04-09", "2026-04-10", "2026-04-13", "2026-04-14", "2026-04-15", "2026-04-16", "2026-04-17", "2026-04-20", "2026-04-21", "2026-04-22", "2026-04-23", "2026-04-24", "2026-04-27", "2026-04-28", "2026-04-29", "2026-04-30", "2026-05-06", "2026-05-07", "2026-05-08", "2026-05-11", "2026-05-12", "2026-05-13", "2026-05-14", "2026-05-15", "2026-05-18", "2026-05-19", "2026-05-20", "2026-05-21", "2026-05-22", "2026-05-25", "2026-05-26", "2026-05-27", "2026-05-28", "2026-05-29", "2026-06-01", "2026-06-02", "2026-06-03", "2026-06-04", "2026-06-05", "2026-06-08", "2026-06-09", "2026-06-10", "2026-06-11", "2026-06-12", "2026-06-15", "2026-06-16", "2026-06-17", "2026-06-18", "2026-06-22", "2026-06-23", "2026-06-24", "2026-06-25", "2026-06-26", "2026-06-29", "2026-06-30", "2026-07-01", "2026-07-02", "2026-07-03", "2026-07-06", "2026-07-07", "2026-07-08", "2026-07-09", "2026-07-10", "2026-07-13", "2026-07-14", "2026-07-15", "2026-07-16", "2026-07-17", "2026-07-20", "2026-07-21", "2026-07-22", "2026-07-23", "2026-07-24", "2026-07-27", "2026-07-28", "2026-07-29", "2026-07-30"], "range40": 10.6, "t40": -4.5, "sup_touch": 6, "res_touch": 7, "sup_level": 1.01, "res_level": 1.06, "highs": [1.01, 0.99, 0.97, 0.99, 0.99, 0.98, 0.98, 0.99, 0.98, 0.98, 0.97, 0.96, 1.0, 0.99, 1.0, 1.0, 1.01, 1.02, 1.02, 1.02, 1.02, 1.03, 1.03, 1.03, 1.02, 1.03, 1.02, 1.03, 1.04, 1.05, 1.05, 1.05, 1.07, 1.07, 1.08, 1.09, 1.07, 1.05, 1.05, 1.05, 1.07, 1.05, 1.06, 1.08, 1.08, 1.07, 1.08, 1.07, 1.07, 1.09, 1.08, 1.07, 1.04, 1.04, 1.04, 1.03, 1.05, 1.09, 1.07, 1.07, 1.08, 1.1, 1.1, 1.08, 1.09, 1.09, 1.07, 1.08, 1.09, 1.07, 1.07, 1.07, 1.06, 1.05, 1.07, 1.07, 1.06, 1.05, 1.06, 1.05, 1.03, 1.02, 1.04, 1.05, 1.05, 1.04, 1.04, 1.04, 1.02, 1.016], "lows": [0.99, 0.95, 0.95, 0.97, 0.97, 0.96, 0.97, 0.97, 0.97, 0.96, 0.96, 0.95, 0.97, 0.98, 0.99, 0.99, 1.0, 1.01, 1.01, 1.01, 1.01, 1.01, 1.02, 1.02, 1.01, 1.02, 1.02, 1.01, 1.03, 1.04, 1.05, 1.04, 1.05, 1.06, 1.06, 1.06, 1.05, 1.04, 1.03, 1.04, 1.03, 1.03, 1.05, 1.06, 1.06, 1.05, 1.06, 1.05, 1.05, 1.07, 1.06, 1.04, 1.01, 1.02, 1.02, 1.02, 1.03, 1.04, 1.06, 1.06, 1.06, 1.07, 1.06, 1.06, 1.07, 1.05, 1.05, 1.06, 1.07, 1.05, 1.05, 1.05, 1.04, 1.04, 1.03, 1.05, 1.02, 1.02, 1.05, 1.02, 0.99, 0.99, 1.0, 1.02, 1.03, 1.02, 1.02, 1.01, 1.0, 0.989]}, {"name": "MSCI中国A股ETF南方", "type": "ETF", "score": 86, "label": "🟢 确认箱体(中长)", "closes": [1.47, 1.41, 1.43, 1.46, 1.44, 1.45, 1.45, 1.44, 1.46, 1.44, 1.43, 1.43, 1.48, 1.47, 1.49, 1.5, 1.51, 1.5, 1.53, 1.53, 1.53, 1.53, 1.55, 1.54, 1.54, 1.54, 1.53, 1.55, 1.55, 1.58, 1.59, 1.59, 1.61, 1.61, 1.62, 1.6, 1.58, 1.57, 1.58, 1.58, 1.56, 1.58, 1.59, 1.61, 1.59, 1.6, 1.58, 1.57, 1.59, 1.6, 1.58, 1.56, 1.52, 1.55, 1.54, 1.53, 1.55, 1.59, 1.59, 1.6, 1.61, 1.65, 1.61, 1.62, 1.63, 1.6, 1.61, 1.63, 1.63, 1.58, 1.59, 1.59, 1.57, 1.55, 1.59, 1.57, 1.54, 1.57, 1.56, 1.53, 1.48, 1.5, 1.53, 1.53, 1.54, 1.51, 1.53, 1.49, 1.51, 1.49], "dates": ["2026-03-20", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02", "2026-04-03", "2026-04-07", "2026-04-08", "2026-04-09", "2026-04-10", "2026-04-13", "2026-04-14", "2026-04-15", "2026-04-16", "2026-04-17", "2026-04-20", "2026-04-21", "2026-04-22", "2026-04-23", "2026-04-24", "2026-04-27", "2026-04-28", "2026-04-29", "2026-04-30", "2026-05-06", "2026-05-07", "2026-05-08", "2026-05-11", "2026-05-12", "2026-05-13", "2026-05-14", "2026-05-15", "2026-05-18", "2026-05-19", "2026-05-20", "2026-05-21", "2026-05-22", "2026-05-25", "2026-05-26", "2026-05-27", "2026-05-28", "2026-05-29", "2026-06-01", "2026-06-02", "2026-06-03", "2026-06-04", "2026-06-05", "2026-06-08", "2026-06-09", "2026-06-10", "2026-06-11", "2026-06-12", "2026-06-15", "2026-06-16", "2026-06-17", "2026-06-18", "2026-06-22", "2026-06-23", "2026-06-24", "2026-06-25", "2026-06-26", "2026-06-29", "2026-06-30", "2026-07-01", "2026-07-02", "2026-07-03", "2026-07-06", "2026-07-07", "2026-07-08", "2026-07-09", "2026-07-10", "2026-07-13", "2026-07-14", "2026-07-15", "2026-07-16", "2026-07-17", "2026-07-20", "2026-07-21", "2026-07-22", "2026-07-23", "2026-07-24", "2026-07-27", "2026-07-28", "2026-07-29", "2026-07-30"], "range40": 11.4, "t40": -4.9, "sup_touch": 6, "res_touch": 4, "sup_level": 1.5, "res_level": 1.64, "highs": [1.49, 1.47, 1.43, 1.46, 1.46, 1.45, 1.45, 1.46, 1.46, 1.46, 1.44, 1.43, 1.48, 1.47, 1.5, 1.5, 1.51, 1.52, 1.53, 1.53, 1.54, 1.54, 1.55, 1.55, 1.55, 1.55, 1.54, 1.56, 1.56, 1.59, 1.59, 1.59, 1.61, 1.62, 1.63, 1.63, 1.6, 1.58, 1.58, 1.58, 1.61, 1.58, 1.6, 1.61, 1.61, 1.6, 1.61, 1.59, 1.59, 1.61, 1.6, 1.59, 1.54, 1.55, 1.55, 1.53, 1.57, 1.59, 1.6, 1.6, 1.62, 1.65, 1.65, 1.62, 1.64, 1.63, 1.61, 1.63, 1.65, 1.61, 1.6, 1.6, 1.58, 1.58, 1.59, 1.61, 1.57, 1.57, 1.58, 1.56, 1.54, 1.51, 1.53, 1.55, 1.54, 1.53, 1.53, 1.52, 1.51, 1.505], "lows": [1.47, 1.41, 1.41, 1.44, 1.44, 1.43, 1.43, 1.44, 1.44, 1.44, 1.43, 1.42, 1.43, 1.47, 1.48, 1.49, 1.5, 1.5, 1.51, 1.52, 1.53, 1.52, 1.53, 1.53, 1.53, 1.54, 1.53, 1.54, 1.55, 1.54, 1.58, 1.58, 1.59, 1.6, 1.6, 1.6, 1.57, 1.56, 1.55, 1.57, 1.56, 1.55, 1.58, 1.58, 1.59, 1.57, 1.58, 1.57, 1.56, 1.58, 1.57, 1.55, 1.51, 1.52, 1.53, 1.52, 1.53, 1.56, 1.59, 1.59, 1.59, 1.61, 1.59, 1.6, 1.63, 1.59, 1.58, 1.61, 1.62, 1.58, 1.58, 1.58, 1.56, 1.55, 1.55, 1.57, 1.53, 1.52, 1.56, 1.53, 1.48, 1.48, 1.48, 1.53, 1.53, 1.51, 1.5, 1.49, 1.48, 1.471]}, {"name": "中证500低波动ETF华安", "type": "ETF", "score": 86, "label": "🟢 确认箱体(中长)", "closes": [1.93, 1.83, 1.88, 1.91, 1.88, 1.9, 1.91, 1.88, 1.91, 1.88, 1.87, 1.88, 1.94, 1.92, 1.94, 1.93, 1.94, 1.94, 1.95, 1.96, 1.97, 1.97, 1.99, 1.97, 1.96, 1.96, 1.95, 1.98, 1.96, 2.0, 2.0, 2.0, 2.03, 2.03, 2.05, 2.02, 1.98, 1.97, 2.0, 1.99, 1.95, 1.98, 2.01, 2.01, 1.99, 2.0, 1.96, 1.97, 1.97, 1.97, 1.96, 1.95, 1.89, 1.92, 1.91, 1.9, 1.93, 1.98, 1.97, 1.99, 1.98, 2.01, 1.99, 1.99, 1.99, 1.94, 1.98, 2.01, 2.03, 1.99, 2.0, 1.99, 1.96, 1.95, 1.98, 1.98, 1.92, 1.93, 1.93, 1.92, 1.86, 1.88, 1.92, 1.92, 1.93, 1.89, 1.91, 1.9, 1.93, 1.93], "dates": ["2026-03-20", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02", "2026-04-03", "2026-04-07", "2026-04-08", "2026-04-09", "2026-04-10", "2026-04-13", "2026-04-14", "2026-04-15", "2026-04-16", "2026-04-17", "2026-04-20", "2026-04-21", "2026-04-22", "2026-04-23", "2026-04-24", "2026-04-27", "2026-04-28", "2026-04-29", "2026-04-30", "2026-05-06", "2026-05-07", "2026-05-08", "2026-05-11", "2026-05-12", "2026-05-13", "2026-05-14", "2026-05-15", "2026-05-18", "2026-05-19", "2026-05-20", "2026-05-21", "2026-05-22", "2026-05-25", "2026-05-26", "2026-05-27", "2026-05-28", "2026-05-29", "2026-06-01", "2026-06-02", "2026-06-03", "2026-06-04", "2026-06-05", "2026-06-08", "2026-06-09", "2026-06-10", "2026-06-11", "2026-06-12", "2026-06-15", "2026-06-16", "2026-06-17", "2026-06-18", "2026-06-22", "2026-06-23", "2026-06-24", "2026-06-25", "2026-06-26", "2026-06-29", "2026-06-30", "2026-07-01", "2026-07-02", "2026-07-03", "2026-07-06", "2026-07-07", "2026-07-08", "2026-07-09", "2026-07-10", "2026-07-13", "2026-07-14", "2026-07-15", "2026-07-16", "2026-07-17", "2026-07-20", "2026-07-21", "2026-07-22", "2026-07-23", "2026-07-24", "2026-07-27", "2026-07-28", "2026-07-29", "2026-07-30"], "range40": 11.8, "t40": -2.5, "sup_touch": 6, "res_touch": 6, "sup_level": 1.87, "res_level": 2.03, "highs": [1.95, 1.93, 1.88, 1.91, 1.91, 1.91, 1.91, 1.91, 1.91, 1.91, 1.89, 1.88, 1.94, 1.94, 1.96, 1.93, 1.94, 1.95, 1.96, 1.97, 1.98, 1.97, 1.99, 1.99, 1.97, 1.97, 1.96, 1.98, 1.98, 2.0, 2.0, 2.02, 2.04, 2.04, 2.05, 2.05, 2.02, 1.98, 2.0, 1.99, 2.03, 1.99, 2.01, 2.01, 2.03, 2.01, 2.0, 2.0, 1.99, 1.99, 1.97, 1.98, 1.93, 1.93, 1.92, 1.92, 1.95, 1.98, 1.98, 1.99, 1.99, 2.02, 2.02, 1.99, 1.99, 1.99, 1.98, 2.01, 2.05, 2.03, 2.01, 2.06, 1.99, 1.97, 1.98, 2.01, 1.97, 1.94, 1.94, 1.93, 1.94, 1.89, 1.93, 1.94, 2.03, 1.92, 1.92, 1.92, 1.94, 1.94], "lows": [1.91, 1.83, 1.84, 1.88, 1.87, 1.87, 1.88, 1.88, 1.89, 1.88, 1.86, 1.87, 1.89, 1.92, 1.92, 1.92, 1.92, 1.94, 1.94, 1.95, 1.96, 1.96, 1.97, 1.96, 1.95, 1.95, 1.94, 1.95, 1.96, 1.97, 1.99, 1.98, 2.0, 2.01, 2.02, 2.01, 1.97, 1.96, 1.96, 1.98, 1.95, 1.95, 1.99, 1.98, 1.99, 1.97, 1.96, 1.94, 1.95, 1.91, 1.95, 1.94, 1.87, 1.88, 1.89, 1.89, 1.92, 1.94, 1.96, 1.95, 1.97, 1.97, 1.99, 1.97, 1.98, 1.94, 1.93, 1.86, 1.98, 1.98, 1.99, 1.97, 1.95, 1.94, 1.93, 1.97, 1.92, 1.9, 1.92, 1.91, 1.85, 1.83, 1.88, 1.91, 1.9, 1.88, 1.9, 1.88, 1.9, 1.9]}];
+const colors = ['#e74c3c','#2980b9','#9b59b6','#16a085','#e67e22','#34495e','#1abc9c','#d35400','#8e44ad'];
+const grid = document.getElementById('chartsGrid');
+chartData.forEach((c, idx) => {
+  const card = document.createElement('div');
+  card.className = 'chart-card';
+  card.innerHTML = `
+    <h4><span style="color:${colors[idx%colors.length]}">●</span> ${c.name}</h4>
+    <div class="sub">得分${c.score} · 40日振幅${c.range40}% · 40日趋势${c.t40>0?'+':''}${c.t40}%</div>
+    <div class="sr-line"><span class="sup">▲支撑 ${c.sup_level} (${c.sup_touch}触)</span> <span class="res">▼阻力 ${c.res_level} (${c.res_touch}触)</span></div>
+    <div class="chart-box"><canvas></canvas></div>
+  `;
+  grid.appendChild(card);
+  const ctx = card.querySelector('canvas');
+  
+  // Build datasets: price line + support/resistance reference lines
+  const datasets = [{
+    label: '收盘价',
+    data: c.closes,
+    borderColor: colors[idx%colors.length],
+    backgroundColor: colors[idx%colors.length]+'15',
+    borderWidth: 1.8,
+    pointRadius: 0,
+    fill: true,
+    tension: 0.35,
+  }];
+  
+  // Add support and resistance reference lines
+  if (c.sup_level && c.sup_level > 0) {
+    const supData = new Array(c.dates.length).fill(c.sup_level);
+    datasets.push({
+      label: '支撑线',
+      data: supData,
+      borderColor: '#16a085',
+      borderWidth: 1,
+      borderDash: [4, 4],
+      pointRadius: 0,
+      fill: false,
+    });
+  }
+  if (c.res_level && c.res_level > 0) {
+    const resData = new Array(c.dates.length).fill(c.res_level);
+    datasets.push({
+      label: '阻力线',
+      data: resData,
+      borderColor: '#e74c3c',
+      borderWidth: 1,
+      borderDash: [4, 4],
+      pointRadius: 0,
+      fill: false,
+    });
+  }
+  
+  new Chart(ctx, {
+    type: 'line',
+    data: { labels: c.dates, datasets: datasets },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins: { legend:{display:false}, tooltip:{ callbacks:{ title:(i)=>c.dates[i[0].dataIndex], label:(i)=>i.dataset.label+': '+i.parsed.y }}},
+      scales: { x: { display:false }, y: { display:true, position:'right', ticks:{ font:{size:9}, color:'#95a5a6' }, grid:{ color:'#f0f2f5' } } }
+    }
+  });
+});
+</script>
+</body>
+</html>

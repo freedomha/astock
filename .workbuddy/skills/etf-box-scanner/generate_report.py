@@ -18,6 +18,7 @@ def build_report(results, klines, output_path):
     box_long = [r for r in results if "中长" in r["label"]]
     box_medium = [r for r in results if "中期" in r["label"] and "中长" not in r["label"]]
     confirmed = box_long + box_medium
+    box_top = [r for r in results if r["label"].startswith("🟡 箱顶")]
     narrow = [r for r in results if r["label"].startswith("🟡 窄幅")]
     wide_swing = [r for r in results if r["label"].startswith("🟡 宽幅")]
     downtrend = [r for r in results if r["label"].startswith("🔴")]
@@ -120,7 +121,7 @@ body {{ font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','M
 .header h1 {{ font-size:26px; margin-bottom:8px; }}
 .header .subtitle {{ opacity:0.85; font-size:14px; }}
 .header .meta {{ margin-top:14px; display:flex; gap:24px; font-size:13px; opacity:0.75; flex-wrap:wrap; }}
-.summary-cards {{ display:grid; grid-template-columns:repeat(5,1fr); gap:14px; margin-bottom:28px; }}
+.summary-cards {{ display:grid; grid-template-columns:repeat(6,1fr); gap:14px; margin-bottom:28px; }}
 .summary-card {{ background:#fff; border-radius:10px; padding:18px; text-align:center; box-shadow:0 2px 10px rgba(0,0,0,0.06); }}
 .summary-card .number {{ font-size:30px; font-weight:700; }}
 .summary-card .label {{ font-size:12px; color:#7f8c8d; margin-top:4px; }}
@@ -184,6 +185,7 @@ tr:hover td {{ background:#fafbfc; }}
 <div class="summary-cards">
   <div class="summary-card c-blue"><div class="number">{total}</div><div class="label">分析ETF总数</div></div>
   <div class="summary-card c-green"><div class="number">{len(confirmed)}</div><div class="label">🟢 确认箱体（中长+中期）</div></div>
+  <div class="summary-card c-orange"><div class="number">{len(box_top)}</div><div class="label">🟡 箱顶观望</div></div>
   <div class="summary-card c-orange"><div class="number">{len(narrow) + len(wide_swing)}</div><div class="label">🟡 窄幅/宽幅震荡</div></div>
   <div class="summary-card c-red"><div class="number">{len(downtrend)}</div><div class="label">🔴 下跌趋势</div></div>
   <div class="summary-card c-gray"><div class="number">{len(trend)}</div><div class="label">⚪ 趋势行情</div></div>
@@ -296,11 +298,11 @@ chartData.forEach((c, idx) => {{
 def main():
     cwd = os.getcwd()
     skill_dir = os.path.dirname(os.path.abspath(__file__))
-    results_file = os.path.join(skill_dir, "etf_concussion_results.json")
-    kline_file = os.path.join(skill_dir, "etf_concussion_kline_data.json")
+    results_file = os.path.join(skill_dir, "etf_box_results.json")
+    kline_file = os.path.join(skill_dir, "etf_box_kline_data.json")
     outdir = os.path.join(cwd, "reports", "etf")
     os.makedirs(outdir, exist_ok=True)
-    output = os.path.join(outdir, "etf_concussion_report.html")
+    output = os.path.join(outdir, "etf_box_report.html")
 
     with open(results_file) as f:
         results = json.load(f)

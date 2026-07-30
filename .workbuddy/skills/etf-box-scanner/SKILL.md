@@ -1,9 +1,9 @@
 ---
-name: etf-concussion-scanner
-description: Use when analyzing A-share ETFs for box-consolidation (箱体震荡) patterns suitable for medium-term swing trading (中线差价) — scan all largest ETFs, score on range width + trend flatness + bounce quality, label as 确认箱体/窄幅收敛/趋势行情.
+name: etf-box-scanner
+description: Use when analyzing A-share ETFs for box-consolidation (箱体震荡) patterns suitable for medium-term swing trading (中线差价) — scan all largest ETFs, score on range width + trend flatness + bounce quality, label as 确认箱体/箱顶观望/窄幅收敛/趋势行情.
 ---
 
-# ETF Concussion Scanner (ETF箱体震荡形态扫描) v1
+# ETF Box Scanner (ETF箱体震荡形态扫描) v1
 
 ## Overview
 
@@ -15,7 +15,7 @@ A tradable box range requires:
 3. **Range quality** — multiple touches of support/resistance confirm the box
 4. **Position signal** — current position in range (near support = entry opportunity)
 
-Uses `westock-data` to fetch ETF K-line data, then runs a specialized concussion scoring engine that **rewards tradable box ranges, not narrow dead ranges.**
+Uses `westock-data` to fetch ETF K-line data, then runs a specialized box scoring engine that **rewards tradable box ranges, not narrow dead ranges.**
 
 > **核心改进**: 本算法专为**中线差价**设计 — 筛选振幅足够做波段、但又非单边趋势的箱体震荡ETF。
 
@@ -30,8 +30,8 @@ Uses `westock-data` to fetch ETF K-line data, then runs a specialized concussion
 
 ```
 1. Ensure all_etfs_larggest.json exists in project root
-2. Run analyze.py → fetches K-line + scores + saves etf_concussion_results.json & etf_concussion_kline_data.json
-3. Run generate_report.py → reports/etf/etf_concussion_report.html
+2. Run analyze.py → fetches K-line + scores + saves etf_box_results.json & etf_box_kline_data.json
+3. Run generate_report.py → reports/etf/etf_box_report.html
 4. present_files the HTML report
 ```
 
@@ -45,24 +45,24 @@ Uses `westock-data` to fetch ETF K-line data, then runs a specialized concussion
 
 ```bash
 PYTHON="/Users/aldiadmin/.workbuddy/binaries/python/versions/3.13.12/bin/python3"
-$PYTHON .codebuddy/skills/etf-concussion-scanner/analyze.py
+$PYTHON .workbuddy/skills/etf-box-scanner/analyze.py
 ```
 
 `analyze.py` does everything in one run:
 - Loads ETF codes from `all_etfs_larggest.json`
-- Fetches 250-day daily K-line for each ETF (parallel, 8 workers) → `etf_concussion_kline_data.json`
-- Scores each ETF with the concussion engine → `etf_concussion_results.json`
+- Fetches 250-day daily K-line for each ETF (parallel, 8 workers) → `etf_box_kline_data.json`
+- Scores each ETF with the box scoring engine → `etf_box_results.json`
 - Prints summary with box-consolidation labels
 
 ### Step 3: Generate HTML Report
 
 ```bash
-$PYTHON .codebuddy/skills/etf-concussion-scanner/generate_report.py
+$PYTHON .workbuddy/skills/etf-box-scanner/generate_report.py
 ```
 
-Produces `reports/etf/etf_concussion_report.html` with: summary cards, 90-day K-line sparklines for confirmed box ETFs, TOP25 ranking table, detailed analysis cards. Present via `present_files`.
+Produces `reports/etf/etf_box_report.html` with: summary cards, 90-day K-line sparklines for confirmed box ETFs, TOP25 ranking table, detailed analysis cards. Present via `present_files`.
 
-## Concussion Scoring Engine
+## Box Scoring Engine
 
 ### Core Principle
 
@@ -73,11 +73,12 @@ A **tradable box range** requires FOUR conditions simultaneously:
 4. **位置优势** — near support = good entry, near resistance = caution
 
 ### Windowing
+
 - **中期 (Medium-term)**: 40 days
 - **长期 (Long-term)**: 90 days
 - K-line fetch: 250 days (for MA120 and reference)
 
-### Scoring Dimensions (max 100, clamped)
+### Scoring Dimensions (max ~103, clamped 0-100)
 
 | Dimension | Max | Criteria |
 |-----------|-----|----------|
@@ -86,8 +87,9 @@ A **tradable box range** requires FOUR conditions simultaneously:
 | Trend flatness 40d | 20 | abs(slope40)<2% = 20, <3% = 15, <5% = 8 |
 | Range quality (bounce count) | 15 | ≥3 support + ≥3 resistance touches = 15 |
 | Near support (entry signal) | 10 | pos40 ≤ 25% = 10, ≤ 35% = 6 |
-| ATR compression | 5 | atr20/atr90 < 0.85 = 5 |
+| ATR compression (True Range) | 5 | atr20/atr90 < 0.85 = 5 |
 | Volume stability | 5 | vol_ratio near 1.0 = 5 |
+| MA convergence (均线粘合) | +3 | ma_spread < 2% = +3, < 4% = +1 (bonus) |
 
 **Penalties:**
 - Strong 40d trend (|slope| > 8%) = -15pts
@@ -98,8 +100,9 @@ A **tradable box range** requires FOUR conditions simultaneously:
 
 | Label | Criteria | Meaning |
 |-------|----------|---------|
-| 🟢 确认箱体(中长) | 40d+90d both box range, score≥70 | Best swing opportunity |
-| 🟢 确认箱体(中期) | 40d box range, score≥60 | Medium swing opportunity |
+| 🟢 确认箱体(中长) | 40d+90d both box range (≥4 bounces each), score≥70, pos40≤75% | Best swing opportunity |
+| 🟢 确认箱体(中期) | 40d box range, score≥60, pos40≤75% | Medium swing opportunity |
+| 🟡 箱顶观望 | Box confirmed but pos40>75% (near resistance) | Wait for pullback to support |
 | 🟡 窄幅收敛 | Range narrow but consolidating, score≥45 | Watch for range expansion |
 | 🟡 宽幅震荡 | Wide range but flat, score≥45 | Cautious swing, narrower gap |
 | 🔴 下跌趋势 | 40d slope < -8% | In downtrend, avoid |
@@ -114,13 +117,15 @@ A **tradable box range** requires FOUR conditions simultaneously:
 | **40d斜率** | Linear regression slope % | Must be near zero for true consolidation |
 | **箱体质量** | #support touches + #resistance touches | More touches = more reliable box boundary |
 | **位置(pos40)** | (cur - lo) / (hi - lo) in 40d | Near support = low risk entry zone |
-| **ATR压缩** | atr20 / atr90 ratio | Compression confirms consolidation ending |
+| **ATR压缩** | atr20 / atr90 ratio (True Range) | Compression confirms consolidation ending |
 | **量能稳定** | vol20 / vol60 ratio | Stable volume during consolidation |
+| **均线粘合** | MA20/40/90 spread % | Tight spread = strong consolidation |
 
 ## Interpretation Guidance
 
 - Focus on **🟢 确认箱体(中长)** ETFs — these have confirmed box ranges in both medium and long term, offering the best swing trading setup. Buy near 箱底, sell near 箱顶.
 - **🟢 确认箱体(中期)** ETFs have good medium-term boxes but may have wider long-term amplitude.
+- **🟡 箱顶观望** ETFs have confirmed boxes but price is near resistance (pos40>75%) — wait for pullback to support before entering.
 - **🟡 窄幅收敛** ETFs are early-stage candidates — range is forming but not yet wide enough for profitable swings. Monitor for range expansion.
 - **🟡 宽幅震荡** ETFs have tradable ranges but higher volatility — use tighter position sizing.
 - When **many large ETFs** simultaneously show 确认箱体, it may signal broad market consolidation (适合中线操作).

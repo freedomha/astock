@@ -7,5 +7,5 @@ etf_bowl_results.json
 etf_kline_data.json
 etf_hs_bottom_results.json
 
-.workbuddy/skills/etf-concussion-scanner/etf_concussion_kline_data.json
-.workbuddy/skills/etf-concussion-scanner/etf_concussion_results.json
+.workbuddy/skills/etf-box-scanner/etf_box_kline_data.json
+.workbuddy/skills/etf-box-scanner/etf_box_results.json
