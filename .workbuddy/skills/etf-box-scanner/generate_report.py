@@ -299,7 +299,7 @@ def main():
     cwd = os.getcwd()
     skill_dir = os.path.dirname(os.path.abspath(__file__))
     results_file = os.path.join(skill_dir, "etf_box_results.json")
-    kline_file = os.path.join(skill_dir, "etf_box_kline_data.json")
+    kline_file = os.path.join(cwd, "etf_kline_data.json")
     outdir = os.path.join(cwd, "reports", "etf")
     os.makedirs(outdir, exist_ok=True)
     output = os.path.join(outdir, "etf_box_report.html")

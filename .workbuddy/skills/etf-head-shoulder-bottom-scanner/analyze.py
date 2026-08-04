@@ -547,7 +547,7 @@ def main():
     # Step 2: Check for existing K-line data
     cwd = os.getcwd()
     skill_dir = os.path.dirname(os.path.abspath(__file__))
-    kline_file = os.path.join(skill_dir, "etf_kline_data.json")
+    kline_file = os.path.join(cwd, "etf_kline_data.json")
     kline_data = {}
     
     if os.path.exists(kline_file):

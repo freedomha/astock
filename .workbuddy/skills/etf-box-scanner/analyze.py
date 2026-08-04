@@ -482,52 +482,57 @@ def main():
         return
     print(f"Loaded {len(etfs)} ETFs")
     
-    # Step 2: Fetch K-line data in parallel
-    print(f"\nFetching K-line data (max {MAX_WORKERS} concurrent, {KLINE_DAYS} days each)...")
-    codes = [e["code"] for e in etfs]
-    kline_data = {}
-    done = 0
-    total = len(codes)
-    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
-        futures = {executor.submit(fetch_kline, code): code for code in codes}
-        for future in as_completed(futures):
-            code = futures[future]
-            try:
-                _, data = future.result()
-                if data:
-                    kline_data[code] = data
-                done += 1
-                if done % 20 == 0 or done == total:
-                    print(f"  Progress: {done}/{total}")
-            except Exception as e:
-                print(f"  {code} fetch error: {e}")
-                done += 1
-    print(f"Fetched {len(kline_data)}/{total} ETF K-lines")
-    
-    # Re-fetch failures
-    missing = [c for c in codes if c not in kline_data]
-    if missing:
-        print(f"\nRetrying {len(missing)} failed ETFs (up to 6 retries)...")
-        for c in missing:
-            _, d = fetch_kline(c, retries=6)
-            if d:
-                kline_data[c] = d
-        still_missing = [c for c in codes if c not in kline_data]
-        print(f"After retry: {len(kline_data)}/{total} (still missing {len(still_missing)})")
-        if still_missing:
-            name_map = {e["code"]: e["name"] for e in etfs}
-            print("  Missing:", ", ".join(f'{name_map.get(c, c)}({c})' for c in still_missing))
-    
-    # Save raw kline data
-    cwd = os.getcwd()
-    skill_dir = os.path.dirname(os.path.abspath(__file__))
-    kline_file = os.path.join(skill_dir, "etf_box_kline_data.json")
-    with open(kline_file, "w") as f:
-        json.dump(kline_data, f, ensure_ascii=False)
-    print(f"K-line data saved: {kline_file}")
+    # Step 2: Load or fetch K-line data (shared project-root file)
+    kline_file = os.path.join(os.getcwd(), "etf_kline_data.json")
+    if os.path.exists(kline_file):
+        print(f"\nLoading shared K-line data: {kline_file}")
+        with open(kline_file) as f:
+            kline_data = json.load(f)
+        print(f"Loaded {len(kline_data)} ETF K-lines")
+    else:
+        print(f"\nFetching K-line data (max {MAX_WORKERS} concurrent, {KLINE_DAYS} days each)...")
+        codes = [e["code"] for e in etfs]
+        kline_data = {}
+        done = 0
+        total = len(codes)
+        with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+            futures = {executor.submit(fetch_kline, code): code for code in codes}
+            for future in as_completed(futures):
+                code = futures[future]
+                try:
+                    _, data = future.result()
+                    if data:
+                        kline_data[code] = data
+                    done += 1
+                    if done % 20 == 0 or done == total:
+                        print(f"  Progress: {done}/{total}")
+                except Exception as e:
+                    print(f"  {code} fetch error: {e}")
+                    done += 1
+        print(f"Fetched {len(kline_data)}/{total} ETF K-lines")
+
+        # Re-fetch failures
+        missing = [c for c in codes if c not in kline_data]
+        if missing:
+            print(f"\nRetrying {len(missing)} failed ETFs (up to 6 retries)...")
+            for c in missing:
+                _, d = fetch_kline(c, retries=6)
+                if d:
+                    kline_data[c] = d
+            still_missing = [c for c in codes if c not in kline_data]
+            print(f"After retry: {len(kline_data)}/{total} (still missing {len(still_missing)})")
+            if still_missing:
+                name_map = {e["code"]: e["name"] for e in etfs}
+                print("  Missing:", ", ".join(f'{name_map.get(c, c)}({c})' for c in still_missing))
+
+        # Save to shared project root file
+        with open(kline_file, "w") as f:
+            json.dump(kline_data, f, ensure_ascii=False)
+        print(f"K-line data saved: {kline_file}")
     
     # Step 3: Analyze box consolidation
     print("\nAnalyzing box consolidation patterns...")
+    skill_dir = os.path.dirname(os.path.abspath(__file__))
     results = []
     for e in etfs:
         kl = kline_data.get(e["code"])

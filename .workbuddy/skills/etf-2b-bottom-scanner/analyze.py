@@ -415,53 +415,59 @@ def main():
         return
     print(f"共加载 {len(etfs)} 只ETF")
     
-    # Step 2: Fetch K-line data in parallel
-    print(f"\n📊 并行拉取K线数据 (最多{MAX_WORKERS}并发, 每只{KLINE_DAYS}天)...")
-    codes = [e["code"] for e in etfs]
-    kline_data = {}
-    done = 0
-    total = len(codes)
-    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
-        futures = {executor.submit(fetch_kline, code): code for code in codes}
-        for future in as_completed(futures):
-            code = futures[future]
-            try:
-                _, data = future.result()
-                if data:
-                    kline_data[code] = data
-                done += 1
-                if done % 20 == 0 or done == total:
-                    print(f"  进度: {done}/{total}")
-            except Exception as e:
-                print(f"  {code} 拉取失败: {e}")
-                done += 1
-    print(f"成功获取 {len(kline_data)}/{total} 只ETF K线数据")
-    
-    # Re-fetch any ETFs that failed
-    missing = [c for c in codes if c not in kline_data]
-    if missing:
-        print(f"\n🔁 补拉 {len(missing)} 个失败ETF (增强重试, 最多6次)...")
-        for c in missing:
-            _, d = fetch_kline(c, retries=6)
-            if d:
-                kline_data[c] = d
-        still_missing = [c for c in codes if c not in kline_data]
-        print(f"补拉后覆盖 {len(kline_data)}/{total} (仍缺失 {len(still_missing)})")
-        if still_missing:
-            name_map = {e["code"]: e["name"] for e in etfs}
-            print("  缺失ETF:", ", ".join(f'{name_map.get(c, c)}({c})' for c in still_missing[:10]))
-            if len(still_missing) > 10:
-                print(f"  ... 还有 {len(still_missing) - 10} 个")
-    
-    # Save raw kline data to skill directory
-    skill_dir = os.path.dirname(os.path.abspath(__file__))
-    kline_file = os.path.join(skill_dir, "etf_kline_data.json")
-    with open(kline_file, "w") as f:
-        json.dump(kline_data, f, ensure_ascii=False)
-    print(f"K线数据已保存: {kline_file}")
+    # Step 2: Load or fetch K-line data (shared project-root file)
+    kline_file = os.path.join(os.getcwd(), "etf_kline_data.json")
+    if os.path.exists(kline_file):
+        print(f"\n📊 加载共享K线数据: {kline_file}")
+        with open(kline_file) as f:
+            kline_data = json.load(f)
+        print(f"已加载 {len(kline_data)} 只ETF K线数据")
+    else:
+        print(f"\n📊 并行拉取K线数据 (最多{MAX_WORKERS}并发, 每只{KLINE_DAYS}天)...")
+        codes = [e["code"] for e in etfs]
+        kline_data = {}
+        done = 0
+        total = len(codes)
+        with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+            futures = {executor.submit(fetch_kline, code): code for code in codes}
+            for future in as_completed(futures):
+                code = futures[future]
+                try:
+                    _, data = future.result()
+                    if data:
+                        kline_data[code] = data
+                    done += 1
+                    if done % 20 == 0 or done == total:
+                        print(f"  进度: {done}/{total}")
+                except Exception as e:
+                    print(f"  {code} 拉取失败: {e}")
+                    done += 1
+        print(f"成功获取 {len(kline_data)}/{total} 只ETF K线数据")
+
+        # Re-fetch any ETFs that failed
+        missing = [c for c in codes if c not in kline_data]
+        if missing:
+            print(f"\n🔁 补拉 {len(missing)} 个失败ETF (增强重试, 最多6次)...")
+            for c in missing:
+                _, d = fetch_kline(c, retries=6)
+                if d:
+                    kline_data[c] = d
+            still_missing = [c for c in codes if c not in kline_data]
+            print(f"补拉后覆盖 {len(kline_data)}/{total} (仍缺失 {len(still_missing)})")
+            if still_missing:
+                name_map = {e["code"]: e["name"] for e in etfs}
+                print("  缺失ETF:", ", ".join(f'{name_map.get(c, c)}({c})' for c in still_missing[:10]))
+                if len(still_missing) > 10:
+                    print(f"  ... 还有 {len(still_missing) - 10} 个")
+
+        # Save to shared project root file
+        with open(kline_file, "w") as f:
+            json.dump(kline_data, f, ensure_ascii=False)
+        print(f"K线数据已保存: {kline_file}")
     
     # Step 3: Analyze 2B patterns
     print("\n🔍 检测2B底部形态...")
+    skill_dir = os.path.dirname(os.path.abspath(__file__))
     results = []
     for e in etfs:
         kl = kline_data.get(e["code"])
