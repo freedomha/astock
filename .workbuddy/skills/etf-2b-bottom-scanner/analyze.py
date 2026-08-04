@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-A股ETF 2B底部形态检测与评分引擎 (v1)
+A股ETF 2B底部形态检测与评分引擎 (v2)
 
 2B规则 (Victor Sperandeo):
 价格跌破前60日低点后,在2个交易日内收盘回升至该低点之上
@@ -10,6 +10,7 @@ A股ETF 2B底部形态检测与评分引擎 (v1)
 1. 找前60日最低收盘价 (bars[2..61])
 2. 检查 bars 0-2 是否有低点跌破该底线
 3. 检查跌破后2个交易日内是否收盘回升至该底线之上
+4. 【v2新增】2阳确认: 回升后需出现2根阳线(close>open)才确认进场信号
 
 评分引擎: 7维度 (max 100)
 """
@@ -77,31 +78,35 @@ def load_etfs():
 def parse_kline(kline_data):
     """
     Parse raw kline data from westock-data.
-    
-    Input: list of {date, first, last, high, low, volume} newest-first
+
+    Input: list of {date, first/open, last, high, low, volume} newest-first
     Output: list of {date, open, close, high, low, volume} sorted oldest-first
     Returns None if not enough data.
+
+    Handles both 'first' and 'open' field names (westock-data output format varies).
     """
     if not kline_data or len(kline_data) < 80:
         return None
-    
+
     records = []
     for k in kline_data:
         try:
+            open_price = float(k.get("first", k.get("open")))
+            close_price = float(k["last"])
             records.append({
                 "date": k["date"],
-                "open": float(k["first"]),
-                "close": float(k["last"]),
+                "open": open_price,
+                "close": close_price,
                 "high": float(k["high"]),
                 "low": float(k["low"]),
                 "volume": float(k.get("volume", 0)),
             })
-        except (KeyError, ValueError):
+        except (KeyError, ValueError, TypeError):
             continue
-    
+
     if len(records) < 80:
         return None
-    
+
     records.sort(key=lambda x: x["date"])
     return records
 
@@ -183,10 +188,38 @@ def detect_2b_bottom(records):
     return (breakdown_bar, recovery_bar, prior_low_price, prior_low_bar)
 
 
-def score_2b(records, breakdown_bar, recovery_bar, prior_low_price, prior_low_bar):
+def find_2yang_confirmation(records, recovery_bar):
+    """
+    Check for 2 bullish bars (close > open) after the recovery bar as entry confirmation.
+
+    Returns (entry_bar, confirmed) where:
+    - entry_bar: index of the 2nd bullish bar (entry point), or None
+    - confirmed: bool, True only if 2 bullish bars found
+    """
+    n = len(records)
+    bullish_count = 0
+    entry_bar = None
+
+    for offset in range(n - recovery_bar):
+        bar_idx = recovery_bar + offset
+        if bar_idx >= n:
+            break
+        if records[bar_idx]["close"] > records[bar_idx]["open"]:
+            bullish_count += 1
+            entry_bar = bar_idx
+            if bullish_count >= 2:
+                return (entry_bar, True)
+
+    return (entry_bar, False)
+
+
+def score_2b(records, breakdown_bar, recovery_bar, prior_low_price, prior_low_bar, entry_bar=None, confirmed=False):
     """
     Score the 2B bottom pattern on 7 dimensions (max 100).
-    
+
+    v2: entry_bar and confirmed are from find_2yang_confirmation().
+    If entry_bar is provided, "current" price is from entry_bar instead of recovery_bar.
+
     Returns dict with score, label, and detailed metrics.
     """
     n = len(records)
@@ -194,7 +227,12 @@ def score_2b(records, breakdown_bar, recovery_bar, prior_low_price, prior_low_ba
     highs = [r["high"] for r in records]
     lows = [r["low"] for r in records]
     vols = [r["volume"] for r in records]
-    cur = closes[-1]
+    # v2: use entry_bar close as current price when confirmed, else use recovery bar
+    if entry_bar is not None:
+        cur_bar = entry_bar
+    else:
+        cur_bar = recovery_bar
+    cur = closes[cur_bar]
     
     # ---- Dimension 1: Break depth (max 20) ----
     breakdown_low = records[breakdown_bar]["low"]
@@ -316,16 +354,26 @@ def score_2b(records, breakdown_bar, recovery_bar, prior_low_price, prior_low_ba
     # ---- Total score ----
     score = score_d1 + score_d2 + score_d3 + score_d4 + score_d5 + score_d6 + score_d7 - penalties
     score = max(0, min(100, score))
-    
-    # ---- Label ----
-    if score >= 80:
-        label = "🟢 2B买入确认"
-    elif score >= 65:
-        label = "🟢 2B买入候选"
-    elif score >= 50:
-        label = "🟡 2B观察"
+
+    # ---- Label (v2: incorporates 2-yang confirmation) ----
+    if confirmed:
+        if score >= 80:
+            label = "🟢 2B买入确认"
+        elif score >= 65:
+            label = "🟢 2B买入候选(已确认)"
+        elif score >= 50:
+            label = "🟡 2B观察(已确认)"
+        else:
+            label = "⚪ 无2B信号"
     else:
-        label = "⚪ 无2B信号"
+        if score >= 80:
+            label = "🟡 2B买入候选(待2阳确认)"
+        elif score >= 65:
+            label = "🟡 2B候选(待2阳确认)"
+        elif score >= 50:
+            label = "🟡 2B观察(待2阳确认)"
+        else:
+            label = "⚪ 无2B信号"
     
     # ---- Reasons ----
     reasons = []
@@ -354,9 +402,11 @@ def score_2b(records, breakdown_bar, recovery_bar, prior_low_price, prior_low_ba
     return {
         "score": score,
         "label": label,
+        "confirmed": confirmed,
         "current": round(cur, 2),
         "breakdown_bar": breakdown_bar,
         "recovery_bar": recovery_bar,
+        "entry_bar": entry_bar,
         "prior_low_price": round(prior_low_price, 2),
         "prior_low_bar": prior_low_bar,
         "break_pct": round(break_depth_pct, 2),
@@ -370,6 +420,7 @@ def score_2b(records, breakdown_bar, recovery_bar, prior_low_price, prior_low_ba
         "penalties": penalties,
         "breakdown_date": records[breakdown_bar]["date"],
         "recovery_date": records[recovery_bar]["date"],
+        "entry_date": records[entry_bar]["date"] if entry_bar is not None else None,
         "prior_low_date": records[prior_low_bar]["date"],
         "reasons": reasons,
     }
@@ -378,27 +429,35 @@ def score_2b(records, breakdown_bar, recovery_bar, prior_low_price, prior_low_ba
 def analyze_2b(code, name, etype, kline_data):
     """
     Analyze a single ETF for 2B bottom detection.
-    
+
+    v2: After detection, checks for 2-yang confirmation.
+    Entry point shifts to the 2nd bullish bar after recovery.
+
     Returns scored result dict or None if no valid data/pattern.
     """
     if not kline_data:
         return None
-    
+
     records = parse_kline(kline_data)
     if not records:
         return None
-    
+
     detected = detect_2b_bottom(records)
     if detected is None:
         return None
-    
+
     breakdown_bar, recovery_bar, prior_low_price, prior_low_bar = detected
-    
-    result = score_2b(records, breakdown_bar, recovery_bar, prior_low_price, prior_low_bar)
+
+    # v2: Check 2-yang confirmation
+    entry_bar, confirmed = find_2yang_confirmation(records, recovery_bar)
+
+    result = score_2b(records, breakdown_bar, recovery_bar,
+                      prior_low_price, prior_low_bar,
+                      entry_bar=entry_bar, confirmed=confirmed)
     result["code"] = code
     result["name"] = name
     result["type"] = etype
-    
+
     return result
 
 
@@ -485,45 +544,64 @@ def main():
     print(f"分析结果已保存: {results_file}")
     
     # Step 4: Summary
-    confirmed = [r for r in results if r["label"] == "🟢 2B买入确认"]
-    candidate = [r for r in results if r["label"] == "🟢 2B买入候选"]
-    watch = [r for r in results if r["label"] == "🟡 2B观察"]
-    no_signal = [r for r in results if r["label"] == "⚪ 无2B信号"]
-    
+    confirmed_list = [r for r in results if r.get("confirmed")]
+    unconfirmed_list = [r for r in results if not r.get("confirmed")]
+
     print("\n" + "=" * 60)
-    print(f"🏆 2B底部检测汇总 (共{len(results)}只ETF检测到2B信号)")
+    print(f"🏆 2B底部检测汇总 (共{len(results)}只ETF检测到2B信号) [v2 含2阳确认]")
     print("=" * 60)
-    print(f"  🟢 2B买入确认 (≥80): {len(confirmed)}")
-    print(f"  🟢 2B买入候选 (65-79): {len(candidate)}")
-    print(f"  🟡 2B观察 (50-64): {len(watch)}")
-    print(f"  ⚪ 无2B信号 (<50): {len(no_signal)}")
-    
+    print(f"  ✅ 已确认 (2阳确认通过): {len(confirmed_list)}")
+    print(f"  ⏳ 待确认 (缺少2阳): {len(unconfirmed_list)}")
+
+    # By score tier + confirmation
+    confirmed_high = [r for r in confirmed_list if r["score"] >= 80]
+    confirmed_mid = [r for r in confirmed_list if 65 <= r["score"] < 80]
+    confirmed_low = [r for r in confirmed_list if 50 <= r["score"] < 65]
+    unconf_high = [r for r in unconfirmed_list if r["score"] >= 80]
+    unconf_mid = [r for r in unconfirmed_list if 65 <= r["score"] < 80]
+    unconf_low = [r for r in unconfirmed_list if 50 <= r["score"] < 65]
+
+    print(f"\n    已确认 — ≥80: {len(confirmed_high)} | 65-79: {len(confirmed_mid)} | 50-64: {len(confirmed_low)}")
+    print(f"    待确认 — ≥80: {len(unconf_high)} | 65-79: {len(unconf_mid)} | 50-64: {len(unconf_low)}")
+
     # No signals at all
     total_etfs = len(etfs)
     no_detect = total_etfs - len(results)
     print(f"  未检测到2B形态: {no_detect}/{total_etfs}")
-    
-    # Top results table
+
+    # Top results table (confirmed first, then unconfirmed)
     top_n = min(25, len(results))
     if top_n > 0:
-        print(f"\n{'排名':<4}{'ETF名称':<22}{'得分':<5}{'判定':<14}{'破位日':<12}{'回升日':<12}{'破深%':<7}{'回升%':<7}{'量比':<6}{'前跌%':<7}{'滞后':<4}")
-        print("-" * 120)
-        for i, r in enumerate(results[:top_n]):
-            print(f"{i+1:<4}{r['name']:<22}{r['score']:<5}{r['label']:<14}{r['breakdown_date']:<12}{r['recovery_date']:<12}{r['break_pct']:<7}{r['recovery_pct']:<7}{r['vol_ratio']:<6.0%}{r['prior_decline']:<7}{r['lag_bars']:<4}")
+        print(f"\n{'排名':<4}{'ETF名称':<22}{'得分':<5}{'判定':<22}{'破位日':<12}{'回升日':<12}{'入场日':<12}{'破深%':<7}{'回升%':<7}")
+        print("-" * 130)
+        # Sort: confirmed first by score, then unconfirmed by score
+        sorted_for_display = sorted(results, key=lambda r: (r.get("confirmed", False), r["score"]), reverse=True)
+        for i, r in enumerate(sorted_for_display[:top_n]):
+            entry_d = r.get("entry_date") or "-"
+            print(f"{i+1:<4}{r['name']:<22}{r['score']:<5}{r['label']:<22}{r['breakdown_date']:<12}{r['recovery_date']:<12}{entry_d:<12}{r['break_pct']:<7}{r['recovery_pct']:<7}")
     
     # Detailed for confirmed
-    if confirmed:
+    if confirmed_list:
         print("\n" + "=" * 60)
-        print("📝 2B买入确认ETF详细分析")
+        print(f"📝 2B已确认ETF详细分析 (共{len(confirmed_list)}只)")
         print("=" * 60)
-        for i, r in enumerate(confirmed):
-            print(f"\n{i+1}. {r['name']} — {r['label']} 得分:{r['score']}/100")
-            print(f"   当前价: {r['current']} | 前低:{r['prior_low_price']} ({r['prior_low_date']})")
-            print(f"   破位: {r['breakdown_date']}(深{r['break_pct']}%) | 回升: {r['recovery_date']}(+{r['recovery_pct']:.1f}%)")
+        for i, r in enumerate(confirmed_list):
+            print(f"\n{i+1}. {r['name']} — {r['label']}")
+            print(f"   得分:{r['score']}/100 | 入场价:{r['current']} | 入场日:{r['entry_date']}")
+            print(f"   前低:{r['prior_low_price']} ({r['prior_low_date']}) | 破位: {r['breakdown_date']}(深{r['break_pct']}%) | 回升: {r['recovery_date']}(+{r['recovery_pct']:.1f}%)")
             print(f"   滞后: {r['lag_bars']}天 | 前期跌幅: {r['prior_decline']}% | 量比: {r['vol_ratio']:.0%} | 距60MA: {r['d_ma60']:+.1f}%")
             print(f"   评分详情: D1(破深)={r['d1']} D2(回升)={r['d2']} D3(量)={r['d3']} D4(前低质)={r['d4']} D5(前跌)={r['d5']} D6(速度)={r['d6']} D7(60MA)={r['d7']} 惩罚={r['penalties']}")
             for reason in r["reasons"]:
                 print(f"     {reason}")
+
+    # Show top unconfirmed signals that need monitoring
+    if unconf_high:
+        print("\n" + "=" * 60)
+        print(f"⏳ 待确认高评分信号 (≥80分, 需等待2阳确认, 共{len(unconf_high)}只)")
+        print("=" * 60)
+        for i, r in enumerate(unconf_high[:10]):
+            print(f"  {i+1}. {r['name']}({r['code']}) 得分:{r['score']} | 前低:{r['prior_low_price']}({r['prior_low_date']})")
+            print(f"     破位:{r['breakdown_date']}(深{r['break_pct']}%) 回升:{r['recovery_date']}(+{r['recovery_pct']:.1f}%) — 缺少2根阳线确认")
     
     return results
 

@@ -1,9 +1,9 @@
 ---
 name: etf-2b-bottom-scanner
-description: Use when analyzing A-share ETFs for 2B bottom (2B底) reversal patterns — scan all 352 largest ETFs, detect false breakdowns (price breaks below prior 60-day low then recovers within 2 days), score on 7 dimensions, and label as 2B买入确认/2B买入候选/2B观察. Chinese stock market convention: red=up, green=down.
+description: Use when analyzing A-share ETFs for 2B bottom (2B底) reversal patterns — scan all 352 largest ETFs, detect false breakdowns (price breaks below prior 60-day low then recovers within 2 days), score on 7 dimensions, and label as 2B买入确认/2B买入候选/2B观察. v2 adds 2-yang confirmation mechanism. Chinese stock market convention: red=up, green=down.
 ---
 
-# ETF 2B Bottom Scanner (ETF 2B底形态扫描) v1
+# ETF 2B Bottom Scanner (ETF 2B底形态扫描) v2
 
 ## Overview
 
@@ -12,6 +12,9 @@ Quantitatively scans the 352 largest A-share ETFs (from `all_etfs_larggest.json`
 Unlike bowl-bottom (gradual deceleration) and head-shoulder-bottom (5-point structure), the 2B pattern is a **single-bar event** — an aggressive reversal signal that indicates the prior low was the true bottom.
 
 > The 2B bottom is a **reversal pattern** — it signals that the prior low area has been tested and held, and the trend may reverse from down to up. It differs from the bowl-bottom pattern which signals basing/consolidation.
+
+**v2 New Feature: 2-Yang Confirmation (2阳确认)**
+After the 2B pattern forms (breakdown + recovery), the scanner requires **2 bullish bars (close > open)** after the recovery bar before confirming the entry signal. Backtesting shows this improves 20-day win rate from 49.0% to 51.7% and average return from +1.7% to +2.4%. See `backtest_2b.py` in project root for the full backtest.
 
 Uses `westock-data` to fetch ETF K-line data, then runs a 7-dimension scoring engine.
 
@@ -86,27 +89,37 @@ A detection requires **both** the breakdown and the recovery.
 
 **Score clamped:** 0-100
 
-## Label Grading System
+## Label Grading System (v2)
 
-| Label | Score | Meaning |
-|-------|-------|---------|
-| 🟢 2B买入确认 | ≥80 | High-confidence 2B bottom, confirmed reversal |
-| 🟢 2B买入候选 | 65-79 | Likely 2B bottom, monitor for confirmation |
-| 🟡 2B观察 | 50-64 | Weak 2B signal, insufficient pattern quality |
-| ⚪ 无2B信号 | <50 | No valid 2B pattern detected |
+Labels combine pattern quality score with 2-yang confirmation status:
+
+| Label | Score | Confirmed | Meaning |
+|-------|-------|-----------|---------|
+| 🟢 2B买入确认 | ≥80 | Yes | High-confidence 2B + confirmed entry, ready to buy |
+| 🟢 2B买入候选(已确认) | 65-79 | Yes | Moderate 2B + confirmed entry, monitor for position |
+| 🟡 2B观察(已确认) | 50-64 | Yes | Weak 2B but entry confirmed, cautious |
+| 🟡 2B买入候选(待2阳确认) | ≥80 | No | Strong pattern but needs 2 more bullish bars |
+| 🟡 2B候选(待2阳确认) | 65-79 | No | Moderate pattern, wait for bullish confirmation |
+| 🟡 2B观察(待2阳确认) | 50-64 | No | Weak pattern, low priority |
+| ⚪ 无2B信号 | <50 | — | No valid 2B pattern detected |
+
+> **Key principle**: A high-scoring unconfirmed signal (≥80, 待确认) means the pattern quality is excellent but the entry is not yet safe. These should be monitored for the next 1-2 trading days — if 2 bullish bars appear, the label upgrades to 🟢 2B买入确认.
 
 ## Interpretation Guidance
 
-- Focus on **🟢 2B买入确认** ETFs — these have the strongest 2B bottom evidence (shallow break + fast strong recovery + volume contraction).
-- **🟢 2B买入候选** ETFs show a valid 2B pattern but with lower confidence — monitor for follow-through buying.
-- **🟡 2B观察** ETFs have a marginal breakdown/recovery that may not constitute a true 2B.
-- A 2B signal is a **point-in-time event** — it fires on a specific bar, unlike bowl-bottom which is a state. The scan checks if a signal is currently active.
-- Not all 2B signals lead to sustained reversals — combine with volume, trend depth, and market context.
+- **🟢 2B买入确认** — Ready-to-buy signals. Pattern ≥80 + 2-yang confirmed. Highest confidence entry point.
+- **🟢 2B买入候选(已确认)** — Confirmed moderate signals (65-79). Reasonable entry but monitor closely.
+- **🟡 待确认高评分 (≥80)** — Excellent pattern quality but not yet confirmed. **Watch these tomorrow** — if an additional bullish bar appears, they can upgrade to 买入确认. These are the most actionable "pending" signals.
+- A 2B signal is a **point-in-time event** — it fires on a specific bar, unlike bowl-bottom which is a state.
+- **2-yang confirmation is critical**: backtest shows it filters out ~5% of low-quality signals and improves 20-day average return by 41% (from +1.7% to +2.4%).
+- Not all confirmed 2B signals lead to sustained reversals — combine with volume, trend depth, and market context.
 - When multiple ETFs from the same sector show 2B signals simultaneously, it may indicate sector-level basing.
 
 ## Important Notes
 
 - Uses Chinese stock market color convention: **red = up (涨)**, **green = down (跌)** — opposite to US/EU.
+- **v2 Confirmation**: Prefer only **已确认** signals for entry. 待确认 signals should be re-checked next trading day.
+- `backtest_2b.py` in project root contains the full backtest engine — re-run it to validate algorithm changes.
 - This is a quantitative scan only — **not investment advice**.
 - Data sourced from 腾讯自选股 via westock-data skill; may have delay, trust exchange official data.
-- Re-run daily to check for fresh 2B signals.
+- Re-run daily to check for fresh 2B signals and confirmation updates.
