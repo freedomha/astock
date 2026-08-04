@@ -325,7 +325,7 @@ def compute_forward_returns(closes, from_idx, periods):
 
 def main():
     # Load K-line data
-    kline_file = os.path.join(os.getcwd(), "etf_kline_data.json")
+    kline_file = os.path.join(os.getcwd(), "etf_kline_data_500.json")
     if not os.path.exists(kline_file):
         print(f"❌ 未找到K线数据文件: {kline_file}")
         sys.exit(1)
@@ -474,8 +474,40 @@ def main():
             print(f"    {i+1}. {r['code']} @{r['eval_date']} 买入{r['price']:.2f} "
                   f"→ 20日后 {r['fwd20d']:+.2f}%")
 
+    # ========== Quarterly breakdown ==========
+    print(f"\n{'='*80}")
+    print(f"📅 按季度分解 (确认碗底 + 碗底确认中)")
+    print(f"{'='*80}")
+
+    key_signals = [r for r in all_results if r["label"] in ["确认碗底", "碗底确认中"]]
+    from collections import defaultdict
+    quarterly = defaultdict(list)
+    for r in key_signals:
+        d = r["eval_date"]
+        q = d[:4] + "-Q" + str((int(d[5:7]) - 1) // 3 + 1)
+        quarterly[q].append(r)
+
+    for q in sorted(quarterly.keys()):
+        signals = quarterly[q]
+        n = len(signals)
+        f20 = [r["fwd20d"] for r in signals if r.get("fwd20d") is not None]
+        f60 = [r["fwd60d"] for r in signals if r.get("fwd60d") is not None]
+        f90 = [r["fwd90d"] for r in signals if r.get("fwd90d") is not None]
+        s20 = f"{sum(f20)/len(f20):+.1f}%({sum(1 for v in f20 if v>0)/len(f20)*100:.0f}%胜)" if f20 else "N/A"
+        s60 = f"{sum(f60)/len(f60):+.1f}%({sum(1 for v in f60 if v>0)/len(f60)*100:.0f}%胜)" if f60 else "N/A"
+        s90 = f"{sum(f90)/len(f90):+.1f}%({sum(1 for v in f90 if v>0)/len(f90)*100:.0f}%胜)" if f90 else "N/A"
+        print(f"  {q}: {n}次 | 20d={s20} | 60d={s60} | 90d={s90}")
+
+    # ========== Best-performing ETF bowl signals ==========
+    print(f"\n{'='*80}")
+    print(f"🏆 历史最佳碗底信号 Top 10 (按90日收益)")
+    print(f"{'='*80}")
+    ranked = sorted(key_signals, key=lambda x: -(x.get("fwd90d") or -9999))
+    for i, r in enumerate(ranked[:10]):
+        print(f"  {i+1}. {r['code']} @{r['eval_date']} {r['label']}(得分{r['score']}) → 20d:{r.get('fwd20d','?')}% 60d:{r.get('fwd60d','?')}% 90d:{r.get('fwd90d','?')}%")
+
     # Save results
-    output_file = os.path.join(os.getcwd(), "etf_bowl_backtest_results.json")
+    output_file = os.path.join(os.getcwd(), "etf_bowl_backtest_500_results.json")
     with open(output_file, "w") as f:
         json.dump({
             "config": {
