@@ -35,7 +35,10 @@ def run_westock(*args):
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
         if result.returncode != 0:
             return None
-        return json.loads(result.stdout)
+        data = json.loads(result.stdout)
+        if isinstance(data, dict) and data.get("success") is False:
+            return None
+        return data
     except Exception as e:
         print(f"  Error: {e}", file=sys.stderr)
         return None
@@ -356,11 +359,11 @@ def score_2b(records, breakdown_bar, recovery_bar, prior_low_price, prior_low_ba
         "recovery_bar": recovery_bar,
         "prior_low_price": round(prior_low_price, 2),
         "prior_low_bar": prior_low_bar,
-        "break_depth_pct": round(break_depth_pct, 2),
+        "break_pct": round(break_depth_pct, 2),
         "recovery_pct": round(recovery_pct, 2),
         "vol_ratio": round(vol_ratio, 2),
         "prior_decline": round(prior_decline, 1),
-        "lag": lag,
+        "lag_bars": lag,
         "d_ma60": round(d_ma60, 1),
         "d1": score_d1, "d2": score_d2, "d3": score_d3,
         "d4": score_d4, "d5": score_d5, "d6": score_d6, "d7": score_d7,
@@ -500,7 +503,7 @@ def main():
         print(f"\n{'排名':<4}{'ETF名称':<22}{'得分':<5}{'判定':<14}{'破位日':<12}{'回升日':<12}{'破深%':<7}{'回升%':<7}{'量比':<6}{'前跌%':<7}{'滞后':<4}")
         print("-" * 120)
         for i, r in enumerate(results[:top_n]):
-            print(f"{i+1:<4}{r['name']:<22}{r['score']:<5}{r['label']:<14}{r['breakdown_date']:<12}{r['recovery_date']:<12}{r['break_depth_pct']:<7}{r['recovery_pct']:<7}{r['vol_ratio']:<6.0%}{r['prior_decline']:<7}{r['lag']:<4}")
+            print(f"{i+1:<4}{r['name']:<22}{r['score']:<5}{r['label']:<14}{r['breakdown_date']:<12}{r['recovery_date']:<12}{r['break_pct']:<7}{r['recovery_pct']:<7}{r['vol_ratio']:<6.0%}{r['prior_decline']:<7}{r['lag_bars']:<4}")
     
     # Detailed for confirmed
     if confirmed:
@@ -510,8 +513,8 @@ def main():
         for i, r in enumerate(confirmed):
             print(f"\n{i+1}. {r['name']} — {r['label']} 得分:{r['score']}/100")
             print(f"   当前价: {r['current']} | 前低:{r['prior_low_price']} ({r['prior_low_date']})")
-            print(f"   破位: {r['breakdown_date']}(深{r['break_depth_pct']}%) | 回升: {r['recovery_date']}(+{r['recovery_pct']:.1f}%)")
-            print(f"   滞后: {r['lag']}天 | 前期跌幅: {r['prior_decline']}% | 量比: {r['vol_ratio']:.0%} | 距60MA: {r['d_ma60']:+.1f}%")
+            print(f"   破位: {r['breakdown_date']}(深{r['break_pct']}%) | 回升: {r['recovery_date']}(+{r['recovery_pct']:.1f}%)")
+            print(f"   滞后: {r['lag_bars']}天 | 前期跌幅: {r['prior_decline']}% | 量比: {r['vol_ratio']:.0%} | 距60MA: {r['d_ma60']:+.1f}%")
             print(f"   评分详情: D1(破深)={r['d1']} D2(回升)={r['d2']} D3(量)={r['d3']} D4(前低质)={r['d4']} D5(前跌)={r['d5']} D6(速度)={r['d6']} D7(60MA)={r['d7']} 惩罚={r['penalties']}")
             for reason in r["reasons"]:
                 print(f"     {reason}")
