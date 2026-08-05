@@ -149,15 +149,28 @@ def find_head_shoulder_pattern(lows, highs, closes, volumes):
         if v3_idx < n * 0.65:
             continue
         
-        # Shoulders should not be too far apart in price (within 20%)
+        # Shoulders should not be too far apart in price (within 15% — tighter for better symmetry)
         shoulder_max = max(v1_price, v3_price)
         shoulder_min = min(v1_price, v3_price)
-        if shoulder_max > 0 and (shoulder_max - shoulder_min) / shoulder_min > 0.20:
+        if shoulder_max > 0 and (shoulder_max - shoulder_min) / shoulder_min > 0.15:
             continue
         
         # Minimum time between shoulders and head (at least 10 bars)
         if v2_idx - v1_idx < 10 or v3_idx - v2_idx < 10:
             continue
+        
+        # Prior downtrend check: LS must form after a real decline, not in a sideways/up market.
+        # Head-shoulder-bottom is a REVERSAL pattern — compute quality metrics for scoring.
+        early_start = max(0, v1_idx - 40)
+        early_prices = closes[early_start:v1_idx] if v1_idx > early_start else closes[:1]
+        early_high = max(early_prices) if early_prices else v1_price
+        prior_decline = (early_high - v1_price) / early_high * 100 if early_high > 0 else 0
+        
+        # LS position in 120-day range (was it near the bottom of a real decline?)
+        ls_n120 = min(120, v1_idx + 1)
+        ls_hi = max(closes[max(0, v1_idx - ls_n120 + 1):v1_idx + 1])
+        ls_lo = min(closes[max(0, v1_idx - ls_n120 + 1):v1_idx + 1])
+        ls_pos = (v1_price - ls_lo) / (ls_hi - ls_lo) * 100 if ls_hi > ls_lo else 50
         
         # Find peaks between valleys for neckline
         peak1_idx, peak1_price = None, float('-inf')
@@ -177,8 +190,8 @@ def find_head_shoulder_pattern(lows, highs, closes, volumes):
         # Neckline slope (%)
         neck_slope = (peak2_price - peak1_price) / peak1_price * 100 if peak1_price > 0 else 0
         
-        # Hard filter: neckline must be roughly horizontal (±8% max, per SKILL.md "steep slope = invalid")
-        if abs(neck_slope) > 8:
+        # Hard filter: neckline must be roughly horizontal (±7% max — tightened from v1)
+        if abs(neck_slope) > 7:
             continue
         
         # Volume analysis
@@ -227,6 +240,8 @@ def find_head_shoulder_pattern(lows, highs, closes, volumes):
             "shoulder_sym": round(shoulder_sym, 2),
             "rs_rising": rs_rising,
             "rs_to_neck_pct": round(rs_to_neck_pct, 2),
+            "prior_decline": round(prior_decline, 1),
+            "ls_pos": round(ls_pos, 0),
         })
     
     if not candidates:
@@ -302,30 +317,30 @@ def score_pattern(p, closes, lows, highs):
     else:
         reasons.append(f"❌ 肩部不对称({ss:.0%})")
     
-    # ---- 4. Neckline flatness (max 10) ----
+    # ---- 4. Neckline flatness (max 12, increased) ----
     ns = abs(p.get("neck_slope", 99))
     if ns <= 3:
-        score += 10
+        score += 12
         reasons.append(f"✅ 颈线平坦(斜率{ns:+.1f}%)")
     elif ns <= 5:
-        score += 7
+        score += 9
         reasons.append(f"✅ 颈线较平(斜率{ns:+.1f}%)")
-    elif ns <= 8:
-        score += 4
+    elif ns <= 7:
+        score += 5
         reasons.append(f"🟡 颈线倾斜(斜率{ns:+.1f}%)")
     else:
         reasons.append(f"❌ 颈线陡峭(斜率{ns:+.1f}%)")
     
-    # ---- 5. Volume contraction LS→RS (max 10) ----
+    # ---- 5. Volume contraction LS→RS (max 8) ----
     vr = p.get("vol_rs_ls", 1.0)
     if vr < 0.70:
-        score += 10
+        score += 8
         reasons.append(f"✅ 量度萎缩({vr:.0%})")
     elif vr < 0.85:
-        score += 7
+        score += 5
         reasons.append(f"✅ 量度缩({vr:.0%})")
     elif vr < 1.0:
-        score += 4
+        score += 3
         reasons.append(f"🟡 量度平稳({vr:.0%})")
     else:
         reasons.append(f"❌ 量度放大({vr:.0%})")
@@ -343,7 +358,15 @@ def score_pattern(p, closes, lows, highs):
         score += 5
         reasons.append(f"🟡 中低位({pos120*100:.0f}%)")
     else:
-        reasons.append(f"❌ 中高位({pos120*100:.0f}%)")
+        # High range position = weaker reversal signal, apply penalty
+        if pos120 > 0.80:
+            score -= 5
+            reasons.append(f"⚠️ 高位风险({pos120*100:.0f}%)")
+        elif pos120 > 0.70:
+            score -= 3
+            reasons.append(f"⚠️ 偏高位({pos120*100:.0f}%)")
+        else:
+            reasons.append(f"❌ 中高位({pos120*100:.0f}%)")
     
     # ---- 7. Time symmetry (max 8) ----
     ts = p.get("time_sym", 0)
@@ -371,9 +394,34 @@ def score_pattern(p, closes, lows, highs):
         reasons.append(f"❌ 右肩远离颈线({rtn:.1f}%)")
     
     # ---- Penalties ----
+    # Prior decline insufficient (LS didn't form after real downtrend)
+    pd = p.get("prior_decline", 99)
+    if pd < 3:
+        score -= 15
+        reasons.append(f"⚠️ 前置跌幅不足({pd:.0f}%): 非真正下跌后反转")
+    elif pd < 5:
+        score -= 10
+        reasons.append(f"⚠️ 前置跌幅偏弱({pd:.0f}%)")
+    elif pd < 8:
+        score -= 5
+        reasons.append(f"⚠️ 前置跌幅一般({pd:.0f}%)")
+    else:
+        reasons.append(f"✅ 前置跌幅充分({pd:.0f}%)")
+    
+    # LS formed too high in range (in an uptrend, not after a real decline)
+    lp = p.get("ls_pos", 50)
+    if lp > 75:
+        score -= 10
+        reasons.append(f"⚠️ 左肩高位({lp:.0f}%): 形态处于上涨区间")
+    elif lp > 60:
+        score -= 5
+        reasons.append(f"⚠️ 左肩偏高({lp:.0f}%)")
+    elif lp <= 35:
+        reasons.append(f"✅ 左肩低位({lp:.0f}%)")
+    
     # Recent crash
     t20 = lin_slope(closes[-20:], 20) if n >= 20 else 0
-    if t20 < -15:
+    if t20 < -12:
         score -= 20
         reasons.append(f"⚠️ 近20日暴跌({t20:+.1f}%)")
     elif t20 < -8:
@@ -519,21 +567,33 @@ def analyze_hs_bottom(code, name, etype, kline_data):
     rtn = pattern.get("rs_to_neck_pct", 99)
     rs_rising = pattern.get("rs_rising", False)
     
-    if score >= 70 and rtn <= 5:
+    if score >= 72 and rtn <= 8:
         base["label"] = "🟢 头肩底确认"
-    elif score >= 55 and rtn <= 15:
+    elif score >= 52 and rtn <= 12:
         base["label"] = "🟢 头肩底形成中"
     elif score >= 40:
         base["label"] = "🟡 头肩底候选"
     else:
         base["label"] = "⚪ 非头肩底"
-    
+
     return base
+
+
+def label_pattern(score, rs_to_neck_pct):
+    """Standalone label function — callable from backtest.py and other tools."""
+    if score >= 72 and rs_to_neck_pct <= 8:
+        return "🟢 头肩底确认"
+    elif score >= 52 and rs_to_neck_pct <= 12:
+        return "🟢 头肩底形成中"
+    elif score >= 40:
+        return "🟡 头肩底候选"
+    else:
+        return "⚪ 非头肩底"
 
 
 def main():
     print("=" * 60)
-    print("A股ETF头肩底形态分析 (v1)")
+    print("A股ETF头肩底形态分析 (v2)")
     print("=" * 60)
     
     # Step 1: Load ETFs
