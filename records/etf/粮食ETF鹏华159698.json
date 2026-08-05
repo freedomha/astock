@@ -1,0 +1,169 @@
+{
+  "name": "粮食ETF鹏华",
+  "code": "sz159698",
+  "exchange": "深圳主板",
+  "tracking_index": "国证粮食产业指数（399365）",
+  "fund_manager": "鹏华基金",
+  "inception_date": "2023-07-26",
+  "created": "2026-08-05",
+  "data_source": "腾讯自选股(westock-data) K-line + 新浪财经/东方财富",
+  "position": {
+    "entry_date": "2026-08-05",
+    "entry_price": 0.8592,
+    "shares": 2300,
+    "entry_cost": 1976.16,
+    "current_price": 0.875,
+    "current_value": 2012.50,
+    "pnl": 36.34,
+    "pnl_pct": 1.84
+  },
+  "market_data": {
+    "price": 0.875,
+    "day_change_pct": 0.57,
+    "amount_daily": 44150000,
+    "fund_size": 839000000,
+    "nav": 0.8586,
+    "discount_pct": 1.91,
+    "high_250d": 1.24,
+    "low_250d": 0.81,
+    "range_250d_pct": 53.09,
+    "chg_5d": 2.94,
+    "chg_10d": 5.42,
+    "chg_20d": 5.42,
+    "chg_60d": -18.22,
+    "chg_120d": -19.72,
+    "consecutive_up_days": 6,
+    "tracking_index_pe": 23.51,
+    "pe_range_note": "处于近一年20%-80%历史分位，估值正常"
+  },
+  "technical_analysis": {
+    "pos_250d": 15.1,
+    "pos_120d": 15.1,
+    "drawdown_250d_pct": -29.4,
+    "zone": "底部区域（250日位置15.1%）",
+    "ma20": 0.8438,
+    "ma60": 0.8971,
+    "ma120": 1.001,
+    "vs_ma20_pct": 3.7,
+    "vs_ma60_pct": -2.5,
+    "decel_ratio": 0.89,
+    "decel_note": "下跌减速中（<1），但未完全企稳",
+    "vol_contraction_20d_60d": 0.97,
+    "vol_note": "量能未明显收缩，不满足缩量筑底条件",
+    "atr_compression": 1.01,
+    "atr_note": "波动率未压缩",
+    "quadratic_fit_a": -1.4e-05,
+    "bowl_shape": "非经典碗底形态（二次拟合a<0，接近直线下跌后反弹）",
+    "higher_low_pct": 0.0,
+    "higher_low_note": "近10日低与前期持平，尚未形成Higher-Low",
+    "recent_low": 0.81,
+    "trend_20d": "企稳反弹",
+    "trend_60d": "仍在下跌",
+    "pattern_summary": "深跌后的低位反弹，站上MA20但受MA60压制。非碗底，属于V型反弹后的左侧区域"
+  },
+  "fund_info": {
+    "management_fee": 0.005,
+    "custody_fee": 0.001,
+    "top_holdings": [
+      {"name": "隆平高科", "weight_pct": 7.90},
+      {"name": "北大荒", "weight_pct": 6.67},
+      {"name": "诺普信", "weight_pct": 5.25},
+      {"name": "亚盛集团", "weight_pct": 4.00},
+      {"name": "兴发集团", "weight_pct": 3.96}
+    ],
+    "top5_weight_sum": 27.78
+  },
+  "operation_plan": {
+    "add_position": {
+      "strategy_a": {
+        "name": "回踩MA20加仓（推荐）",
+        "trigger": "0.84-0.85",
+        "size": "当前仓位×1",
+        "note": "等连续上涨后的正常回调，回踩MA20(0.844)附近加仓，不追高"
+      },
+      "strategy_b": {
+        "name": "区间分批加仓",
+        "trigger": "0.81-0.85 分2-3次",
+        "size": "当前仓位×1.5",
+        "note": "仓位较轻时的网格建仓方式，0.85一笔、0.83一笔、0.81一笔"
+      },
+      "strategy_c": {
+        "name": "突破MA60加仓",
+        "trigger": "放量突破0.90（MA60附近）",
+        "size": "当前仓位×0.5",
+        "note": "重新站上MA60确认中期趋势反转，确定性更高但成本略高"
+      }
+    },
+    "stop_loss": {
+      "hard_stop": {
+        "level": 0.81,
+        "loss_pct": -5.7,
+        "loss_amount": -113.16,
+        "action": "无条件清仓",
+        "note": "破250日最低0.81，底部结构完全失效"
+      },
+      "trend_stop": {
+        "level": 0.83,
+        "loss_pct": -3.4,
+        "loss_amount": -67.16,
+        "action": "减半仓（留半仓观察）",
+        "note": "跌破MA20(0.844)确认反弹结束"
+      },
+      "trailing_stop": {
+        "level": "买入价下方3% = 0.833",
+        "loss_pct": -3.0,
+        "loss_amount": -59.28,
+        "action": "清仓",
+        "note": "本金保护型止损，数学上严格但可能被正常波动扫出"
+      }
+    },
+    "take_profit": {
+      "target_1": {
+        "level": 0.90,
+        "gain_pct": 4.7,
+        "gain_amount": 93.84,
+        "note": "MA60阻力位，可减1/3锁定利润",
+        "action": "减1/3仓位"
+      },
+      "target_2": {
+        "level": 1.00,
+        "gain_pct": 16.4,
+        "gain_amount": 323.84,
+        "note": "MA120附近／心理整数关口",
+        "action": "再减1/3，移损至0.90"
+      },
+      "target_3": {
+        "level": 1.10,
+        "gain_pct": 28.0,
+        "gain_amount": 553.84,
+        "note": "前期密集成交区上沿",
+        "action": "剩余仓位清仓"
+      }
+    },
+    "key_levels": {
+      "resistance": [0.90, 1.00, 1.10, 1.24],
+      "current_price": 0.875,
+      "support_add": [0.85, 0.84, 0.81],
+      "ma20": 0.844,
+      "ma60": 0.897,
+      "stop_trend": 0.83,
+      "stop_hard": 0.81,
+      "highest_250d": 1.24,
+      "lowest_250d": 0.81
+    }
+  },
+  "risk": {
+    "main_risk": "V型反弹后出现回调概率大（连续6阳涨5.4%）；60日趋势仍为下跌（-18.2%），未确认反转",
+    "technical_risk": "非碗底形态，反弹基础不牢固；价格仍受MA60（0.897）压制",
+    "valuation_risk": "PE 23.51x处于正常区间但非低估，安全边际有限",
+    "liquidity_risk": "中高（基金规模仅8.39亿，日成交约4500万，大单可能滑点）",
+    "sector_risk": "粮食/农业板块受季节性、天气、政策补贴影响大；资金当前净流出",
+    "key_monitor": [
+      "能否放量突破MA60（0.90）",
+      "MA20（0.844）是否形成有效支撑",
+      "国证粮食产业指数PE变化",
+      "资金流向是否转正",
+      "主要重仓股（隆平高科/北大荒）季报业绩"
+    ]
+  }
+}

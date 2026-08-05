@@ -1,0 +1,127 @@
+{
+  "name": "黄金ETF华安",
+  "code": "sh518880",
+  "exchange": "上海主板",
+  "tracking_index": "黄金9999 (AU9999.SGE)",
+  "fund_manager": "华安基金",
+  "created": "2026-08-05",
+  "data_source": "腾讯自选股(westock-data) + 公开市场信息",
+  "position": {
+    "entry_date": "2026-08-05",
+    "entry_price": 8.637,
+    "shares": 300,
+    "entry_cost": 2591.10,
+    "current_price": 8.64,
+    "current_value": 2592.00,
+    "pnl": 0.90,
+    "pnl_pct": 0.03
+  },
+  "market_data": {
+    "price": 8.64,
+    "prev_close": 8.408,
+    "day_change": 0.232,
+    "day_change_pct": 2.76,
+    "open": 8.459,
+    "high": 8.644,
+    "low": 8.442,
+    "volume": 7474522,
+    "amount": 6399150042,
+    "turnover_rate": 6.79,
+    "volume_ratio": 2.43,
+    "high_52w": 11.977,
+    "low_52w": 7.35,
+    "chg_5d": 2.96,
+    "chg_10d": 0.93,
+    "chg_20d": 0.59,
+    "chg_60d": -11.89,
+    "chg_ytd": -7.11,
+    "nav": 8.4167,
+    "discount_pct": 2.65,
+    "fund_size": 92662000000,
+    "total_market_cap": 95121000000
+  },
+  "fund_flow": {
+    "consecutive_inflow_days": 15,
+    "total_inflow": 5146000000,
+    "inflow_5d": 1526000000,
+    "inflow_10d": 4700000000,
+    "trend": "持续净申购"
+  },
+  "position_analysis": {
+    "pos_52w": 27.9,
+    "zone": "底部区域",
+    "trend_60d": "下跌中",
+    "trend_20d": "企稳",
+    "shape": "磨底中",
+    "international_gold_price": 4084,
+    "gold_ath": 5598.75,
+    "gold_drawdown_pct": 27.0
+  },
+  "operation_plan": {
+    "add_position": {
+      "strategy_a": {
+        "name": "回踩加仓",
+        "trigger": "8.2-8.3",
+        "size": "当前仓位×1",
+        "note": "已有底仓，等回调"
+      },
+      "strategy_b": {
+        "name": "区间加仓",
+        "trigger": "8.0-8.3",
+        "size": "分2-3次",
+        "note": "仓位较轻，网格思维"
+      },
+      "strategy_c": {
+        "name": "突破确认加仓",
+        "trigger": "放量突破8.8→9.0",
+        "size": "当前仓位×0.5",
+        "note": "右侧确认，确定性高"
+      }
+    },
+    "stop_loss": {
+      "hard_stop": {
+        "level": 7.35,
+        "loss_pct": -14.9,
+        "action": "无条件清仓",
+        "note": "52周低，破位意味着底部失效"
+      },
+      "trend_stop": {
+        "level": 7.60,
+        "loss_pct": -12.0,
+        "action": "清仓",
+        "note": "破近期平台下沿"
+      },
+      "trailing_stop": {
+        "level": "成本价下方3-5%",
+        "loss_pct": -3.0,
+        "action": "减半仓",
+        "note": "保本第一"
+      }
+    },
+    "take_profit": {
+      "target_1": {
+        "level": 9.50,
+        "gain_pct": 10.0,
+        "action": "减1/3仓位"
+      },
+      "target_2": {
+        "level": 10.25,
+        "gain_pct": 18.7,
+        "action": "再减1/3，移损至9.5"
+      }
+    },
+    "key_levels": {
+      "resistance": [9.0, 9.5, 10.0],
+      "current_price": 8.64,
+      "support_add": [8.3, 8.2, 8.0],
+      "stop_trend": 7.60,
+      "stop_hard": 7.35
+    }
+  },
+  "risk": {
+    "main_risk": "美联储政策不确定性，若通胀回升导致加息预期重现，金价可能继续承压",
+    "premium_risk": "当前溢价2.65%，可接受；＞5%需警惕",
+    "liquidity_risk": "低（规模926亿，日成交20亿+）",
+    "key_monitor": ["FOMC会议纪要", "CPI/PCE数据", "美元指数", "资金流向"]
+  }
+}
