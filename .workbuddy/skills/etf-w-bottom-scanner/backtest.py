@@ -9,8 +9,6 @@ A股ETF W底形态回测 (v1)
 
 import json
 import os
-import sys
-from datetime import datetime
 
 
 def lin_slope(arr, win):
