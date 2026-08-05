@@ -289,7 +289,7 @@ def detect_w_bottom(records):
 
     # Phase 3: Peak (from left trough to T-12, index up to 108)
     pk_idx, pk_val = None, float('-inf')
-    for i in range(max(lt_idx or 96, 96), 109):
+    for i in range(lt_idx + 1, 109):
         if closes[i] > pk_val:
             pk_val = closes[i]
             pk_idx = i

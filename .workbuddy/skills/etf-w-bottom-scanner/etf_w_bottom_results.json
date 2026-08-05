@@ -332,6 +332,35 @@
     ]
   },
   {
+    "code": "sh517800",
+    "name": "人工智能50ETF方正富邦",
+    "type": "ETF",
+    "score": 47,
+    "label": "W底形成中",
+    "status": "形成中",
+    "current": 1.033,
+    "left_trough": 0.98,
+    "right_trough": 1.05,
+    "peak": 1.06,
+    "recovery_pct": 8.2,
+    "trough_diff_pct": 7.1,
+    "vol_ratio": 1.1,
+    "rt_elevation_pct": 7.1,
+    "prior_decline_pct": 28.6,
+    "lt_date": "2025-11-21",
+    "pk_date": "2025-12-09",
+    "rt_date": "2025-12-31",
+    "reasons": [
+      "双底基本对称(差7.1%)+5",
+      "反弹偏弱(8.2%)+3",
+      "右底抬高7.1%+15",
+      "量能略增(VR=1.10)+2",
+      "前期深跌(28.6%)+10",
+      "时间对称(12d/16d)+5",
+      "右底V形反弹+4"
+    ]
+  },
+  {
     "code": "sh515920",
     "name": "智能消费ETF博时",
     "type": "ETF",
@@ -420,35 +449,6 @@
       "时间不对称(27d/10d)+1",
       "温和下跌+2",
       "右底反弹+3"
-    ]
-  },
-  {
-    "code": "sh517800",
-    "name": "人工智能50ETF方正富邦",
-    "type": "ETF",
-    "score": 42,
-    "label": "W底候选",
-    "status": "形成中",
-    "current": 1.033,
-    "left_trough": 0.98,
-    "right_trough": 1.05,
-    "peak": 1.06,
-    "recovery_pct": 8.2,
-    "trough_diff_pct": 7.1,
-    "vol_ratio": 1.1,
-    "rt_elevation_pct": 7.1,
-    "prior_decline_pct": 28.6,
-    "lt_date": "2025-11-21",
-    "pk_date": "2025-12-30",
-    "rt_date": "2025-12-31",
-    "reasons": [
-      "双底基本对称(差7.1%)+5",
-      "反弹偏弱(8.2%)+3",
-      "右底抬高7.1%+15",
-      "量能略增(VR=1.10)+2",
-      "前期深跌(28.6%)+10",
-      "时间不对称(27d/1d)+1",
-      "右底V形反弹+4"
     ]
   }
 ]
