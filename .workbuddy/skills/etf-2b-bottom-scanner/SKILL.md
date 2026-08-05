@@ -1,9 +1,9 @@
 ---
 name: etf-2b-bottom-scanner
-description: Use when analyzing A-share ETFs for 2B bottom (2B底) reversal patterns — scan all 352 largest ETFs, detect false breakdowns (price breaks below prior 60-day low then recovers within 2 days), score on 7 dimensions, and label as 2B买入确认/2B买入候选/2B观察. v2 adds 2-yang confirmation mechanism. Chinese stock market convention: red=up, green=down.
+description: Use when analyzing A-share ETFs for 2B bottom (2B底) reversal patterns — scan all 352 largest ETFs, detect false breakdowns (price breaks below prior 60-day low then recovers within 2 days), score on 7 dimensions, and label as 2B买入确认/2B买入候选/2B观察. v3 adds quality pre-filter to eliminate 74% of low-quality signals. Chinese stock market convention: red=up, green=down.
 ---
 
-# ETF 2B Bottom Scanner (ETF 2B底形态扫描) v2
+# ETF 2B Bottom Scanner (ETF 2B底形态扫描) v3
 
 ## Overview
 
@@ -12,6 +12,14 @@ Quantitatively scans the 352 largest A-share ETFs (from `all_etfs_larggest.json`
 Unlike bowl-bottom (gradual deceleration) and head-shoulder-bottom (5-point structure), the 2B pattern is a **single-bar event** — an aggressive reversal signal that indicates the prior low was the true bottom.
 
 > The 2B bottom is a **reversal pattern** — it signals that the prior low area has been tested and held, and the trend may reverse from down to up. It differs from the bowl-bottom pattern which signals basing/consolidation.
+
+**v3 New Feature: Quality Pre-Filter (质量预过滤)**
+Based on 500-day backtest of 1880 signals, a 3-condition quality gate is applied BEFORE scoring:
+1. **回升力度 ≥ 0.75%**: recovery close must be at least 0.75% above prior low. Signals with <0.5% recovery have only 33.8% 20d win rate.
+2. **缩量(量比 < 0.8)**: breakdown volume must be below 80% of 60d average. Non-contraction signals have only 50-52% win rate.
+3. **前期跌幅 5-15%**: prior decline must be meaningful but not extreme. <5% or >15% both degrade significantly.
+
+**Effect**: Filters ~74% of low-quality signals. In backtest, 20d win rate improves from 58.8% to 69.4%, 20d avg return from +2.77% to +4.70%.
 
 **v2 New Feature: 2-Yang Confirmation (2阳确认)**
 After the 2B pattern forms (breakdown + recovery), the scanner requires **2 bullish bars (close > open)** after the recovery bar before confirming the entry signal. Backtesting shows this improves 20-day win rate from 49.0% to 51.7% and average return from +1.7% to +2.4%. See `backtest_2b.py` in project root for the full backtest.

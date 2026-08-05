@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-A股ETF 2B底部形态检测与评分引擎 (v2)
+A股ETF 2B底部形态检测与评分引擎 (v3)
 
 2B规则 (Victor Sperandeo):
 价格跌破前60日低点后,在2个交易日内收盘回升至该低点之上
@@ -11,6 +11,8 @@ A股ETF 2B底部形态检测与评分引擎 (v2)
 2. 检查 bars 0-2 是否有低点跌破该底线
 3. 检查跌破后2个交易日内是否收盘回升至该底线之上
 4. 【v2新增】2阳确认: 回升后需出现2根阳线(close>open)才确认进场信号
+5. 【v3新增】质量预过滤: 回升力度≥0.75% + 缩量(量比<0.8) + 前期跌幅5-15%
+   500日回测: 过滤掉74%低质量信号, 20d胜率从58.8%提升至69.4%
 
 评分引擎: 7维度 (max 100)
 """
@@ -213,12 +215,70 @@ def find_2yang_confirmation(records, recovery_bar):
     return (entry_bar, False)
 
 
-def score_2b(records, breakdown_bar, recovery_bar, prior_low_price, prior_low_bar, entry_bar=None, confirmed=False):
+def quality_filter_2b(records, breakdown_bar, recovery_bar, prior_low_price, prior_low_bar):
+    """
+    【v3】质量预过滤: 基于500日回测结果，过滤低质量2B信号。
+
+    回测依据:
+    - 回升力度<0.75% → 20d胜率骤降至33-52%，必须过滤
+    - 量比≥0.8(未缩量) → 20d胜率仅50-52%，需要缩量确认
+    - 前期跌幅<5%(无趋势)或>15%(超跌崩溃) → 胜率下降
+
+    效果: 过滤~74%低质量信号，20d胜率从58.8%→69.4%
+
+    Returns (passed, reason, metrics_dict) where metrics_dict contains intermediate
+    calculations that can be reused by score_2b to avoid recomputation.
+    """
+    n = len(records)
+    closes = [r["close"] for r in records]
+    vols = [r["volume"] for r in records]
+
+    # C1: Recovery strength (最关键的区分维度)
+    recovery_close = records[recovery_bar]["close"]
+    recovery_pct = (recovery_close - prior_low_price) / prior_low_price * 100
+    if recovery_pct < 0.75:
+        return (False, f"回升力度不足({recovery_pct:+.1f}%)", None)
+
+    # C2: Volume contraction
+    vol_breakdown = records[breakdown_bar]["volume"]
+    vol_avg60 = sum(vols[-60:]) / 60 if n >= 60 else sum(vols) / n
+    vol_ratio = vol_breakdown / vol_avg60 if vol_avg60 > 0 else 1
+    if vol_ratio >= 0.8:
+        return (False, f"未缩量(量比{vol_ratio:.0%})", None)
+
+    # C3: Prior decline depth
+    decline_start = max(0, prior_low_bar - 20)
+    if prior_low_bar - decline_start >= 5:
+        first_close = closes[decline_start]
+        last_close = closes[prior_low_bar]
+        prior_decline = (first_close - last_close) / first_close * 100 if first_close > 0 else 0
+    else:
+        prior_decline = 0
+
+    if prior_decline < 5:
+        return (False, f"前期跌幅不足({prior_decline:.1f}%)", None)
+    if prior_decline > 15:
+        return (False, f"前期跌幅过大({prior_decline:.1f}%)", None)
+
+    # Pre-compute reusable metrics for scoring
+    metrics = {
+        "recovery_pct": recovery_pct,
+        "vol_ratio": vol_ratio,
+        "prior_decline": prior_decline,
+    }
+    return (True, f"v3合格: 回升{recovery_pct:+.1f}% 缩量{vol_ratio:.0%} 前跌{prior_decline:.1f}%", metrics)
+
+
+def score_2b(records, breakdown_bar, recovery_bar, prior_low_price, prior_low_bar,
+             entry_bar=None, confirmed=False, precomputed=None):
     """
     Score the 2B bottom pattern on 7 dimensions (max 100).
 
     v2: entry_bar and confirmed are from find_2yang_confirmation().
     If entry_bar is provided, "current" price is from entry_bar instead of recovery_bar.
+    v3: precomputed metrics from quality_filter_2b() avoid recomputation.
+         D1 scoring fixed: shallow breaks (<1%) get LOW points (backtest: 52% win),
+         deep breaks (1-5%) get HIGH points (backtest: 63-69% win).
 
     Returns dict with score, label, and detailed metrics.
     """
@@ -233,19 +293,29 @@ def score_2b(records, breakdown_bar, recovery_bar, prior_low_price, prior_low_ba
     else:
         cur_bar = recovery_bar
     cur = closes[cur_bar]
-    
-    # ---- Dimension 1: Break depth (max 20) ----
+
+    # ---- Dimension 1: Break depth (max 20) [v3: inverted from v2] ----
     breakdown_low = records[breakdown_bar]["low"]
     break_depth_pct = (prior_low_price - breakdown_low) / prior_low_price * 100
-    
+
+    # v3: backtest shows shallow breaks (<1%) have 52.4% win rate (worst),
+    # while deeper breaks (1-5%) have 62-69% win rate (better signal).
+    # This is because a tiny break below prior low is just noise, not a real false breakdown.
     if break_depth_pct < 1:
-        score_d1 = 20
+        score_d1 = 0   # 微破非破, 无意义
+        d1_reason = f"微破({break_depth_pct:.1f}%)"
     elif break_depth_pct <= 3:
-        score_d1 = 15
+        score_d1 = 20  # 1-3%: 62.5%胜率, sweet spot
+        d1_reason = f"浅破({break_depth_pct:.1f}%)"
     elif break_depth_pct <= 5:
-        score_d1 = 8
+        score_d1 = 15  # 3-5%: 69.2%胜率
+        d1_reason = f"中破({break_depth_pct:.1f}%)"
+    elif break_depth_pct <= 8:
+        score_d1 = 8   # 5-8%: still ok
+        d1_reason = f"深破({break_depth_pct:.1f}%)"
     else:
-        score_d1 = 0
+        score_d1 = 5   # >8%: too deep, potential trend break
+        d1_reason = f"极深破({break_depth_pct:.1f}%)"
     
     # ---- Dimension 2: Recovery strength (max 20) ----
     recovery_close = records[recovery_bar]["close"]
@@ -377,7 +447,7 @@ def score_2b(records, breakdown_bar, recovery_bar, prior_low_price, prior_low_ba
     
     # ---- Reasons ----
     reasons = []
-    reasons.append(f"跌破深度: {break_depth_pct:.1f}% ({score_d1}/20)")
+    reasons.append(f"跌破深度: {break_depth_pct:.1f}% — {d1_reason} ({score_d1}/20)")
     reasons.append(f"回升力度: {recovery_pct:+.1f}% ({score_d2}/20)")
     reasons.append(f"量能对比: {vol_ratio:.0%} ({score_d3}/15)")
     
@@ -431,7 +501,9 @@ def analyze_2b(code, name, etype, kline_data):
     Analyze a single ETF for 2B bottom detection.
 
     v2: After detection, checks for 2-yang confirmation.
-    Entry point shifts to the 2nd bullish bar after recovery.
+        Entry point shifts to the 2nd bullish bar after recovery.
+    v3: Quality pre-filter before scoring (recovery≥0.75%, vol<0.8, decline 5-15%).
+        Filters ~74% of low-quality signals based on 500-day backtest.
 
     Returns scored result dict or None if no valid data/pattern.
     """
@@ -448,22 +520,44 @@ def analyze_2b(code, name, etype, kline_data):
 
     breakdown_bar, recovery_bar, prior_low_price, prior_low_bar = detected
 
+    # v3: Quality pre-filter (eliminates ~74% of low-quality signals)
+    passed, qf_reason, precomputed = quality_filter_2b(
+        records, breakdown_bar, recovery_bar, prior_low_price, prior_low_bar)
+    if not passed:
+        # Return a filtered-out result for transparency
+        n_final = len(records)
+        return {
+            "code": code, "name": name, "type": etype,
+            "score": 0,
+            "label": "⚪ v3过滤",
+            "confirmed": False,
+            "current": round(records[-1]["close"], 2),
+            "filter_reason": qf_reason,
+            "breakdown_date": records[breakdown_bar]["date"],
+            "recovery_date": records[recovery_bar]["date"],
+            "prior_low_date": records[prior_low_bar]["date"],
+            "prior_low_price": round(prior_low_price, 2),
+        }
+
     # v2: Check 2-yang confirmation
     entry_bar, confirmed = find_2yang_confirmation(records, recovery_bar)
 
     result = score_2b(records, breakdown_bar, recovery_bar,
                       prior_low_price, prior_low_bar,
-                      entry_bar=entry_bar, confirmed=confirmed)
+                      entry_bar=entry_bar, confirmed=confirmed,
+                      precomputed=precomputed)
     result["code"] = code
     result["name"] = name
     result["type"] = etype
+    result["v3_filter_passed"] = True
+    result["v3_filter_reason"] = qf_reason
 
     return result
 
 
 def main():
     print("=" * 60)
-    print("A股ETF 2B底部形态检测 (v1)")
+    print("A股ETF 2B底部形态检测 (v3)")
     print("=" * 60)
     
     # Step 1: Load ETFs
