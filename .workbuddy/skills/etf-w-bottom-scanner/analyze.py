@@ -3,7 +3,7 @@
 A股ETF W底形态分析 (v1)
 
 W底判定逻辑 (5阶段流水线):
-Phase 1: 前期下跌 — T-120到T-40，40日斜率≤-0.5%/日
+Phase 1: 前期下跌 — T-120到T-40，40日斜率≤-0.005%/日
 Phase 2-3: 左底→峰顶 — 左底到峰顶反弹≥8%
 Phase 4: 右底验证 — 右底在±10%内，量能≤1.2x
 Phase 5: 突破状态 — 2/3日收于峰顶之上=确认
@@ -355,12 +355,14 @@ def analyze_w_bottom(code, name, etype, kline_data):
         return None
     records.sort(key=lambda x: x["date"])
 
-    detection = detect_w_bottom(records)
+    # Use most recent 120 days for pattern detection
+    window = records[-120:]
+    detection = detect_w_bottom(window)
     if detection is None:
         return None
 
-    closes = [r["close"] for r in records]
-    volumes = [r["volume"] for r in records]
+    closes = [r["close"] for r in window]
+    volumes = [r["volume"] for r in window]
     score, label, reasons = score_w_bottom(
         closes, volumes,
         detection["lt_idx"], detection["lt_val"],
@@ -391,9 +393,9 @@ def analyze_w_bottom(code, name, etype, kline_data):
         "vol_ratio": round(detection["vratio"], 2),
         "rt_elevation_pct": round(rt_ele, 1),
         "prior_decline_pct": round(decline_pct, 1),
-        "lt_date": records[detection["lt_idx"]]["date"],
-        "pk_date": records[detection["pk_idx"]]["date"],
-        "rt_date": records[detection["rt_idx"]]["date"],
+        "lt_date": window[detection["lt_idx"]]["date"],
+        "pk_date": window[detection["pk_idx"]]["date"],
+        "rt_date": window[detection["rt_idx"]]["date"],
         "reasons": reasons,
     }
 
