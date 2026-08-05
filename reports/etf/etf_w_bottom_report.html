@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A&#32929;ETF W&#24213;&#24418;&#24577;&#20998;&#26512;&#25253;&#21578; &#183; 2026-08-05</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif; background:#f5f6fa; color:#2c3e50; line-height:1.6; }
+.container { max-width:1280px; margin:0 auto; padding:20px; }
+.header { background:linear-gradient(135deg,#1a3a5c 0%,#0d4d6e 50%,#0a2a44 100%); color:#fff; padding:36px 30px; border-radius:12px; margin-bottom:24px; box-shadow:0 4px 20px rgba(0,0,0,0.15); }
+.header h1 { font-size:26px; margin-bottom:8px; }
+.header .subtitle { opacity:0.85; font-size:14px; }
+.header .meta { margin-top:14px; display:flex; gap:24px; font-size:13px; opacity:0.75; flex-wrap:wrap; }
+.summary-cards { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:28px; }
+.summary-card { background:#fff; border-radius:10px; padding:18px; text-align:center; box-shadow:0 2px 10px rgba(0,0,0,0.06); }
+.summary-card .number { font-size:30px; font-weight:700; }
+.summary-card .label { font-size:12px; color:#7f8c8d; margin-top:4px; }
+.c-green .number { color:#27ae60; }
+.c-blue .number { color:#2980b9; }
+.c-orange .number { color:#e67e22; }
+.c-gray .number { color:#7f8c8d; }
+.section-title { font-size:19px; font-weight:600; margin:28px 0 14px; padding-bottom:10px; border-bottom:2px solid #ecf0f1; display:flex; align-items:center; gap:8px; }
+.section-title .count { font-size:13px; color:#7f8c8d; font-weight:400; }
+.table-wrapper { background:#fff; border-radius:10px; overflow:hidden; box-shadow:0 2px 10px rgba(0,0,0,0.06); margin-bottom:28px; overflow-x:auto; }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+th { background:#f8f9fa; padding:11px 9px; text-align:left; font-weight:600; color:#5a6473; white-space:nowrap; border-bottom:2px solid #e8eaed; }
+td { padding:10px 9px; border-bottom:1px solid #f0f2f5; white-space:nowrap; }
+tr:hover td { background:#fafbfc; }
+.muted { color:#95a5a6; font-size:12px; }
+.pos { color:#e74c3c; font-weight:600; }
+.neg { color:#16a085; font-weight:600; }
+.charts-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-bottom:28px; }
+.chart-card { background:#fff; border-radius:10px; padding:16px; box-shadow:0 2px 10px rgba(0,0,0,0.06); }
+.chart-card h4 { font-size:15px; margin-bottom:4px; display:flex; align-items:center; gap:8px; }
+.chart-card .sub { font-size:12px; color:#7f8c8d; margin-bottom:10px; }
+.chart-box { height:150px; position:relative; }
+.detail-card { background:#fff; border-radius:10px; padding:20px; margin-bottom:18px; box-shadow:0 2px 10px rgba(0,0,0,0.06); border-left:4px solid #27ae60; }
+.detail-head { display:flex; align-items:center; gap:12px; margin-bottom:14px; flex-wrap:wrap; }
+.detail-head .rank { color:#fff; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px; }
+.detail-head h3 { font-size:18px; }
+.badge { color:#fff; padding:3px 10px; border-radius:12px; font-size:12px; }
+.score-badge { background:#34495e; color:#fff; padding:3px 10px; border-radius:12px; font-size:12px; font-weight:600; }
+.detail-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:14px; }
+.metric { background:#f8f9fa; padding:9px 12px; border-radius:6px; }
+.metric .ml { font-size:12px; color:#7f8c8d; display:block; }
+.metric .mv { font-size:15px; font-weight:600; }
+.reasons { background:#f8f9fa; padding:12px 16px; border-radius:6px; }
+.reasons ul { list-style:none; margin-top:6px; }
+.reasons li { padding:2px 0; font-size:13px; }
+.note { background:#e8f4fd; border-left:4px solid #2980b9; padding:14px 18px; border-radius:6px; margin:20px 0; font-size:13px; }
+.disclaimer { background:#fdecea; border-radius:8px; padding:16px 20px; margin-top:28px; font-size:12px; color:#c0392b; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+  <h1>A&#32929;ETF W&#24213;&#24418;&#24577;&#20998;&#26512;&#25253;&#21578;</h1>
+  <div class="subtitle">&#21508;&#26495;&#22359;&#35268;&#27169;&#26368;&#22823;ETF&#30340;W&#24213;&#24418;&#24577;&#25195;&#25551; &#183; &#26469;&#33258; all_etfs_larggest.json</div>
+  <div class="meta">
+    <span>&#25253;&#21578;&#26085;&#26399;: 2026-08-05</span>
+    <span>&#25195;&#25551;&#33539;&#22260;: 352 &#21482;ETF</span>
+    <span>K&#32447;&#21608;&#26399;: &#26085;&#32447; 250 &#22825;</span>
+    <span>&#31639;&#27861;: 5&#38454;&#27573;&#27969;&#27700;&#32447; + 8&#32500;&#35780;&#20998;</span>
+  </div>
+</div>
+
+<div class="summary-cards">
+  <div class="summary-card c-gray"><div class="number">352</div><div class="label">&#25195;&#25551;ETF&#24635;&#25968;</div></div>
+  <div class="summary-card c-green"><div class="number">9</div><div class="label">W&#24213;&#30830;&#35748;</div></div>
+  <div class="summary-card c-blue"><div class="number">4</div><div class="label">W&#24213;&#24418;&#25104;&#20013;</div></div>
+  <div class="summary-card c-orange"><div class="number">2</div><div class="label">W&#24213;&#20505;&#36873;</div></div>
+</div>
+
+<div class="note">
+  <b>W&#24213;&#21028;&#23450;&#36923;&#36753;:</b> 5&#38454;&#27573;&#27969;&#27700;&#32447;&#26816;&#27979; &#8212; &#9312;&#21069;&#26399;&#19979;&#36300;(40&#26085;&#26012;&#29575;&#8804;-0.005%/&#26085;) &#8594; &#9313;&#24038;&#24213;&#24418;&#25104;(T-40&#33267;T-25) &#8594; &#9314;&#21453;&#24377;&#33267;&#23792;&#39030;(&#8805;8%) &#8594; &#9315;&#21491;&#24213;&#39564;&#35777;(&#177;10%&#20869;, &#37327;&#33021;&#8804;1.2x) &#8594; &#9316;&#31361;&#30772;&#30830;&#35748;(2/3&#26085;&#25910;&#20110;&#23792;&#39030;&#20043;&#19978;)&#12290;
+  <b>W&#24213;&#30830;&#35748;</b>&#34920;&#31034;&#24050;&#23436;&#25104;&#39048;&#32447;&#31361;&#30772;, <b>W&#24213;&#24418;&#25104;&#20013;</b>&#34920;&#31034;&#21452;&#24213;&#32467;&#26500;&#23436;&#25972;&#20294;&#23578;&#26410;&#31361;&#30772;, <b>W&#24213;&#20505;&#36873;</b>&#20026;&#24369;&#20449;&#21495;&#12290;
+</div>
+
+<div class="section-title">W&#24213;&#20449;&#21495;ETF &#8212; K&#32447;&#32553;&#30053;&#22270; <span class="count">(&#23637;&#31034;&#21069;9&#21517; 120&#26085;&#36208;&#21183;)</span></div>
+<div class="charts-grid" id="chartsGrid"></div>
+
+<div class="section-title">&#32508;&#21512;&#24471;&#20998;&#25490;&#21517; (TOP 25) <span class="count">&#39068;&#33394;: &#28072;&#32418;&#36300;&#32511; (A&#32929;&#24815;&#20363;)</span></div>
+<div class="table-wrapper">
+<table>
+<thead><tr>
+<th>#</th><th>ETF&#21517;&#31216;</th><th>&#24418;&#24577;&#21028;&#23450;</th><th>&#24471;&#20998;</th><th>&#29376;&#24577;</th><th>&#21453;&#24377;%</th><th>&#21452;&#24213;&#24046;%</th><th>&#37327;&#27604;</th><th>&#21491;&#24213;&#25260;&#39640;%</th><th>&#24403;&#21069;&#20215;</th>
+</tr></thead>
+<tbody>
+
+        <tr>
+          <td><b>1</b></td>
+          <td><b>科创芯片ETF嘉实</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#27ae60;font-weight:600">W底确认</span></td>
+          <td><b>62</b></td>
+          <td>确认 &#x2705;</td>
+          <td class="pos">11.3%</td>
+          <td class="neg">9.9%</td>
+          <td>0.96</td>
+          <td class="pos">9.9%</td>
+          <td class="neg">1.109</td>
+        </tr>
+        <tr>
+          <td><b>2</b></td>
+          <td><b>沪深港科技50ETF交银</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#2980b9;font-weight:600">W底形成中</span></td>
+          <td><b>59</b></td>
+          <td>形成中 &#x23F3;</td>
+          <td class="pos">15.9%</td>
+          <td class="neg">7.5%</td>
+          <td>0.92</td>
+          <td class="pos">7.5%</td>
+          <td class="neg">1.154</td>
+        </tr>
+        <tr>
+          <td><b>3</b></td>
+          <td><b>半导体龙头ETF工银</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#27ae60;font-weight:600">W底确认</span></td>
+          <td><b>58</b></td>
+          <td>确认 &#x2705;</td>
+          <td class="pos">10.4%</td>
+          <td class="neg">9.1%</td>
+          <td>1.05</td>
+          <td class="pos">9.1%</td>
+          <td class="neg">2.317</td>
+        </tr>
+        <tr>
+          <td><b>4</b></td>
+          <td><b>创新100ETF申万菱信</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#27ae60;font-weight:600">W底确认</span></td>
+          <td><b>58</b></td>
+          <td>确认 &#x2705;</td>
+          <td class="pos">8.6%</td>
+          <td class="neg">7.1%</td>
+          <td>0.92</td>
+          <td class="pos">7.1%</td>
+          <td class="neg">2.517</td>
+        </tr>
+        <tr>
+          <td><b>5</b></td>
+          <td><b>科创信息ETF摩根</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#27ae60;font-weight:600">W底确认</span></td>
+          <td><b>57</b></td>
+          <td>确认 &#x2705;</td>
+          <td class="pos">8.6%</td>
+          <td class="neg">7.8%</td>
+          <td>0.93</td>
+          <td class="pos">7.8%</td>
+          <td class="neg">1.782</td>
+        </tr>
+        <tr>
+          <td><b>6</b></td>
+          <td><b>科技50ETF富国</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#27ae60;font-weight:600">W底确认</span></td>
+          <td><b>57</b></td>
+          <td>确认 &#x2705;</td>
+          <td class="pos">8.4%</td>
+          <td class="neg">8.4%</td>
+          <td>0.94</td>
+          <td class="pos">8.4%</td>
+          <td class="neg">2.011</td>
+        </tr>
+        <tr>
+          <td><b>7</b></td>
+          <td><b>黄金股ETF永赢</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#2980b9;font-weight:600">W底形成中</span></td>
+          <td><b>56</b></td>
+          <td>形成中 &#x23F3;</td>
+          <td class="pos">12.3%</td>
+          <td class="neg">9.1%</td>
+          <td>0.92</td>
+          <td class="pos">9.1%</td>
+          <td class="neg">1.87</td>
+        </tr>
+        <tr>
+          <td><b>8</b></td>
+          <td><b>500质量成长ETF鹏扬</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#27ae60;font-weight:600">W底确认</span></td>
+          <td><b>53</b></td>
+          <td>确认 &#x2705;</td>
+          <td class="pos">9.9%</td>
+          <td class="neg">9.0%</td>
+          <td>1.05</td>
+          <td class="pos">9.0%</td>
+          <td class="neg">1.353</td>
+        </tr>
+        <tr>
+          <td><b>9</b></td>
+          <td><b>科创AIETF博时</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#27ae60;font-weight:600">W底确认</span></td>
+          <td><b>51</b></td>
+          <td>确认 &#x2705;</td>
+          <td class="pos">8.2%</td>
+          <td class="neg">8.2%</td>
+          <td>1.16</td>
+          <td class="pos">8.2%</td>
+          <td class="neg">0.817</td>
+        </tr>
+        <tr>
+          <td><b>10</b></td>
+          <td><b>质量ETF中金</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#2980b9;font-weight:600">W底形成中</span></td>
+          <td><b>50</b></td>
+          <td>形成中 &#x23F3;</td>
+          <td class="pos">9.8%</td>
+          <td class="neg">6.6%</td>
+          <td>0.86</td>
+          <td class="pos">6.6%</td>
+          <td class="neg">0.679</td>
+        </tr>
+        <tr>
+          <td><b>11</b></td>
+          <td><b>中证500ETF南方</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#27ae60;font-weight:600">W底确认</span></td>
+          <td><b>48</b></td>
+          <td>确认 &#x2705;</td>
+          <td class="pos">10.0%</td>
+          <td class="neg">10.0%</td>
+          <td>1.11</td>
+          <td class="pos">10.0%</td>
+          <td class="neg">7.657</td>
+        </tr>
+        <tr>
+          <td><b>12</b></td>
+          <td><b>人工智能50ETF方正富邦</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#2980b9;font-weight:600">W底形成中</span></td>
+          <td><b>47</b></td>
+          <td>形成中 &#x23F3;</td>
+          <td class="pos">8.2%</td>
+          <td class="neg">7.1%</td>
+          <td>1.1</td>
+          <td class="pos">7.1%</td>
+          <td class="neg">1.033</td>
+        </tr>
+        <tr>
+          <td><b>13</b></td>
+          <td><b>智能消费ETF博时</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#27ae60;font-weight:600">W底确认</span></td>
+          <td><b>47</b></td>
+          <td>确认 &#x2705;</td>
+          <td class="pos">8.4%</td>
+          <td class="neg">7.5%</td>
+          <td>1.04</td>
+          <td class="pos">7.5%</td>
+          <td class="neg">1.176</td>
+        </tr>
+        <tr>
+          <td><b>14</b></td>
+          <td><b>游戏ETF华夏</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#f39c12;font-weight:600">W底候选</span></td>
+          <td><b>44</b></td>
+          <td>形成中 &#x23F3;</td>
+          <td class="pos">8.2%</td>
+          <td class="neg">7.5%</td>
+          <td>1.1</td>
+          <td class="pos">7.5%</td>
+          <td class="neg">1.154</td>
+        </tr>
+        <tr>
+          <td><b>15</b></td>
+          <td><b>汽车ETF国泰</b><br><span class="muted">ETF</span></td>
+          <td><span style="color:#f39c12;font-weight:600">W底候选</span></td>
+          <td><b>42</b></td>
+          <td>形成中 &#x23F3;</td>
+          <td class="pos">8.3%</td>
+          <td class="neg">6.8%</td>
+          <td>1.01</td>
+          <td class="pos">6.8%</td>
+          <td class="neg">1.146</td>
+        </tr>
+</tbody></table>
+</div>
+
+<div class="section-title">W&#24213;&#20449;&#21495;ETF&#35814;&#32454;&#20998;&#26512;</div>
+
+        <div class="detail-card" style="border-left-color:#27ae60">
+          <div class="detail-head">
+            <span class="rank" style="background:#27ae60">#1</span>
+            <h3>科创芯片ETF嘉实</h3>
+            <span class="badge" style="background:#27ae60">W底确认</span>
+            <span class="score-badge">&#24471;&#20998; 62/100</span>
+          </div>
+          <div class="detail-grid">
+            <div class="metric"><span class="ml">&#24403;&#21069;&#20215;&#26684;</span><span class="mv">1.109</span></div>
+            <div class="metric"><span class="ml">&#24038;&#24213;&#20215;&#26684;</span><span class="mv neg">0.71</span></div>
+            <div class="metric"><span class="ml">&#23792;&#39030;&#20215;&#26684;</span><span class="mv pos">0.79</span></div>
+            <div class="metric"><span class="ml">&#21491;&#24213;&#20215;&#26684;</span><span class="mv">0.78</span></div>
+            <div class="metric"><span class="ml">&#21453;&#24377;&#24133;&#24230;</span><span class="mv pos">11.3%</span></div>
+            <div class="metric"><span class="ml">&#21452;&#24213;&#20559;&#24046;</span><span class="mv">9.9%</span></div>
+            <div class="metric"><span class="ml">&#21491;&#24213;&#25260;&#39640;</span><span class="mv pos">9.9%</span></div>
+            <div class="metric"><span class="ml">&#25104;&#20132;&#37327;&#27604;</span><span class="mv">0.96</span></div>
+            <div class="metric"><span class="ml">&#21069;&#26399;&#36300;&#24133;</span><span class="mv neg">40.9%</span></div>
+            <div class="metric"><span class="ml">&#24038;&#24213;&#26085;&#26399;</span><span class="mv">2025-11-21</span></div>
+            <div class="metric"><span class="ml">&#23792;&#39030;&#26085;&#26399;</span><span class="mv">2025-12-30</span></div>
+            <div class="metric"><span class="ml">&#21491;&#24213;&#26085;&#26399;</span><span class="mv">2025-12-31</span></div>
+          </div>
+          <div class="reasons"><b>&#35780;&#20998;&#20381;&#25454;:</b><ul><li>双底基本对称(差9.9%)+5</li><li>反弹适中(11.3%)+8</li><li>右底抬高9.9%+15</li><li>量能持平(VR=0.96)+6</li><li>前期深跌(40.9%)+10</li><li>时间不对称(27d/1d)+1</li><li>强势突破(40.4%)+10</li><li>温和下跌+2</li><li>右底V形反弹+4</li></ul></div>
+        </div>
+        <div class="detail-card" style="border-left-color:#2980b9">
+          <div class="detail-head">
+            <span class="rank" style="background:#2980b9">#2</span>
+            <h3>沪深港科技50ETF交银</h3>
+            <span class="badge" style="background:#2980b9">W底形成中</span>
+            <span class="score-badge">&#24471;&#20998; 59/100</span>
+          </div>
+          <div class="detail-grid">
+            <div class="metric"><span class="ml">&#24403;&#21069;&#20215;&#26684;</span><span class="mv">1.154</span></div>
+            <div class="metric"><span class="ml">&#24038;&#24213;&#20215;&#26684;</span><span class="mv neg">1.07</span></div>
+            <div class="metric"><span class="ml">&#23792;&#39030;&#20215;&#26684;</span><span class="mv pos">1.24</span></div>
+            <div class="metric"><span class="ml">&#21491;&#24213;&#20215;&#26684;</span><span class="mv">1.15</span></div>
+            <div class="metric"><span class="ml">&#21453;&#24377;&#24133;&#24230;</span><span class="mv pos">15.9%</span></div>
+            <div class="metric"><span class="ml">&#21452;&#24213;&#20559;&#24046;</span><span class="mv">7.5%</span></div>
+            <div class="metric"><span class="ml">&#21491;&#24213;&#25260;&#39640;</span><span class="mv pos">7.5%</span></div>
+            <div class="metric"><span class="ml">&#25104;&#20132;&#37327;&#27604;</span><span class="mv">0.92</span></div>
+            <div class="metric"><span class="ml">&#21069;&#26399;&#36300;&#24133;</span><span class="mv neg">15.3%</span></div>
+            <div class="metric"><span class="ml">&#24038;&#24213;&#26085;&#26399;</span><span class="mv">2026-04-23</span></div>
+            <div class="metric"><span class="ml">&#23792;&#39030;&#26085;&#26399;</span><span class="mv">2026-05-26</span></div>
+            <div class="metric"><span class="ml">&#21491;&#24213;&#26085;&#26399;</span><span class="mv">2026-06-08</span></div>
+          </div>
+          <div class="reasons"><b>&#35780;&#20998;&#20381;&#25454;:</b><ul><li>双底基本对称(差7.5%)+5</li><li>强反弹(15.9%)+15</li><li>右底抬高7.5%+15</li><li>量能持平(VR=0.92)+6</li><li>前期深跌(15.3%)+10</li><li>时间不对称(20d/9d)+1</li><li>右底V形反弹+4</li></ul></div>
+        </div>
+        <div class="detail-card" style="border-left-color:#27ae60">
+          <div class="detail-head">
+            <span class="rank" style="background:#27ae60">#3</span>
+            <h3>半导体龙头ETF工银</h3>
+            <span class="badge" style="background:#27ae60">W底确认</span>
+            <span class="score-badge">&#24471;&#20998; 58/100</span>
+          </div>
+          <div class="detail-grid">
+            <div class="metric"><span class="ml">&#24403;&#21069;&#20215;&#26684;</span><span class="mv">2.317</span></div>
+            <div class="metric"><span class="ml">&#24038;&#24213;&#20215;&#26684;</span><span class="mv neg">1.64</span></div>
+            <div class="metric"><span class="ml">&#23792;&#39030;&#20215;&#26684;</span><span class="mv pos">1.81</span></div>
+            <div class="metric"><span class="ml">&#21491;&#24213;&#20215;&#26684;</span><span class="mv">1.79</span></div>
+            <div class="metric"><span class="ml">&#21453;&#24377;&#24133;&#24230;</span><span class="mv pos">10.4%</span></div>
+            <div class="metric"><span class="ml">&#21452;&#24213;&#20559;&#24046;</span><span class="mv">9.1%</span></div>
+            <div class="metric"><span class="ml">&#21491;&#24213;&#25260;&#39640;</span><span class="mv pos">9.1%</span></div>
+            <div class="metric"><span class="ml">&#25104;&#20132;&#37327;&#27604;</span><span class="mv">1.05</span></div>
+            <div class="metric"><span class="ml">&#21069;&#26399;&#36300;&#24133;</span><span class="mv neg">35.5%</span></div>
+            <div class="metric"><span class="ml">&#24038;&#24213;&#26085;&#26399;</span><span class="mv">2025-11-21</span></div>
+            <div class="metric"><span class="ml">&#23792;&#39030;&#26085;&#26399;</span><span class="mv">2025-12-30</span></div>
+            <div class="metric"><span class="ml">&#21491;&#24213;&#26085;&#26399;</span><span class="mv">2025-12-31</span></div>
+          </div>
+          <div class="reasons"><b>&#35780;&#20998;&#20381;&#25454;:</b><ul><li>双底基本对称(差9.1%)+5</li><li>反弹适中(10.4%)+8</li><li>右底抬高9.1%+15</li><li>量能略增(VR=1.05)+2</li><li>前期深跌(35.5%)+10</li><li>时间不对称(27d/1d)+1</li><li>强势突破(28.0%)+10</li><li>温和下跌+2</li><li>右底V形反弹+4</li></ul></div>
+        </div>
+        <div class="detail-card" style="border-left-color:#27ae60">
+          <div class="detail-head">
+            <span class="rank" style="background:#27ae60">#4</span>
+            <h3>创新100ETF申万菱信</h3>
+            <span class="badge" style="background:#27ae60">W底确认</span>
+            <span class="score-badge">&#24471;&#20998; 58/100</span>
+          </div>
+          <div class="detail-grid">
+            <div class="metric"><span class="ml">&#24403;&#21069;&#20215;&#26684;</span><span class="mv">2.517</span></div>
+            <div class="metric"><span class="ml">&#24038;&#24213;&#20215;&#26684;</span><span class="mv neg">1.98</span></div>
+            <div class="metric"><span class="ml">&#23792;&#39030;&#20215;&#26684;</span><span class="mv pos">2.15</span></div>
+            <div class="metric"><span class="ml">&#21491;&#24213;&#20215;&#26684;</span><span class="mv">2.12</span></div>
+            <div class="metric"><span class="ml">&#21453;&#24377;&#24133;&#24230;</span><span class="mv pos">8.6%</span></div>
+            <div class="metric"><span class="ml">&#21452;&#24213;&#20559;&#24046;</span><span class="mv">7.1%</span></div>
+            <div class="metric"><span class="ml">&#21491;&#24213;&#25260;&#39640;</span><span class="mv pos">7.1%</span></div>
+            <div class="metric"><span class="ml">&#25104;&#20132;&#37327;&#27604;</span><span class="mv">0.92</span></div>
+            <div class="metric"><span class="ml">&#21069;&#26399;&#36300;&#24133;</span><span class="mv neg">24.6%</span></div>
+            <div class="metric"><span class="ml">&#24038;&#24213;&#26085;&#26399;</span><span class="mv">2025-11-21</span></div>
+            <div class="metric"><span class="ml">&#23792;&#39030;&#26085;&#26399;</span><span class="mv">2025-12-25</span></div>
+            <div class="metric"><span class="ml">&#21491;&#24213;&#26085;&#26399;</span><span class="mv">2025-12-31</span></div>
+          </div>
+          <div class="reasons"><b>&#35780;&#20998;&#20381;&#25454;:</b><ul><li>双底基本对称(差7.1%)+5</li><li>反弹偏弱(8.6%)+3</li><li>右底抬高7.1%+15</li><li>量能持平(VR=0.92)+6</li><li>前期深跌(24.6%)+10</li><li>时间不对称(24d/4d)+1</li><li>强势突破(17.1%)+10</li><li>温和下跌+2</li><li>右底V形反弹+4</li></ul></div>
+        </div>
+        <div class="detail-card" style="border-left-color:#27ae60">
+          <div class="detail-head">
+            <span class="rank" style="background:#27ae60">#5</span>
+            <h3>科创信息ETF摩根</h3>
+            <span class="badge" style="background:#27ae60">W底确认</span>
+            <span class="score-badge">&#24471;&#20998; 57/100</span>
+          </div>
+          <div class="detail-grid">
+            <div class="metric"><span class="ml">&#24403;&#21069;&#20215;&#26684;</span><span class="mv">1.782</span></div>
+            <div class="metric"><span class="ml">&#24038;&#24213;&#20215;&#26684;</span><span class="mv neg">1.28</span></div>
+            <div class="metric"><span class="ml">&#23792;&#39030;&#20215;&#26684;</span><span class="mv pos">1.39</span></div>
+            <div class="metric"><span class="ml">&#21491;&#24213;&#20215;&#26684;</span><span class="mv">1.38</span></div>
+            <div class="metric"><span class="ml">&#21453;&#24377;&#24133;&#24230;</span><span class="mv pos">8.6%</span></div>
+            <div class="metric"><span class="ml">&#21452;&#24213;&#20559;&#24046;</span><span class="mv">7.8%</span></div>
+            <div class="metric"><span class="ml">&#21491;&#24213;&#25260;&#39640;</span><span class="mv pos">7.8%</span></div>
+            <div class="metric"><span class="ml">&#25104;&#20132;&#37327;&#27604;</span><span class="mv">0.93</span></div>
+            <div class="metric"><span class="ml">&#21069;&#26399;&#36300;&#24133;</span><span class="mv neg">36.8%</span></div>
+            <div class="metric"><span class="ml">&#24038;&#24213;&#26085;&#26399;</span><span class="mv">2025-11-21</span></div>
+            <div class="metric"><span class="ml">&#23792;&#39030;&#26085;&#26399;</span><span class="mv">2025-12-30</span></div>
+            <div class="metric"><span class="ml">&#21491;&#24213;&#26085;&#26399;</span><span class="mv">2025-12-31</span></div>
+          </div>
+          <div class="reasons"><b>&#35780;&#20998;&#20381;&#25454;:</b><ul><li>双底基本对称(差7.8%)+5</li><li>反弹偏弱(8.6%)+3</li><li>右底抬高7.8%+15</li><li>量能持平(VR=0.93)+6</li><li>前期深跌(36.8%)+10</li><li>时间不对称(27d/1d)+1</li><li>强势突破(28.2%)+10</li><li>温和下跌+2</li><li>右底V形反弹+4</li></ul></div>
+        </div>
+        <div class="detail-card" style="border-left-color:#27ae60">
+          <div class="detail-head">
+            <span class="rank" style="background:#27ae60">#6</span>
+            <h3>科技50ETF富国</h3>
+            <span class="badge" style="background:#27ae60">W底确认</span>
+            <span class="score-badge">&#24471;&#20998; 57/100</span>
+          </div>
+          <div class="detail-grid">
+            <div class="metric"><span class="ml">&#24403;&#21069;&#20215;&#26684;</span><span class="mv">2.011</span></div>
+            <div class="metric"><span class="ml">&#24038;&#24213;&#20215;&#26684;</span><span class="mv neg">1.67</span></div>
+            <div class="metric"><span class="ml">&#23792;&#39030;&#20215;&#26684;</span><span class="mv pos">1.81</span></div>
+            <div class="metric"><span class="ml">&#21491;&#24213;&#20215;&#26684;</span><span class="mv">1.81</span></div>
+            <div class="metric"><span class="ml">&#21453;&#24377;&#24133;&#24230;</span><span class="mv pos">8.4%</span></div>
+            <div class="metric"><span class="ml">&#21452;&#24213;&#20559;&#24046;</span><span class="mv">8.4%</span></div>
+            <div class="metric"><span class="ml">&#21491;&#24213;&#25260;&#39640;</span><span class="mv pos">8.4%</span></div>
+            <div class="metric"><span class="ml">&#25104;&#20132;&#37327;&#27604;</span><span class="mv">0.94</span></div>
+            <div class="metric"><span class="ml">&#21069;&#26399;&#36300;&#24133;</span><span class="mv neg">27.2%</span></div>
+            <div class="metric"><span class="ml">&#24038;&#24213;&#26085;&#26399;</span><span class="mv">2025-11-21</span></div>
+            <div class="metric"><span class="ml">&#23792;&#39030;&#26085;&#26399;</span><span class="mv">2025-12-25</span></div>
+            <div class="metric"><span class="ml">&#21491;&#24213;&#26085;&#26399;</span><span class="mv">2025-12-31</span></div>
+          </div>
+          <div class="reasons"><b>&#35780;&#20998;&#20381;&#25454;:</b><ul><li>双底基本对称(差8.4%)+5</li><li>反弹偏弱(8.4%)+3</li><li>右底抬高8.4%+15</li><li>量能持平(VR=0.94)+6</li><li>前期深跌(27.2%)+10</li><li>时间不对称(24d/4d)+1</li><li>强势突破(11.1%)+10</li><li>温和下跌+2</li><li>右底V形反弹+4</li></ul></div>
+        </div>
+        <div class="detail-card" style="border-left-color:#2980b9">
+          <div class="detail-head">
+            <span class="rank" style="background:#2980b9">#7</span>
+            <h3>黄金股ETF永赢</h3>
+            <span class="badge" style="background:#2980b9">W底形成中</span>
+            <span class="score-badge">&#24471;&#20998; 56/100</span>
+          </div>
+          <div class="detail-grid">
+            <div class="metric"><span class="ml">&#24403;&#21069;&#20215;&#26684;</span><span class="mv">1.87</span></div>
+            <div class="metric"><span class="ml">&#24038;&#24213;&#20215;&#26684;</span><span class="mv neg">1.87</span></div>
+            <div class="metric"><span class="ml">&#23792;&#39030;&#20215;&#26684;</span><span class="mv pos">2.1</span></div>
+            <div class="metric"><span class="ml">&#21491;&#24213;&#20215;&#26684;</span><span class="mv">2.04</span></div>
+            <div class="metric"><span class="ml">&#21453;&#24377;&#24133;&#24230;</span><span class="mv pos">12.3%</span></div>
+            <div class="metric"><span class="ml">&#21452;&#24213;&#20559;&#24046;</span><span class="mv">9.1%</span></div>
+            <div class="metric"><span class="ml">&#21491;&#24213;&#25260;&#39640;</span><span class="mv pos">9.1%</span></div>
+            <div class="metric"><span class="ml">&#25104;&#20132;&#37327;&#27604;</span><span class="mv">0.92</span></div>
+            <div class="metric"><span class="ml">&#21069;&#26399;&#36300;&#24133;</span><span class="mv neg">34.6%</span></div>
+            <div class="metric"><span class="ml">&#24038;&#24213;&#26085;&#26399;</span><span class="mv">2025-11-21</span></div>
+            <div class="metric"><span class="ml">&#23792;&#39030;&#26085;&#26399;</span><span class="mv">2025-12-26</span></div>
+            <div class="metric"><span class="ml">&#21491;&#24213;&#26085;&#26399;</span><span class="mv">2025-12-31</span></div>
+          </div>
+          <div class="reasons"><b>&#35780;&#20998;&#20381;&#25454;:</b><ul><li>双底基本对称(差9.1%)+5</li><li>反弹较强(12.3%)+12</li><li>右底抬高9.1%+15</li><li>量能持平(VR=0.92)+6</li><li>前期深跌(34.6%)+10</li><li>时间不对称(25d/3d)+1</li><li>右底V形反弹+4</li></ul></div>
+        </div>
+        <div class="detail-card" style="border-left-color:#27ae60">
+          <div class="detail-head">
+            <span class="rank" style="background:#27ae60">#8</span>
+            <h3>500质量成长ETF鹏扬</h3>
+            <span class="badge" style="background:#27ae60">W底确认</span>
+            <span class="score-badge">&#24471;&#20998; 53/100</span>
+          </div>
+          <div class="detail-grid">
+            <div class="metric"><span class="ml">&#24403;&#21069;&#20215;&#26684;</span><span class="mv">1.353</span></div>
+            <div class="metric"><span class="ml">&#24038;&#24213;&#20215;&#26684;</span><span class="mv neg">1.11</span></div>
+            <div class="metric"><span class="ml">&#23792;&#39030;&#20215;&#26684;</span><span class="mv pos">1.22</span></div>
+            <div class="metric"><span class="ml">&#21491;&#24213;&#20215;&#26684;</span><span class="mv">1.21</span></div>
+            <div class="metric"><span class="ml">&#21453;&#24377;&#24133;&#24230;</span><span class="mv pos">9.9%</span></div>
+            <div class="metric"><span class="ml">&#21452;&#24213;&#20559;&#24046;</span><span class="mv">9.0%</span></div>
+            <div class="metric"><span class="ml">&#21491;&#24213;&#25260;&#39640;</span><span class="mv pos">9.0%</span></div>
+            <div class="metric"><span class="ml">&#25104;&#20132;&#37327;&#27604;</span><span class="mv">1.05</span></div>
+            <div class="metric"><span class="ml">&#21069;&#26399;&#36300;&#24133;</span><span class="mv neg">17.2%</span></div>
+            <div class="metric"><span class="ml">&#24038;&#24213;&#26085;&#26399;</span><span class="mv">2025-11-21</span></div>
+            <div class="metric"><span class="ml">&#23792;&#39030;&#26085;&#26399;</span><span class="mv">2025-12-26</span></div>
+            <div class="metric"><span class="ml">&#21491;&#24213;&#26085;&#26399;</span><span class="mv">2025-12-31</span></div>
+          </div>
+          <div class="reasons"><b>&#35780;&#20998;&#20381;&#25454;:</b><ul><li>双底基本对称(差9.0%)+5</li><li>反弹偏弱(9.9%)+3</li><li>右底抬高9.0%+15</li><li>量能略增(VR=1.05)+2</li><li>前期深跌(17.2%)+10</li><li>时间不对称(25d/3d)+1</li><li>强势突破(10.9%)+10</li><li>右底V形反弹+4</li></ul></div>
+        </div>
+        <div class="detail-card" style="border-left-color:#27ae60">
+          <div class="detail-head">
+            <span class="rank" style="background:#27ae60">#9</span>
+            <h3>科创AIETF博时</h3>
+            <span class="badge" style="background:#27ae60">W底确认</span>
+            <span class="score-badge">&#24471;&#20998; 51/100</span>
+          </div>
+          <div class="detail-grid">
+            <div class="metric"><span class="ml">&#24403;&#21069;&#20215;&#26684;</span><span class="mv">0.817</span></div>
+            <div class="metric"><span class="ml">&#24038;&#24213;&#20215;&#26684;</span><span class="mv neg">0.73</span></div>
+            <div class="metric"><span class="ml">&#23792;&#39030;&#20215;&#26684;</span><span class="mv pos">0.79</span></div>
+            <div class="metric"><span class="ml">&#21491;&#24213;&#20215;&#26684;</span><span class="mv">0.79</span></div>
+            <div class="metric"><span class="ml">&#21453;&#24377;&#24133;&#24230;</span><span class="mv pos">8.2%</span></div>
+            <div class="metric"><span class="ml">&#21452;&#24213;&#20559;&#24046;</span><span class="mv">8.2%</span></div>
+            <div class="metric"><span class="ml">&#21491;&#24213;&#25260;&#39640;</span><span class="mv pos">8.2%</span></div>
+            <div class="metric"><span class="ml">&#25104;&#20132;&#37327;&#27604;</span><span class="mv">1.16</span></div>
+            <div class="metric"><span class="ml">&#21069;&#26399;&#36300;&#24133;</span><span class="mv neg">33.3%</span></div>
+            <div class="metric"><span class="ml">&#24038;&#24213;&#26085;&#26399;</span><span class="mv">2025-11-21</span></div>
+            <div class="metric"><span class="ml">&#23792;&#39030;&#26085;&#26399;</span><span class="mv">2025-12-30</span></div>
+            <div class="metric"><span class="ml">&#21491;&#24213;&#26085;&#26399;</span><span class="mv">2025-12-31</span></div>
+          </div>
+          <div class="reasons"><b>&#35780;&#20998;&#20381;&#25454;:</b><ul><li>双底基本对称(差8.2%)+5</li><li>反弹偏弱(8.2%)+3</li><li>右底抬高8.2%+15</li><li>量能略增(VR=1.16)+2</li><li>前期深跌(33.3%)+10</li><li>时间不对称(27d/1d)+1</li><li>有效突破(3.4%)+7</li><li>平滑下跌+3</li><li>右底V形反弹+4</li></ul></div>
+        </div>
+
+<div class="disclaimer">
+  <b>&#39118;&#38505;&#25552;&#31034;:</b> &#26412;&#25253;&#21578;&#20165;&#22522;&#20110;&#21382;&#21490;&#20215;&#26684;&#24418;&#24577;&#30340;&#23458;&#35266;&#37327;&#21270;&#20998;&#26512;&#65292;&#19981;&#26500;&#25104;&#20219;&#20309;&#25237;&#36164;&#24314;&#35758;&#12290;W&#24213;&#24418;&#24577;&#35782;&#21035;&#23646;&#20110;&#25216;&#26415;&#20998;&#26512;&#26041;&#27861;&#65292;&#23384;&#22312;&#35823;&#21028;&#21487;&#33021;&#65307;
+  &#21452;&#24213;&#32467;&#26500;&#24182;&#38750;100%&#20934;&#30830;&#65292;&#39048;&#32447;&#31361;&#30772;&#21518;&#20173;&#21487;&#33021;&#22238;&#36393;&#22833;&#36133;&#12290;&#25237;&#36164;&#26377;&#39118;&#38505;&#65292;&#20915;&#31574;&#38656;&#35880;&#24910;&#12290;&#35831;&#32467;&#21512;&#22522;&#26412;&#38754;&#12289;&#36164;&#37329;&#38754;&#12289;&#23439;&#35266;&#29615;&#22659;&#32508;&#21512;&#21028;&#26029;&#12290;
+  &#25968;&#25454;&#26469;&#28304;: &#33150;&#35759;&#33258;&#36873;&#32929;&#34892;&#24773;&#25509;&#21475;&#65292;&#21487;&#33021;&#23384;&#22312;&#24310;&#36831;&#65292;&#20197;&#20132;&#26131;&#25152;&#23448;&#26041;&#25968;&#25454;&#20026;&#20934;&#12290;
+</div>
+
+</div>
+
+<script>
+const chartData = [{"name": "科创芯片ETF嘉实", "type": "ETF", "score": 62, "label": "W底确认", "closes": [0.87, 0.86, 0.85, 0.88, 0.89, 0.87, 0.89, 0.89, 0.89, 0.9, 0.91, 0.91, 0.89, 0.84, 0.84, 0.85, 0.86, 0.84, 0.86, 0.85, 0.84, 0.83, 0.84, 0.82, 0.83, 0.81, 0.8, 0.76, 0.78, 0.8, 0.79, 0.79, 0.79, 0.76, 0.79, 0.77, 0.77, 0.79, 0.84, 0.84, 0.86, 0.86, 0.88, 0.88, 0.89, 0.9, 0.92, 0.9, 0.93, 0.91, 0.94, 0.98, 0.96, 0.97, 1.03, 1.09, 1.11, 1.08, 1.14, 1.16, 1.19, 1.16, 1.14, 1.15, 1.2, 1.26, 1.19, 1.21, 1.3, 1.27, 1.24, 1.27, 1.2, 1.12, 1.15, 1.19, 1.21, 1.15, 1.1, 1.16, 1.16, 1.18, 1.17, 1.24, 1.25, 1.32, 1.38, 1.41, 1.39, 1.46, 1.52, 1.5, 1.57, 1.65, 1.6, 1.47, 1.46, 1.47, 1.48, 1.49, 1.63, 1.52, 1.44, 1.47, 1.38, 1.31, 1.2, 1.18, 1.35, 1.3, 1.25, 1.26, 1.28, 1.18, 1.17, 1.08, 1.12, 1.04, 1.1, 1.17], "dates": ["2026-02-04", "2026-02-05", "2026-02-06", "2026-02-09", "2026-02-10", "2026-02-11", "2026-02-12", "2026-02-13", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02", "2026-04-03", "2026-04-07", "2026-04-08", "2026-04-09", "2026-04-10", "2026-04-13", "2026-04-14", "2026-04-15", "2026-04-16", "2026-04-17", "2026-04-20", "2026-04-21", "2026-04-22", "2026-04-23", "2026-04-24", "2026-04-27", "2026-04-28", "2026-04-29", "2026-04-30", "2026-05-06", "2026-05-07", "2026-05-08", "2026-05-11", "2026-05-12", "2026-05-13", "2026-05-14", "2026-05-15", "2026-05-18", "2026-05-19", "2026-05-20", "2026-05-21", "2026-05-22", "2026-05-25", "2026-05-26", "2026-05-27", "2026-05-28", "2026-05-29", "2026-06-01", "2026-06-02", "2026-06-03", "2026-06-04", "2026-06-05", "2026-06-08", "2026-06-09", "2026-06-10", "2026-06-11", "2026-06-12", "2026-06-15", "2026-06-16", "2026-06-17", "2026-06-18", "2026-06-22", "2026-06-23", "2026-06-24", "2026-06-25", "2026-06-26", "2026-06-29", "2026-06-30", "2026-07-01", "2026-07-02", "2026-07-03", "2026-07-06", "2026-07-07", "2026-07-08", "2026-07-09", "2026-07-10", "2026-07-13", "2026-07-14", "2026-07-15", "2026-07-16", "2026-07-17", "2026-07-20", "2026-07-21", "2026-07-22", "2026-07-23", "2026-07-24", "2026-07-27", "2026-07-28", "2026-07-29", "2026-07-30", "2026-07-31", "2026-08-03", "2026-08-04", "2026-08-05"], "left_trough": 0.71, "right_trough": 0.78, "peak": 0.79, "current": 1.109, "recovery": 11.3, "diff": 9.9, "vr": 0.96, "status": "确认"}, {"name": "沪深港科技50ETF交银", "type": "ETF", "score": 59, "label": "W底形成中", "closes": [1.04, 1.03, 1.03, 1.05, 1.05, 1.05, 1.06, 1.05, 1.05, 1.05, 1.05, 1.04, 1.04, 1.0, 1.0, 1.02, 1.02, 1.02, 1.03, 1.03, 1.02, 1.01, 1.02, 1.0, 1.01, 0.99, 0.99, 0.94, 0.96, 0.98, 0.96, 0.98, 0.96, 0.95, 0.97, 0.95, 0.95, 0.95, 1.0, 1.0, 1.02, 1.03, 1.05, 1.05, 1.06, 1.07, 1.08, 1.07, 1.08, 1.07, 1.07, 1.09, 1.07, 1.08, 1.1, 1.15, 1.17, 1.15, 1.19, 1.2, 1.22, 1.19, 1.17, 1.18, 1.19, 1.2, 1.17, 1.2, 1.23, 1.24, 1.21, 1.23, 1.21, 1.18, 1.2, 1.21, 1.21, 1.18, 1.15, 1.19, 1.16, 1.16, 1.16, 1.21, 1.22, 1.25, 1.28, 1.3, 1.26, 1.3, 1.34, 1.3, 1.33, 1.37, 1.36, 1.3, 1.31, 1.31, 1.29, 1.28, 1.34, 1.31, 1.25, 1.28, 1.26, 1.24, 1.17, 1.18, 1.24, 1.22, 1.2, 1.19, 1.21, 1.15, 1.15, 1.12, 1.15, 1.12, 1.15, 1.19], "dates": ["2026-02-04", "2026-02-05", "2026-02-06", "2026-02-09", "2026-02-10", "2026-02-11", "2026-02-12", "2026-02-13", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02", "2026-04-03", "2026-04-07", "2026-04-08", "2026-04-09", "2026-04-10", "2026-04-13", "2026-04-14", "2026-04-15", "2026-04-16", "2026-04-17", "2026-04-20", "2026-04-21", "2026-04-22", "2026-04-23", "2026-04-24", "2026-04-27", "2026-04-28", "2026-04-29", "2026-04-30", "2026-05-06", "2026-05-07", "2026-05-08", "2026-05-11", "2026-05-12", "2026-05-13", "2026-05-14", "2026-05-15", "2026-05-18", "2026-05-19", "2026-05-20", "2026-05-21", "2026-05-22", "2026-05-25", "2026-05-26", "2026-05-27", "2026-05-28", "2026-05-29", "2026-06-01", "2026-06-02", "2026-06-03", "2026-06-04", "2026-06-05", "2026-06-08", "2026-06-09", "2026-06-10", "2026-06-11", "2026-06-12", "2026-06-15", "2026-06-16", "2026-06-17", "2026-06-18", "2026-06-22", "2026-06-23", "2026-06-24", "2026-06-25", "2026-06-26", "2026-06-29", "2026-06-30", "2026-07-01", "2026-07-02", "2026-07-03", "2026-07-06", "2026-07-07", "2026-07-08", "2026-07-09", "2026-07-10", "2026-07-13", "2026-07-14", "2026-07-15", "2026-07-16", "2026-07-17", "2026-07-20", "2026-07-21", "2026-07-22", "2026-07-23", "2026-07-24", "2026-07-27", "2026-07-28", "2026-07-29", "2026-07-30", "2026-07-31", "2026-08-03", "2026-08-04", "2026-08-05"], "left_trough": 1.07, "right_trough": 1.15, "peak": 1.24, "current": 1.154, "recovery": 15.9, "diff": 7.5, "vr": 0.92, "status": "形成中"}, {"name": "半导体龙头ETF工银", "type": "ETF", "score": 58, "label": "W底确认", "closes": [1.97, 1.94, 1.92, 1.98, 2.0, 1.98, 2.01, 2.01, 2.02, 2.02, 2.05, 2.04, 2.0, 1.9, 1.89, 1.93, 1.92, 1.88, 1.92, 1.91, 1.89, 1.87, 1.91, 1.86, 1.89, 1.84, 1.82, 1.73, 1.75, 1.79, 1.75, 1.75, 1.75, 1.69, 1.74, 1.69, 1.69, 1.71, 1.81, 1.81, 1.85, 1.86, 1.9, 1.89, 1.91, 1.92, 1.96, 1.93, 1.98, 1.95, 1.99, 2.09, 2.06, 2.05, 2.15, 2.3, 2.33, 2.27, 2.41, 2.43, 2.49, 2.42, 2.41, 2.44, 2.54, 2.66, 2.59, 2.64, 2.85, 2.82, 2.75, 2.75, 2.6, 2.46, 2.5, 2.59, 2.64, 2.5, 2.39, 2.52, 2.49, 2.5, 2.48, 2.62, 2.65, 2.8, 2.94, 3.04, 2.97, 3.13, 3.31, 3.26, 3.42, 3.53, 3.44, 3.14, 3.12, 3.14, 3.12, 3.09, 3.4, 3.2, 3.02, 3.09, 2.91, 2.75, 2.55, 2.49, 2.74, 2.74, 2.63, 2.65, 2.67, 2.47, 2.41, 2.26, 2.35, 2.18, 2.3, 2.44], "dates": ["2026-02-04", "2026-02-05", "2026-02-06", "2026-02-09", "2026-02-10", "2026-02-11", "2026-02-12", "2026-02-13", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02", "2026-04-03", "2026-04-07", "2026-04-08", "2026-04-09", "2026-04-10", "2026-04-13", "2026-04-14", "2026-04-15", "2026-04-16", "2026-04-17", "2026-04-20", "2026-04-21", "2026-04-22", "2026-04-23", "2026-04-24", "2026-04-27", "2026-04-28", "2026-04-29", "2026-04-30", "2026-05-06", "2026-05-07", "2026-05-08", "2026-05-11", "2026-05-12", "2026-05-13", "2026-05-14", "2026-05-15", "2026-05-18", "2026-05-19", "2026-05-20", "2026-05-21", "2026-05-22", "2026-05-25", "2026-05-26", "2026-05-27", "2026-05-28", "2026-05-29", "2026-06-01", "2026-06-02", "2026-06-03", "2026-06-04", "2026-06-05", "2026-06-08", "2026-06-09", "2026-06-10", "2026-06-11", "2026-06-12", "2026-06-15", "2026-06-16", "2026-06-17", "2026-06-18", "2026-06-22", "2026-06-23", "2026-06-24", "2026-06-25", "2026-06-26", "2026-06-29", "2026-06-30", "2026-07-01", "2026-07-02", "2026-07-03", "2026-07-06", "2026-07-07", "2026-07-08", "2026-07-09", "2026-07-10", "2026-07-13", "2026-07-14", "2026-07-15", "2026-07-16", "2026-07-17", "2026-07-20", "2026-07-21", "2026-07-22", "2026-07-23", "2026-07-24", "2026-07-27", "2026-07-28", "2026-07-29", "2026-07-30", "2026-07-31", "2026-08-03", "2026-08-04", "2026-08-05"], "left_trough": 1.64, "right_trough": 1.79, "peak": 1.81, "current": 2.317, "recovery": 10.4, "diff": 9.1, "vr": 1.05, "status": "确认"}, {"name": "创新100ETF申万菱信", "type": "ETF", "score": 58, "label": "W底确认", "closes": [], "dates": [], "left_trough": 1.98, "right_trough": 2.12, "peak": 2.15, "current": 2.517, "recovery": 8.6, "diff": 7.1, "vr": 0.92, "status": "确认"}, {"name": "科创信息ETF摩根", "type": "ETF", "score": 57, "label": "W底确认", "closes": [1.52, 1.51, 1.49, 1.54, 1.55, 1.53, 1.56, 1.56, 1.54, 1.55, 1.57, 1.57, 1.54, 1.45, 1.44, 1.47, 1.48, 1.45, 1.48, 1.46, 1.44, 1.43, 1.45, 1.41, 1.43, 1.4, 1.38, 1.31, 1.35, 1.38, 1.35, 1.36, 1.35, 1.32, 1.36, 1.32, 1.31, 1.34, 1.42, 1.42, 1.44, 1.45, 1.49, 1.49, 1.51, 1.52, 1.55, 1.52, 1.55, 1.53, 1.56, 1.63, 1.6, 1.61, 1.7, 1.8, 1.83, 1.78, 1.87, 1.88, 1.93, 1.87, 1.84, 1.86, 1.93, 2.01, 1.92, 1.95, 2.09, 2.06, 1.99, 2.04, 1.92, 1.82, 1.86, 1.93, 1.94, 1.86, 1.78, 1.87, 1.85, 1.86, 1.85, 1.95, 1.97, 2.07, 2.15, 2.2, 2.16, 2.26, 2.34, 2.3, 2.4, 2.51, 2.43, 2.23, 2.22, 2.25, 2.25, 2.27, 2.48, 2.33, 2.24, 2.26, 2.15, 2.05, 1.89, 1.87, 2.11, 2.05, 1.97, 1.97, 2.0, 1.86, 1.84, 1.71, 1.79, 1.69, 1.77, 1.87], "dates": ["2026-02-04", "2026-02-05", "2026-02-06", "2026-02-09", "2026-02-10", "2026-02-11", "2026-02-12", "2026-02-13", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02", "2026-04-03", "2026-04-07", "2026-04-08", "2026-04-09", "2026-04-10", "2026-04-13", "2026-04-14", "2026-04-15", "2026-04-16", "2026-04-17", "2026-04-20", "2026-04-21", "2026-04-22", "2026-04-23", "2026-04-24", "2026-04-27", "2026-04-28", "2026-04-29", "2026-04-30", "2026-05-06", "2026-05-07", "2026-05-08", "2026-05-11", "2026-05-12", "2026-05-13", "2026-05-14", "2026-05-15", "2026-05-18", "2026-05-19", "2026-05-20", "2026-05-21", "2026-05-22", "2026-05-25", "2026-05-26", "2026-05-27", "2026-05-28", "2026-05-29", "2026-06-01", "2026-06-02", "2026-06-03", "2026-06-04", "2026-06-05", "2026-06-08", "2026-06-09", "2026-06-10", "2026-06-11", "2026-06-12", "2026-06-15", "2026-06-16", "2026-06-17", "2026-06-18", "2026-06-22", "2026-06-23", "2026-06-24", "2026-06-25", "2026-06-26", "2026-06-29", "2026-06-30", "2026-07-01", "2026-07-02", "2026-07-03", "2026-07-06", "2026-07-07", "2026-07-08", "2026-07-09", "2026-07-10", "2026-07-13", "2026-07-14", "2026-07-15", "2026-07-16", "2026-07-17", "2026-07-20", "2026-07-21", "2026-07-22", "2026-07-23", "2026-07-24", "2026-07-27", "2026-07-28", "2026-07-29", "2026-07-30", "2026-07-31", "2026-08-03", "2026-08-04", "2026-08-05"], "left_trough": 1.28, "right_trough": 1.38, "peak": 1.39, "current": 1.782, "recovery": 8.6, "diff": 7.8, "vr": 0.93, "status": "确认"}, {"name": "科技50ETF富国", "type": "ETF", "score": 57, "label": "W底确认", "closes": [1.88, 1.85, 1.84, 1.87, 1.88, 1.86, 1.88, 1.86, 1.87, 1.88, 1.89, 1.9, 1.88, 1.81, 1.8, 1.83, 1.83, 1.82, 1.86, 1.88, 1.87, 1.84, 1.83, 1.79, 1.82, 1.78, 1.76, 1.69, 1.71, 1.75, 1.72, 1.74, 1.74, 1.71, 1.73, 1.7, 1.68, 1.69, 1.77, 1.77, 1.8, 1.81, 1.83, 1.82, 1.83, 1.82, 1.86, 1.85, 1.89, 1.87, 1.85, 1.88, 1.85, 1.87, 1.88, 1.93, 1.95, 1.96, 2.0, 1.98, 2.02, 1.96, 1.95, 1.97, 2.0, 2.01, 1.97, 2.01, 2.05, 2.04, 2.01, 2.02, 1.96, 1.94, 1.96, 1.97, 1.96, 1.94, 1.87, 1.94, 1.89, 1.89, 1.9, 1.96, 1.98, 2.01, 2.03, 2.07, 2.02, 2.05, 2.08, 2.01, 2.04, 2.11, 2.14, 2.07, 2.11, 2.09, 2.05, 2.06, 2.13, 2.11, 2.04, 2.06, 2.06, 2.05, 1.96, 1.97, 2.07, 2.09, 2.07, 2.03, 2.08, 2.01, 2.01, 1.96, 2.01, 1.97, 2.01, 2.08], "dates": ["2026-02-04", "2026-02-05", "2026-02-06", "2026-02-09", "2026-02-10", "2026-02-11", "2026-02-12", "2026-02-13", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02", "2026-04-03", "2026-04-07", "2026-04-08", "2026-04-09", "2026-04-10", "2026-04-13", "2026-04-14", "2026-04-15", "2026-04-16", "2026-04-17", "2026-04-20", "2026-04-21", "2026-04-22", "2026-04-23", "2026-04-24", "2026-04-27", "2026-04-28", "2026-04-29", "2026-04-30", "2026-05-06", "2026-05-07", "2026-05-08", "2026-05-11", "2026-05-12", "2026-05-13", "2026-05-14", "2026-05-15", "2026-05-18", "2026-05-19", "2026-05-20", "2026-05-21", "2026-05-22", "2026-05-25", "2026-05-26", "2026-05-27", "2026-05-28", "2026-05-29", "2026-06-01", "2026-06-02", "2026-06-03", "2026-06-04", "2026-06-05", "2026-06-08", "2026-06-09", "2026-06-10", "2026-06-11", "2026-06-12", "2026-06-15", "2026-06-16", "2026-06-17", "2026-06-18", "2026-06-22", "2026-06-23", "2026-06-24", "2026-06-25", "2026-06-26", "2026-06-29", "2026-06-30", "2026-07-01", "2026-07-02", "2026-07-03", "2026-07-06", "2026-07-07", "2026-07-08", "2026-07-09", "2026-07-10", "2026-07-13", "2026-07-14", "2026-07-15", "2026-07-16", "2026-07-17", "2026-07-20", "2026-07-21", "2026-07-22", "2026-07-23", "2026-07-24", "2026-07-27", "2026-07-28", "2026-07-29", "2026-07-30", "2026-07-31", "2026-08-03", "2026-08-04", "2026-08-05"], "left_trough": 1.67, "right_trough": 1.81, "peak": 1.81, "current": 2.011, "recovery": 8.4, "diff": 8.4, "vr": 0.94, "status": "确认"}, {"name": "黄金股ETF永赢", "type": "ETF", "score": 56, "label": "W底形成中", "closes": [2.63, 2.49, 2.49, 2.56, 2.52, 2.6, 2.57, 2.48, 2.62, 2.66, 2.62, 2.67, 2.87, 2.72, 2.62, 2.58, 2.55, 2.54, 2.57, 2.57, 2.53, 2.46, 2.37, 2.38, 2.37, 2.21, 2.18, 2.03, 2.13, 2.2, 2.13, 2.18, 2.27, 2.25, 2.33, 2.26, 2.25, 2.23, 2.4, 2.34, 2.31, 2.29, 2.31, 2.29, 2.32, 2.29, 2.32, 2.32, 2.31, 2.22, 2.21, 2.18, 2.13, 2.19, 2.14, 2.23, 2.28, 2.32, 2.26, 2.24, 2.23, 2.15, 2.05, 2.01, 1.99, 1.95, 1.91, 1.96, 1.98, 2.05, 1.96, 1.89, 1.89, 1.9, 1.94, 1.92, 1.86, 1.83, 1.72, 1.74, 1.7, 1.7, 1.81, 1.92, 1.89, 1.89, 1.84, 1.87, 1.71, 1.71, 1.63, 1.59, 1.62, 1.58, 1.58, 1.66, 1.78, 1.75, 1.69, 1.69, 1.68, 1.72, 1.66, 1.74, 1.7, 1.71, 1.62, 1.65, 1.75, 1.85, 1.89, 1.79, 1.83, 1.81, 1.84, 1.84, 1.89, 1.88, 1.87, 2.0], "dates": ["2026-02-04", "2026-02-05", "2026-02-06", "2026-02-09", "2026-02-10", "2026-02-11", "2026-02-12", "2026-02-13", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02", "2026-04-03", "2026-04-07", "2026-04-08", "2026-04-09", "2026-04-10", "2026-04-13", "2026-04-14", "2026-04-15", "2026-04-16", "2026-04-17", "2026-04-20", "2026-04-21", "2026-04-22", "2026-04-23", "2026-04-24", "2026-04-27", "2026-04-28", "2026-04-29", "2026-04-30", "2026-05-06", "2026-05-07", "2026-05-08", "2026-05-11", "2026-05-12", "2026-05-13", "2026-05-14", "2026-05-15", "2026-05-18", "2026-05-19", "2026-05-20", "2026-05-21", "2026-05-22", "2026-05-25", "2026-05-26", "2026-05-27", "2026-05-28", "2026-05-29", "2026-06-01", "2026-06-02", "2026-06-03", "2026-06-04", "2026-06-05", "2026-06-08", "2026-06-09", "2026-06-10", "2026-06-11", "2026-06-12", "2026-06-15", "2026-06-16", "2026-06-17", "2026-06-18", "2026-06-22", "2026-06-23", "2026-06-24", "2026-06-25", "2026-06-26", "2026-06-29", "2026-06-30", "2026-07-01", "2026-07-02", "2026-07-03", "2026-07-06", "2026-07-07", "2026-07-08", "2026-07-09", "2026-07-10", "2026-07-13", "2026-07-14", "2026-07-15", "2026-07-16", "2026-07-17", "2026-07-20", "2026-07-21", "2026-07-22", "2026-07-23", "2026-07-24", "2026-07-27", "2026-07-28", "2026-07-29", "2026-07-30", "2026-07-31", "2026-08-03", "2026-08-04", "2026-08-05"], "left_trough": 1.87, "right_trough": 2.04, "peak": 2.1, "current": 1.87, "recovery": 12.3, "diff": 9.1, "vr": 0.92, "status": "形成中"}, {"name": "500质量成长ETF鹏扬", "type": "ETF", "score": 53, "label": "W底确认", "closes": [1.32, 1.3, 1.3, 1.32, 1.32, 1.34, 1.34, 1.32, 1.34, 1.35, 1.35, 1.37, 1.39, 1.34, 1.33, 1.33, 1.34, 1.32, 1.34, 1.33, 1.33, 1.3, 1.29, 1.27, 1.28, 1.24, 1.22, 1.17, 1.2, 1.23, 1.21, 1.23, 1.23, 1.22, 1.24, 1.22, 1.21, 1.21, 1.27, 1.27, 1.28, 1.27, 1.28, 1.27, 1.3, 1.31, 1.31, 1.31, 1.33, 1.32, 1.31, 1.31, 1.3, 1.32, 1.32, 1.36, 1.37, 1.37, 1.39, 1.39, 1.41, 1.38, 1.36, 1.35, 1.38, 1.37, 1.35, 1.37, 1.39, 1.4, 1.38, 1.38, 1.36, 1.35, 1.37, 1.37, 1.37, 1.35, 1.32, 1.35, 1.33, 1.33, 1.35, 1.4, 1.41, 1.42, 1.42, 1.44, 1.41, 1.42, 1.43, 1.39, 1.43, 1.45, 1.46, 1.44, 1.45, 1.44, 1.42, 1.39, 1.43, 1.4, 1.35, 1.39, 1.38, 1.35, 1.28, 1.27, 1.35, 1.35, 1.35, 1.32, 1.35, 1.32, 1.34, 1.3, 1.33, 1.32, 1.35, 1.38], "dates": ["2026-02-04", "2026-02-05", "2026-02-06", "2026-02-09", "2026-02-10", "2026-02-11", "2026-02-12", "2026-02-13", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02", "2026-04-03", "2026-04-07", "2026-04-08", "2026-04-09", "2026-04-10", "2026-04-13", "2026-04-14", "2026-04-15", "2026-04-16", "2026-04-17", "2026-04-20", "2026-04-21", "2026-04-22", "2026-04-23", "2026-04-24", "2026-04-27", "2026-04-28", "2026-04-29", "2026-04-30", "2026-05-06", "2026-05-07", "2026-05-08", "2026-05-11", "2026-05-12", "2026-05-13", "2026-05-14", "2026-05-15", "2026-05-18", "2026-05-19", "2026-05-20", "2026-05-21", "2026-05-22", "2026-05-25", "2026-05-26", "2026-05-27", "2026-05-28", "2026-05-29", "2026-06-01", "2026-06-02", "2026-06-03", "2026-06-04", "2026-06-05", "2026-06-08", "2026-06-09", "2026-06-10", "2026-06-11", "2026-06-12", "2026-06-15", "2026-06-16", "2026-06-17", "2026-06-18", "2026-06-22", "2026-06-23", "2026-06-24", "2026-06-25", "2026-06-26", "2026-06-29", "2026-06-30", "2026-07-01", "2026-07-02", "2026-07-03", "2026-07-06", "2026-07-07", "2026-07-08", "2026-07-09", "2026-07-10", "2026-07-13", "2026-07-14", "2026-07-15", "2026-07-16", "2026-07-17", "2026-07-20", "2026-07-21", "2026-07-22", "2026-07-23", "2026-07-24", "2026-07-27", "2026-07-28", "2026-07-29", "2026-07-30", "2026-07-31", "2026-08-03", "2026-08-04", "2026-08-05"], "left_trough": 1.11, "right_trough": 1.21, "peak": 1.22, "current": 1.353, "recovery": 9.9, "diff": 9.0, "vr": 1.05, "status": "确认"}, {"name": "科创AIETF博时", "type": "ETF", "score": 51, "label": "W底确认", "closes": [0.88, 0.86, 0.84, 0.88, 0.9, 0.89, 0.93, 0.93, 0.9, 0.9, 0.91, 0.94, 0.92, 0.86, 0.84, 0.86, 0.87, 0.86, 0.88, 0.86, 0.84, 0.83, 0.83, 0.8, 0.82, 0.8, 0.78, 0.74, 0.76, 0.77, 0.75, 0.76, 0.75, 0.74, 0.77, 0.74, 0.74, 0.75, 0.8, 0.79, 0.8, 0.8, 0.82, 0.81, 0.83, 0.83, 0.85, 0.83, 0.85, 0.84, 0.83, 0.85, 0.83, 0.84, 0.89, 0.93, 0.96, 0.95, 0.98, 0.97, 1.0, 0.97, 0.95, 0.97, 1.01, 1.02, 0.98, 1.0, 1.02, 1.0, 0.97, 0.97, 0.92, 0.9, 0.91, 0.93, 0.92, 0.9, 0.87, 0.9, 0.87, 0.85, 0.85, 0.89, 0.9, 0.92, 0.96, 0.96, 0.93, 0.96, 1.0, 0.96, 1.0, 1.05, 1.02, 0.96, 0.96, 0.94, 0.94, 0.95, 1.01, 0.98, 0.93, 0.94, 0.9, 0.88, 0.81, 0.81, 0.87, 0.85, 0.83, 0.82, 0.84, 0.79, 0.79, 0.75, 0.8, 0.78, 0.81, 0.84], "dates": ["2026-02-04", "2026-02-05", "2026-02-06", "2026-02-09", "2026-02-10", "2026-02-11", "2026-02-12", "2026-02-13", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02", "2026-04-03", "2026-04-07", "2026-04-08", "2026-04-09", "2026-04-10", "2026-04-13", "2026-04-14", "2026-04-15", "2026-04-16", "2026-04-17", "2026-04-20", "2026-04-21", "2026-04-22", "2026-04-23", "2026-04-24", "2026-04-27", "2026-04-28", "2026-04-29", "2026-04-30", "2026-05-06", "2026-05-07", "2026-05-08", "2026-05-11", "2026-05-12", "2026-05-13", "2026-05-14", "2026-05-15", "2026-05-18", "2026-05-19", "2026-05-20", "2026-05-21", "2026-05-22", "2026-05-25", "2026-05-26", "2026-05-27", "2026-05-28", "2026-05-29", "2026-06-01", "2026-06-02", "2026-06-03", "2026-06-04", "2026-06-05", "2026-06-08", "2026-06-09", "2026-06-10", "2026-06-11", "2026-06-12", "2026-06-15", "2026-06-16", "2026-06-17", "2026-06-18", "2026-06-22", "2026-06-23", "2026-06-24", "2026-06-25", "2026-06-26", "2026-06-29", "2026-06-30", "2026-07-01", "2026-07-02", "2026-07-03", "2026-07-06", "2026-07-07", "2026-07-08", "2026-07-09", "2026-07-10", "2026-07-13", "2026-07-14", "2026-07-15", "2026-07-16", "2026-07-17", "2026-07-20", "2026-07-21", "2026-07-22", "2026-07-23", "2026-07-24", "2026-07-27", "2026-07-28", "2026-07-29", "2026-07-30", "2026-07-31", "2026-08-03", "2026-08-04", "2026-08-05"], "left_trough": 0.73, "right_trough": 0.79, "peak": 0.79, "current": 0.817, "recovery": 8.2, "diff": 8.2, "vr": 1.16, "status": "确认"}];
+const colors = ['#e74c3c','#2980b9','#9b59b6','#16a085','#e67e22','#34495e','#1abc9c','#d35400','#8e44ad'];
+const grid = document.getElementById('chartsGrid');
+chartData.forEach((c, idx) => {
+  const card = document.createElement('div');
+  card.className = 'chart-card';
+  card.innerHTML = `
+    <h4><span style="color:${colors[idx%colors.length]}">&#9679;</span> ${c.name}</h4>
+    <div class="sub">${c.label} &#183; &#24471;&#20998;${c.score} &#183; &#21453;&#24377;${c.recovery}% &#183; &#20559;&#24046;${c.diff}% &#183; VR${c.vr}</div>
+    <div class="chart-box"><canvas></canvas></div>
+  `;
+  grid.appendChild(card);
+
+  const ctx = card.querySelector('canvas').getContext('2d');
+  const ltLine = new Array(c.closes.length).fill(c.left_trough);
+  const pkLine = new Array(c.closes.length).fill(c.peak);
+  const rtLine = new Array(c.closes.length).fill(c.right_trough);
+
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: c.dates,
+      datasets: [
+        { data: c.closes, borderColor: colors[idx%colors.length], backgroundColor: colors[idx%colors.length]+'15', borderWidth: 1.8, pointRadius: 0, fill: true, tension: 0.35, label: '&#25910;&#30424;&#20215;' },
+        { data: ltLine, borderColor: '#16a085', borderDash: [5,5], borderWidth: 1, pointRadius: 0, fill: false, label: '&#24038;&#24213;='+c.left_trough },
+        { data: pkLine, borderColor: '#e67e22', borderDash: [3,3], borderWidth: 1, pointRadius: 0, fill: false, label: '&#23792;&#39030;='+c.peak },
+        { data: rtLine, borderColor: '#2980b9', borderDash: [5,5], borderWidth: 1, pointRadius: 0, fill: false, label: '&#21491;&#24213;='+c.right_trough }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: {display: false}, tooltip: { callbacks: { title: (i) => c.dates[i[0].dataIndex], label: (i) => (i.datasetIndex===0?'&#20215;&#26684; ':'&#21442;&#32771;&#32447; ')+i.parsed.y }}},
+      scales: { x: { display: false }, y: { display: true, position: 'right', ticks: { font: {size: 9}, color: '#95a5a6' }, grid: { color: '#f0f2f5' } } }
+    }
+  });
+});
+</script>
+</body>
+</html>
