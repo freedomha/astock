@@ -672,7 +672,13 @@ def main():
         sorted_for_display = sorted(results, key=lambda r: (r.get("confirmed", False), r["score"]), reverse=True)
         for i, r in enumerate(sorted_for_display[:top_n]):
             entry_d = r.get("entry_date") or "-"
-            print(f"{i+1:<4}{r['name']:<22}{r['score']:<5}{r['label']:<22}{r['breakdown_date']:<12}{r['recovery_date']:<12}{entry_d:<12}{r['break_pct']:<7}{r['recovery_pct']:<7}")
+            break_pct = r.get("break_pct", "-")
+            recovery_pct = r.get("recovery_pct", "-")
+            if isinstance(break_pct, (int, float)):
+                break_pct = f"{break_pct}"
+            if isinstance(recovery_pct, (int, float)):
+                recovery_pct = f"{recovery_pct}"
+            print(f"{i+1:<4}{r['name']:<22}{r['score']:<5}{r['label']:<22}{r['breakdown_date']:<12}{r['recovery_date']:<12}{entry_d:<12}{break_pct:<7}{recovery_pct:<7}")
     
     # Detailed for confirmed
     if confirmed_list:
@@ -681,11 +687,14 @@ def main():
         print("=" * 60)
         for i, r in enumerate(confirmed_list):
             print(f"\n{i+1}. {r['name']} — {r['label']}")
-            print(f"   得分:{r['score']}/100 | 入场价:{r['current']} | 入场日:{r['entry_date']}")
-            print(f"   前低:{r['prior_low_price']} ({r['prior_low_date']}) | 破位: {r['breakdown_date']}(深{r['break_pct']}%) | 回升: {r['recovery_date']}(+{r['recovery_pct']:.1f}%)")
-            print(f"   滞后: {r['lag_bars']}天 | 前期跌幅: {r['prior_decline']}% | 量比: {r['vol_ratio']:.0%} | 距60MA: {r['d_ma60']:+.1f}%")
-            print(f"   评分详情: D1(破深)={r['d1']} D2(回升)={r['d2']} D3(量)={r['d3']} D4(前低质)={r['d4']} D5(前跌)={r['d5']} D6(速度)={r['d6']} D7(60MA)={r['d7']} 惩罚={r['penalties']}")
-            for reason in r["reasons"]:
+            print(f"   得分:{r['score']}/100 | 入场价:{r['current']} | 入场日:{r.get('entry_date', '-')}")
+            bp = r.get("break_pct", "-")
+            rp = r.get("recovery_pct", "-")
+            print(f"   前低:{r.get('prior_low_price','-')} ({r.get('prior_low_date','-')}) | 破位: {r.get('breakdown_date','-')}(深{bp}%) | 回升: {r.get('recovery_date','-')}(+{rp}%)")
+            print(f"   滞后: {r.get('lag_bars','-')}天 | 前期跌幅: {r.get('prior_decline','-')}% | 量比: {r.get('vol_ratio','-')} | 距60MA: {r.get('d_ma60','-')}%")
+            d = {f'D{k}': r.get(f'd{k}', '-') for k in range(1, 8)}
+            print(f"   评分详情: D1(破深)={d['D1']} D2(回升)={d['D2']} D3(量)={d['D3']} D4(前低质)={d['D4']} D5(前跌)={d['D5']} D6(速度)={d['D6']} D7(60MA)={d['D7']} 惩罚={r.get('penalties','-')}")
+            for reason in r.get("reasons", []):
                 print(f"     {reason}")
 
     # Show top unconfirmed signals that need monitoring
@@ -694,8 +703,10 @@ def main():
         print(f"⏳ 待确认高评分信号 (≥80分, 需等待2阳确认, 共{len(unconf_high)}只)")
         print("=" * 60)
         for i, r in enumerate(unconf_high[:10]):
-            print(f"  {i+1}. {r['name']}({r['code']}) 得分:{r['score']} | 前低:{r['prior_low_price']}({r['prior_low_date']})")
-            print(f"     破位:{r['breakdown_date']}(深{r['break_pct']}%) 回升:{r['recovery_date']}(+{r['recovery_pct']:.1f}%) — 缺少2根阳线确认")
+            print(f"  {i+1}. {r['name']}({r['code']}) 得分:{r['score']} | 前低:{r.get('prior_low_price','-')}({r.get('prior_low_date','-')})")
+            bp = r.get("break_pct", "-")
+            rp = r.get("recovery_pct", "-")
+            print(f"     破位:{r.get('breakdown_date','-')}(深{bp}%) 回升:{r.get('recovery_date','-')}(+{rp}%) — 缺少2根阳线确认")
     
     return results
 

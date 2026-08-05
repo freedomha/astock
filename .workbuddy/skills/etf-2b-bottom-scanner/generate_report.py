@@ -15,6 +15,9 @@ from datetime import datetime
 def build_report(results, klines, output_path):
     today = datetime.now().strftime("%Y-%m-%d")
 
+    # Filter out v3 quality-filtered results (score=0, missing scoring details)
+    results = [r for r in results if r.get("score", 0) > 0]
+
     # v2: group by confirmed status
     confirmed_all = [r for r in results if r.get("confirmed")]
     unconfirmed_all = [r for r in results if not r.get("confirmed")]
