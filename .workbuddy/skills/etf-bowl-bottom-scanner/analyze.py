@@ -24,6 +24,7 @@ NODE_BIN = "/Users/aldiadmin/.workbuddy/binaries/node/versions/22.22.2/bin/node"
 
 KLINE_DAYS = 250
 MAX_WORKERS = 8
+CHECK_DAYS = 5  # Fetch this many days for the quick staleness check
 
 
 def run_westock(*args):
@@ -359,6 +360,90 @@ def analyze_bowl_bottom(code, name, etype, kline_data):
     }
 
 
+def update_kline_data(kline_data, etfs, kline_file):
+    """
+    Check cached kline data and append latest records if any are missing.
+
+    Strategy:
+    1. Fetch a small sample (CHECK_DAYS days) for the first ETF to determine
+       the latest available trading date from the data source.
+    2. Compare each cached ETF's newest date against the latest available.
+    3. For ETFs needing an update, fetch fresh 250-day data in parallel and
+       prepend only records newer than the cached newest date.
+    4. New ETFs not in cache are fetched and added whole.
+    5. Save the merged result back to disk.
+
+    Returns the number of ETFs updated.
+    """
+    if not etfs:
+        return 0
+
+    # ---- Quick check: get the latest available date from data source ----
+    sample_code = etfs[0]["code"]
+    sample_data = run_westock("kline", sample_code, "--period", "day", "--limit", str(CHECK_DAYS))
+    if not sample_data or not isinstance(sample_data, list) or len(sample_data) == 0:
+        print("  ⚠ 无法获取最新交易日期, 跳过更新检查")
+        return 0
+    latest_available_date = sample_data[0]["date"]
+
+    # ---- Determine which ETFs need an update ----
+    to_update = []
+    for e in etfs:
+        code = e["code"]
+        cached = kline_data.get(code)
+        if not cached or not isinstance(cached, list) or len(cached) == 0:
+            to_update.append(code)
+            continue
+        latest_cached_date = cached[0]["date"]  # newest-first
+        if latest_cached_date < latest_available_date:
+            to_update.append(code)
+
+    if not to_update:
+        return 0
+
+    print(f"\n🔄 需要更新 {len(to_update)} 只ETF的K线数据 (最新交易日: {latest_available_date})")
+
+    # ---- Fetch and merge in parallel ----
+    updated = 0
+    failed = 0
+    total = len(to_update)
+    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+        futures = {executor.submit(fetch_kline, code): code for code in to_update}
+        for future in as_completed(futures):
+            code = futures[future]
+            try:
+                _, new_data = future.result()
+                if new_data and isinstance(new_data, list) and len(new_data) > 0:
+                    cached = kline_data.get(code, [])
+                    if cached and isinstance(cached, list) and len(cached) > 0:
+                        latest_cached_date = cached[0]["date"]
+                        new_records = [r for r in new_data if r["date"] > latest_cached_date]
+                        if new_records:
+                            kline_data[code] = new_records + cached
+                            updated += 1
+                        # else: no new records to append (up to date)
+                    else:
+                        kline_data[code] = new_data
+                        updated += 1
+                else:
+                    failed += 1
+                if (updated + failed) % 20 == 0:
+                    print(f"  更新进度: {updated + failed}/{total}")
+            except Exception as e:
+                failed += 1
+                print(f"  {code} 更新失败: {e}")
+
+    print(f"更新完成: {updated} 成功, {failed} 失败")
+
+    # ---- Save merged data ----
+    if updated > 0:
+        with open(kline_file, "w") as f:
+            json.dump(kline_data, f, ensure_ascii=False)
+        print(f"K线数据已保存: {kline_file}")
+
+    return updated
+
+
 def main():
     print("=" * 60)
     print("A股ETF碗底形态分析 (v1)")
@@ -379,6 +464,13 @@ def main():
         with open(kline_file) as f:
             kline_data = json.load(f)
         print(f"已加载 {len(kline_data)} 只ETF K线数据")
+
+        # Append latest data if available
+        updated = update_kline_data(kline_data, etfs, kline_file)
+        if updated > 0:
+            print(f"已追加 {updated} 只ETF的最新记录")
+        else:
+            print("K线数据已是最新，无需更新")
     else:
         print(f"\n📊 并行拉取K线数据 (最多{MAX_WORKERS}并发, 每个{KLINE_DAYS}天)...")
         codes = [e["code"] for e in etfs]
