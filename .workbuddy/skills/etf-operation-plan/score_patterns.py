@@ -320,3 +320,369 @@ def analyze_bowl_bottom(code, name, etype, kline_data):
         "c5": round(c5, 1), "c10": round(c10, 1), "c20": round(c20, 1),
         "reasons": reasons,
     }
+
+
+# ─── Box Consolidation Scoring ─────────────────────────────────────────────
+
+def detect_box_bounces(highs, lows, closes, window_days):
+    """
+    Detect range quality by finding support/resistance touches.
+    
+    Uses local extrema detection within the window:
+    - Finds local minima (support candidates) and local maxima (resistance candidates)
+    - Clusters nearby extremes into support/resistance levels (within 2% tolerance)
+    - Counts touches at each clustered level
+    - Returns (max_support_touches, max_resistance_touches, support_level, resistance_level)
+    """
+    n = len(highs)
+    if n < window_days:
+        window_days = n
+    
+    h = highs[-window_days:]
+    l = lows[-window_days:]
+    c = closes[-window_days:]
+    w = len(h)
+    
+    # Find local minima (support candidates): price within 5-day window where low is minimum
+    local_mins = []
+    for i in range(2, w - 2):
+        if l[i] == min(l[i-2:i+3]):
+            local_mins.append({"idx": i, "price": l[i], "close": c[i]})
+    
+    # Find local maxima (resistance candidates): price within 5-day window where high is maximum
+    local_maxs = []
+    for i in range(2, w - 2):
+        if h[i] == max(h[i-2:i+3]):
+            local_maxs.append({"idx": i, "price": h[i], "close": c[i]})
+    
+    # Filter out zero-priced extremes (data quality issue)
+    local_mins = [x for x in local_mins if x["price"] > 0]
+    local_maxs = [x for x in local_maxs if x["price"] > 0]
+    
+    if len(local_mins) < 2 or len(local_maxs) < 2:
+        return 0, 0, 0, 0
+    
+    # Sort by price
+    local_mins.sort(key=lambda x: x["price"])
+    local_maxs.sort(key=lambda x: x["price"])
+    
+    # Cluster support levels (nearby lows within 3% tolerance)
+    def cluster_levels(points, tolerance_pct=0.03):
+        """Group nearby points into levels, count touches at each level."""
+        if not points:
+            return []
+        clusters = []
+        current = [points[0]]
+        for p in points[1:]:
+            avg = sum(x["price"] for x in current) / len(current)
+            if avg <= 0:
+                current.append(p)
+            elif abs(p["price"] - avg) / avg < tolerance_pct:
+                current.append(p)
+            else:
+                clusters.append(current)
+                current = [p]
+        clusters.append(current)
+        
+        results = []
+        for cl in clusters:
+            avg_price = sum(x["price"] for x in cl) / len(cl)
+            results.append({
+                "level": round(avg_price, 2),
+                "touches": len(cl),
+                "prices": [x["price"] for x in cl],
+            })
+        return results
+    
+    support_clusters = cluster_levels(local_mins, 0.025)
+    resistance_clusters = cluster_levels(local_maxs, 0.025)
+    
+    # Find the strongest support and resistance clusters
+    best_support = max(support_clusters, key=lambda x: x["touches"]) if support_clusters else {"level": 0, "touches": 0}
+    best_resistance = max(resistance_clusters, key=lambda x: x["touches"]) if resistance_clusters else {"level": 0, "touches": 0}
+    
+    return best_support["touches"], best_resistance["touches"], best_support["level"], best_resistance["level"]
+
+
+def analyze_box_consolidation(code, name, etype, kline_data):
+    """
+    Box consolidation (箱体震荡) analysis.
+    
+    Returns score (0-100), label, and detailed metrics.
+    A tradable box range = moderate amplitude + flat trend + confirmed box + near support.
+    """
+    if not kline_data or len(kline_data) < 60:
+        return None
+    
+    records = []
+    for k in kline_data:
+        try:
+            records.append({
+                "date": k["date"],
+                "close": float(k["last"]),
+                "high": float(k["high"]),
+                "low": float(k["low"]),
+                "volume": float(k.get("volume", 0)),
+            })
+        except (KeyError, ValueError):
+            continue
+    if len(records) < 60:
+        return None
+    records.sort(key=lambda x: x["date"])
+    
+    closes = [r["close"] for r in records]
+    highs = [r["high"] for r in records]
+    lows = [r["low"] for r in records]
+    vols = [r["volume"] for r in records]
+    n = len(closes)
+    cur = closes[-1]
+    
+    # ---- 40-day window (中期) ----
+    n40 = min(40, n)
+    hi40 = max(highs[-n40:])
+    lo40 = min(lows[-n40:])
+    avg40 = sum(closes[-n40:]) / n40
+    range40_pct = (hi40 - lo40) / avg40 * 100 if avg40 > 0 else 0
+    pos40 = (cur - lo40) / (hi40 - lo40) if hi40 > lo40 else 0.5
+    
+    # ---- 90-day window (长期) ----
+    n90 = min(90, n)
+    hi90 = max(highs[-n90:])
+    lo90 = min(lows[-n90:])
+    avg90 = sum(closes[-n90:]) / n90
+    range90_pct = (hi90 - lo90) / avg90 * 100 if avg90 > 0 else 0
+    pos90 = (cur - lo90) / (hi90 - lo90) if hi90 > lo90 else 0.5
+    
+    # ---- Trend slopes ----
+    t20 = lin_slope(closes, 20)
+    t40 = lin_slope(closes, 40)
+    t90 = lin_slope(closes, 90)
+    
+    # ---- Box bounce quality ----
+    support_touches_40, resist_touches_40, sup_level_40, res_level_40 = detect_box_bounces(highs, lows, closes, 40)
+    support_touches_90, resist_touches_90, sup_level_90, res_level_90 = detect_box_bounces(highs, lows, closes, 90)
+    
+    # Combined bounce quality
+    total_bounces_40 = support_touches_40 + resist_touches_40
+    total_bounces_90 = support_touches_90 + resist_touches_90
+    
+    # ---- ATR and volume ----
+    atr20 = atr(highs, lows, closes, 20)
+    atr90_val = atr(highs, lows, closes, 90)
+    atr_ratio = atr20 / atr90_val if atr90_val > 0 else 1
+    
+    vol20 = sum(vols[-20:]) / 20
+    vol60 = sum(vols[-60:]) / 60
+    vol_ratio = vol20 / vol60 if vol60 > 0 else 1
+    
+    # ---- MA distances ----
+    ma20 = sum(closes[-20:]) / 20
+    ma40 = sum(closes[-n40:]) / n40
+    ma90 = sum(closes[-n90:]) / n90
+    d_ma20 = (cur - ma20) / ma20 * 100
+    d_ma40 = (cur - ma40) / ma40 * 100
+    d_ma90 = (cur - ma90) / ma90 * 100
+    
+    # ---- MA convergence: how close are MA20, MA40, MA90 to each other? ----
+    ma_values = [ma20, ma40, ma90]
+    ma_spread = (max(ma_values) - min(ma_values)) / ma20 * 100 if ma20 > 0 else 100
+    
+    # ---- Rate of change ----
+    c5 = (closes[-1] - closes[-6]) / closes[-6] * 100 if n >= 6 else 0
+    c10 = (closes[-1] - closes[-11]) / closes[-11] * 100 if n >= 11 else 0
+    c20_pct = (closes[-1] - closes[-21]) / closes[-21] * 100 if n >= 21 else 0
+    
+    # ---- Drawdown from 90d high ----
+    dd90 = (cur - hi90) / hi90 * 100 if hi90 > 0 else 0
+    
+    # ---- Distance from 90d low ----
+    dist_lo90 = (cur - lo90) / lo90 * 100 if lo90 > 0 else 0
+    
+    # ============ SCORING (max ~105, clamped 0-100) ============
+    score = 0
+    reasons = []
+    
+    # 1. 40-day range width (振幅) — max 25
+    if 8 <= range40_pct <= 15:
+        score += 25
+        reasons.append(f"✅ 40日振幅理想({range40_pct:.1f}%) 适合差价")
+    elif 5 <= range40_pct < 8:
+        score += 15
+        reasons.append(f"🟡 40日振幅适中({range40_pct:.1f}%) 差价空间略小")
+    elif 15 < range40_pct <= 20:
+        score += 12
+        reasons.append(f"🟡 40日振幅较大({range40_pct:.1f}%) 差价空间充足")
+    elif 20 < range40_pct <= 30:
+        score += 5
+        reasons.append(f"🟡 40日振幅偏大({range40_pct:.1f}%) 波动偏高")
+    elif range40_pct > 30:
+        score += 2
+        reasons.append(f"❌ 40日振幅过大({range40_pct:.1f}%)")
+    else:
+        reasons.append(f"❌ 40日振幅过窄({range40_pct:.1f}%) 无差价空间")
+    
+    # 2. 90-day range width (振幅) — max 20
+    if 10 <= range90_pct <= 20:
+        score += 20
+        reasons.append(f"✅ 90日振幅理想({range90_pct:.1f}%) 长线箱体")
+    elif 5 <= range90_pct < 10:
+        score += 12
+        reasons.append(f"🟡 90日振幅适中({range90_pct:.1f}%)")
+    elif 20 < range90_pct <= 30:
+        score += 8
+        reasons.append(f"🟡 90日振幅偏大({range90_pct:.1f}%)")
+    elif range90_pct > 30:
+        score += 3
+        reasons.append(f"❌ 90日振幅过大({range90_pct:.1f}%)")
+    else:
+        reasons.append(f"❌ 90日振幅过窄({range90_pct:.1f}%)")
+    
+    # 3. Trend flatness 40d — max 20
+    abs_t40 = abs(t40)
+    if abs_t40 < 2:
+        score += 20
+        reasons.append(f"✅ 40日趋势平坦({t40:+.1f}%)")
+    elif abs_t40 < 3:
+        score += 15
+        reasons.append(f"✅ 40日趋势平缓({t40:+.1f}%)")
+    elif abs_t40 < 5:
+        score += 8
+        reasons.append(f"🟡 40日趋势微倾({t40:+.1f}%)")
+    else:
+        reasons.append(f"❌ 40日趋势明显({t40:+.1f}%)")
+    
+    # 4. Box bounce quality — max 15
+    bounce_score = 0
+    if support_touches_40 >= 3 and resist_touches_40 >= 3:
+        bounce_score = 15
+        reasons.append(f"✅ 箱体确认: 支撑{support_touches_40}触+阻力{resist_touches_40}触")
+    elif support_touches_40 >= 2 and resist_touches_40 >= 2:
+        bounce_score = 10
+        reasons.append(f"🟡 箱体初现: 支撑{support_touches_40}触+阻力{resist_touches_40}触")
+    elif support_touches_40 >= 1 and resist_touches_40 >= 1:
+        bounce_score = 5
+        reasons.append(f"🟡 箱体雏形: 支撑{support_touches_40}触+阻力{resist_touches_40}触")
+    else:
+        reasons.append(f"❌ 箱体不明确 支撑{support_touches_40}触+阻力{resist_touches_40}触")
+    
+    # Bonus for 90d box quality
+    if support_touches_90 >= 3 and resist_touches_90 >= 3 and bounce_score < 15:
+        bounce_score = max(bounce_score, 12)
+    
+    score += bounce_score
+    
+    # 5. Near support (entry signal) — max 10
+    if pos40 <= 0.25:
+        score += 10
+        reasons.append(f"✅ 近箱底({pos40:.0%}) 买入区")
+    elif pos40 <= 0.35:
+        score += 6
+        reasons.append(f"🟡 箱中偏底({pos40:.0%})")
+    elif pos40 <= 0.65:
+        score += 3
+        reasons.append(f"🟡 箱中震荡({pos40:.0%})")
+    else:
+        reasons.append(f"⚠️ 近箱顶({pos40:.0%}) 追高风险")
+    
+    # 6. ATR compression — max 5
+    if atr_ratio < 0.85:
+        score += 5
+        reasons.append(f"✅ 波幅压缩({atr_ratio:.0%})")
+    elif atr_ratio < 1.0:
+        score += 3
+        reasons.append(f"🟡 波幅稳定({atr_ratio:.0%})")
+    elif atr_ratio < 1.2:
+        score += 1
+        reasons.append(f"🟡 波幅正常({atr_ratio:.0%})")
+    else:
+        reasons.append(f"❌ 波幅放大({atr_ratio:.0%})")
+    
+    # 7. Volume stability — max 5
+    if 0.7 <= vol_ratio <= 1.3:
+        score += 5
+        reasons.append(f"✅ 量能稳定({vol_ratio:.0%})")
+    elif 0.5 <= vol_ratio <= 1.5:
+        score += 3
+        reasons.append(f"🟡 量能正常({vol_ratio:.0%})")
+    else:
+        reasons.append(f"❌ 量能异动({vol_ratio:.0%})")
+    
+    # 8. MA convergence bonus (均线粘合) — max +3
+    if ma_spread < 2:
+        score += 3
+        reasons.append(f"✅ 均线粘合({ma_spread:.1f}%) +3pt")
+    elif ma_spread < 4:
+        score += 1
+        reasons.append(f"🟡 均线趋合({ma_spread:.1f}%) +1pt")
+    
+    # ---- Penalties ----
+    if abs_t40 > 8:
+        penalty = 15
+        score -= penalty
+        reasons.append(f"🔴 强趋势惩罚({t40:+.1f}%) -{penalty}pt")
+    
+    if dd90 > -3:
+        penalty = 10
+        score -= penalty
+        reasons.append(f"🔴 突破箱顶({dd90:+.1f}%) -{penalty}pt")
+    
+    if t40 < -6 and dd90 < -10:
+        penalty = 10
+        score -= penalty
+        reasons.append(f"🔴 持续下跌({t40:+.1f}%) -{penalty}pt")
+    
+    score = max(0, min(100, score))
+    
+    # ---- Consolidation label ----
+    is_box_40 = range40_pct >= 5 and abs_t40 < 5 and total_bounces_40 >= 4
+    is_box_90 = range90_pct >= 8 and abs(t90) < 6 and total_bounces_90 >= 4
+    is_narrow = range40_pct < 8 and range40_pct >= 3 and abs_t40 < 4
+    is_wide = range40_pct > 20 and abs_t40 < 5
+    is_downtrend = t40 < -8
+    near_top = pos40 > 0.75
+
+    if near_top and is_box_40 and score >= 45:
+        label = "🟡 箱顶观望"
+    elif is_box_40 and is_box_90 and score >= 70:
+        label = "🟢 确认箱体(中长)"
+    elif is_box_40 and score >= 60:
+        label = "🟢 确认箱体(中期)"
+    elif is_downtrend:
+        label = "🔴 下跌趋势"
+    elif is_narrow and score >= 45:
+        label = "🟡 窄幅收敛"
+    elif is_wide and score >= 45:
+        label = "🟡 宽幅震荡"
+    else:
+        label = "⚪ 趋势行情"
+    
+    return {
+        "code": code, "name": name, "type": etype,
+        "score": score, "label": label,
+        "current": round(cur, 2),
+        "range40": round(range40_pct, 1),
+        "range90": round(range90_pct, 1),
+        "pos40": round(pos40 * 100, 1),
+        "pos90": round(pos90 * 100, 1),
+        "t20": round(t20, 1),
+        "t40": round(t40, 1),
+        "t90": round(t90, 1),
+        "sup_touch_40": support_touches_40,
+        "res_touch_40": resist_touches_40,
+        "sup_level_40": round(sup_level_40, 2),
+        "res_level_40": round(res_level_40, 2),
+        "sup_touch_90": support_touches_90,
+        "res_touch_90": resist_touches_90,
+        "sup_level_90": round(sup_level_90, 2),
+        "res_level_90": round(res_level_90, 2),
+        "atr_ratio": round(atr_ratio, 2),
+        "vol_ratio": round(vol_ratio, 2),
+        "ma_spread": round(ma_spread, 1),
+        "d_ma20": round(d_ma20, 1),
+        "d_ma40": round(d_ma40, 1),
+        "d_ma90": round(d_ma90, 1),
+        "dd90": round(dd90, 1),
+        "dist_lo90": round(dist_lo90, 1),
+        "c5": round(c5, 1), "c10": round(c10, 1), "c20": round(c20_pct, 1),
+        "reasons": reasons,
+    }
