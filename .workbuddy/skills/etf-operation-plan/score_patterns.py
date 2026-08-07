@@ -66,28 +66,35 @@ def quadratic_fit(prices):
     return a, b, vx
 
 
-def find_local_extrema(closes, window=5):
-    """Find local minima and maxima in price series."""
-    lows_list = []
-    highs_list = []
+EXTREMA_WINDOW = 5
+
+def find_local_extrema(closes, window=EXTREMA_WINDOW):
+    """Find local minima (valleys) and maxima (peaks) in close price series.
+    
+    Returns two lists of (index, price) tuples, ordered by index ascending.
+    A point is a local extremum if it's the min/max within `window` bars on each side.
+    """
     n = len(closes)
-    for i in range(n):
-        start = max(0, i - window)
-        end = min(n - 1, i + window)
-        if closes[i] <= min(closes[start:end + 1]):
-            lows_list.append((i, closes[i]))
-        if closes[i] >= max(closes[start:end + 1]):
-            highs_list.append((i, closes[i]))
-    # Filter adjacent same
-    filtered_lows = []
-    for i, (idx, val) in enumerate(lows_list):
-        if i == 0 or idx - lows_list[i - 1][0] > 2:
-            filtered_lows.append((idx, val))
-    filtered_highs = []
-    for i, (idx, val) in enumerate(highs_list):
-        if i == 0 or idx - highs_list[i - 1][0] > 2:
-            filtered_highs.append((idx, val))
-    return filtered_lows, filtered_highs
+    lows = []
+    highs = []
+    
+    for i in range(window, n - window):
+        is_min = True
+        is_max = True
+        for j in range(i - window, i + window + 1):
+            if j == i:
+                continue
+            if closes[j] <= closes[i]:
+                is_min = False
+            if closes[j] >= closes[i]:
+                is_max = False
+        
+        if is_min:
+            lows.append((i, closes[i]))
+        if is_max:
+            highs.append((i, closes[i]))
+    
+    return lows, highs
 
 
 # ─── Bowl-Bottom Scoring ──────────────────────────────────────────────────
@@ -1002,3 +1009,455 @@ def analyze_w_bottom(code, name, etype, kline_data):
         "rt_date": window[detection["rt_idx"]]["date"],
         "reasons": reasons,
     }
+
+
+# ─── Head-Shoulder Bottom Scoring ─────────────────────────────────────────
+
+def find_head_shoulder_pattern(lows, highs, closes, volumes):
+    """Find the best head-shoulder-bottom pattern from valley triplets.
+    
+    Walks through valley triplets (v1, v2, v3) where v2 is the head (lowest).
+    Validates geometry, finds connecting peaks for neckline, and scores.
+    
+    Returns dict with pattern details or None if no valid pattern found.
+    """
+    if len(lows) < 3:
+        return None
+    
+    n = len(closes)
+    candidates = []
+    
+    for i in range(len(lows) - 2):
+        v1_idx, v1_price = lows[i]
+        v2_idx, v2_price = lows[i + 1]
+        v3_idx, v3_price = lows[i + 2]
+        
+        # Head (v2) must be the lowest
+        if not (v2_price < v1_price and v2_price < v3_price):
+            continue
+        
+        # Right shoulder should be in the last ~30% of the chart to be relevant
+        if v3_idx < n * 0.65:
+            continue
+        
+        # Shoulders should not be too far apart in price (within 15%)
+        shoulder_max = max(v1_price, v3_price)
+        shoulder_min = min(v1_price, v3_price)
+        if shoulder_max > 0 and (shoulder_max - shoulder_min) / shoulder_min > 0.15:
+            continue
+        
+        # Minimum time between shoulders and head (at least 10 bars)
+        if v2_idx - v1_idx < 10 or v3_idx - v2_idx < 10:
+            continue
+        
+        # Prior downtrend check
+        early_start = max(0, v1_idx - 40)
+        early_prices = closes[early_start:v1_idx] if v1_idx > early_start else closes[:1]
+        early_high = max(early_prices) if early_prices else v1_price
+        prior_decline = (early_high - v1_price) / early_high * 100 if early_high > 0 else 0
+        
+        # LS position in 120-day range
+        ls_n120 = min(120, v1_idx + 1)
+        ls_hi = max(closes[max(0, v1_idx - ls_n120 + 1):v1_idx + 1])
+        ls_lo = min(closes[max(0, v1_idx - ls_n120 + 1):v1_idx + 1])
+        ls_pos = (v1_price - ls_lo) / (ls_hi - ls_lo) * 100 if ls_hi > ls_lo else 50
+        
+        # Find peaks between valleys for neckline
+        peak1_idx, peak1_price = None, float('-inf')
+        peak2_idx, peak2_price = None, float('-inf')
+        
+        for p_idx, p_price in highs:
+            if v1_idx < p_idx < v2_idx:
+                if p_price > peak1_price:
+                    peak1_idx, peak1_price = p_idx, p_price
+            if v2_idx < p_idx < v3_idx:
+                if p_price > peak2_price:
+                    peak2_idx, peak2_price = p_idx, p_price
+        
+        if peak1_idx is None or peak2_idx is None:
+            continue
+        
+        # Neckline slope (%)
+        neck_slope = (peak2_price - peak1_price) / peak1_price * 100 if peak1_price > 0 else 0
+        
+        # Hard filter: neckline must be roughly horizontal (±7% max)
+        if abs(neck_slope) > 7:
+            continue
+        
+        # Volume analysis
+        vol_ls = _avg_volume(volumes, v1_idx - 10, v1_idx + 10)
+        vol_head = _avg_volume(volumes, v2_idx - 10, v2_idx + 10)
+        vol_rs = _avg_volume(volumes, v3_idx - 10, v3_idx + 10)
+        vol_rs_ls = vol_rs / vol_ls if vol_ls > 0 else 1.0
+        vol_head_ls = vol_head / vol_ls if vol_ls > 0 else 1.0
+        
+        # Time symmetry
+        days_ls_to_head = v2_idx - v1_idx
+        days_head_to_rs = v3_idx - v2_idx
+        time_sym = days_ls_to_head / days_head_to_rs if days_head_to_rs > 0 else 0
+        time_sym = min(time_sym, 1 / time_sym) if time_sym > 0 else 0  # normalize to 0-1
+        
+        # Head depth
+        head_depth_ls = (v1_price - v2_price) / v1_price * 100 if v1_price > 0 else 0
+        head_depth_rs = (v3_price - v2_price) / v3_price * 100 if v3_price > 0 else 0
+        head_depth = min(head_depth_ls, head_depth_rs)
+        
+        # Hard filter: head must be significantly lower than shoulders (≥0.5%)
+        if head_depth < 0.5:
+            continue
+        
+        # Shoulder symmetry
+        shoulder_sym = 1.0 - abs(v1_price - v3_price) / max(v1_price, v3_price) if max(v1_price, v3_price) > 0 else 0
+        
+        # RS recovery
+        rs_rising = closes[v3_idx] > closes[v3_idx - 5] if v3_idx >= 5 else False
+        
+        # Distance from RS to neckline
+        neckline_at_rs = peak1_price + (peak2_price - peak1_price) * (v3_idx - peak1_idx) / (peak2_idx - peak1_idx) if peak2_idx > peak1_idx else peak1_price
+        rs_to_neck_pct = (neckline_at_rs - v3_price) / v3_price * 100 if v3_price > 0 else 0
+        
+        candidates.append({
+            "v1_idx": v1_idx, "v1_price": round(v1_price, 3),
+            "v2_idx": v2_idx, "v2_price": round(v2_price, 3),
+            "v3_idx": v3_idx, "v3_price": round(v3_price, 3),
+            "peak1_idx": peak1_idx, "peak1_price": round(peak1_price, 3),
+            "peak2_idx": peak2_idx, "peak2_price": round(peak2_price, 3),
+            "neck_slope": round(neck_slope, 2),
+            "vol_rs_ls": round(vol_rs_ls, 2),
+            "vol_head_ls": round(vol_head_ls, 2),
+            "time_sym": round(time_sym, 2),
+            "head_depth": round(head_depth, 2),
+            "shoulder_sym": round(shoulder_sym, 2),
+            "rs_rising": rs_rising,
+            "rs_to_neck_pct": round(rs_to_neck_pct, 2),
+            "prior_decline": round(prior_decline, 1),
+            "ls_pos": round(ls_pos, 0),
+        })
+    
+    if not candidates:
+        return None
+    
+    # Score each candidate
+    for c in candidates:
+        c["score_raw"] = score_pattern(c, closes, lows, highs)
+    
+    # Sort: prefer patterns with RS closest to end, then by score
+    candidates.sort(key=lambda x: (-x["v3_idx"], -x["score_raw"]))
+    
+    best = candidates[0]
+    best["score"] = best["score_raw"]
+    del best["score_raw"]
+    
+    return best
+
+
+def _avg_volume(volumes, start, end):
+    """Average volume in a window, clamped to valid range."""
+    start = max(0, start)
+    end = min(len(volumes), end)
+    if end <= start:
+        return 0
+    return sum(volumes[start:end]) / (end - start)
+
+
+def score_pattern(p, closes, lows, highs):
+    """Score a head-shoulder-bottom pattern candidate (max 100)."""
+    score = 0
+    reasons = []
+    n = len(closes)
+    cur = closes[-1]
+    
+    # ---- 1. Pattern completeness (max 30) ----
+    all_points = all(k in p for k in ["v1_idx", "v2_idx", "v3_idx", "peak1_idx", "peak2_idx"])
+    order_ok = (p["v1_idx"] < p["peak1_idx"] < p["v2_idx"] < p["peak2_idx"] < p["v3_idx"])
+    
+    if all_points and order_ok:
+        score += 30
+        reasons.append(f"✅ 模式完整(5点确认)")
+    elif all_points:
+        score += 20
+        reasons.append(f"🟡 模式基本完整")
+    elif p.get("v1_idx") is not None and p.get("v2_idx") is not None and p.get("v3_idx") is not None:
+        score += 12
+        reasons.append(f"🟡 三谷存在")
+    
+    # ---- 2. Head depth vs shoulders (max 15) ----
+    hd = p.get("head_depth", 0)
+    if hd >= 2.0:
+        score += 15
+        reasons.append(f"✅ 头部深度充分({hd:.1f}%)")
+    elif hd >= 1.0:
+        score += 8
+        reasons.append(f"🟡 头深一般({hd:.1f}%)")
+    else:
+        reasons.append(f"❌ 头深不足({hd:.1f}%)")
+    
+    # ---- 3. Shoulder symmetry (max 10) ----
+    ss = p.get("shoulder_sym", 0)
+    if ss >= 0.95:
+        score += 10
+        reasons.append(f"✅ 肩部对称({ss:.0%})")
+    elif ss >= 0.90:
+        score += 7
+        reasons.append(f"✅ 肩部较对称({ss:.0%})")
+    elif ss >= 0.85:
+        score += 4
+        reasons.append(f"🟡 肩部偏差({ss:.0%})")
+    else:
+        reasons.append(f"❌ 肩部不对称({ss:.0%})")
+    
+    # ---- 4. Neckline flatness (max 12) ----
+    ns = abs(p.get("neck_slope", 99))
+    if ns <= 3:
+        score += 12
+        reasons.append(f"✅ 颈线平坦(斜率{ns:+.1f}%)")
+    elif ns <= 5:
+        score += 9
+        reasons.append(f"✅ 颈线较平(斜率{ns:+.1f}%)")
+    elif ns <= 7:
+        score += 5
+        reasons.append(f"🟡 颈线倾斜(斜率{ns:+.1f}%)")
+    else:
+        reasons.append(f"❌ 颈线陡峭(斜率{ns:+.1f}%)")
+    
+    # ---- 5. Volume contraction LS→RS (max 8) ----
+    vr = p.get("vol_rs_ls", 1.0)
+    if vr < 0.70:
+        score += 8
+        reasons.append(f"✅ 量度萎缩({vr:.0%})")
+    elif vr < 0.85:
+        score += 5
+        reasons.append(f"✅ 量度缩({vr:.0%})")
+    elif vr < 1.0:
+        score += 3
+        reasons.append(f"🟡 量度平稳({vr:.0%})")
+    else:
+        reasons.append(f"❌ 量度放大({vr:.0%})")
+    
+    # ---- 6. Range position (max 10) ----
+    n120 = min(120, n)
+    hi120 = max(closes[-n120:])
+    lo120 = min(closes[-n120:])
+    pos120 = (cur - lo120) / (hi120 - lo120) if hi120 > lo120 else 0.5
+    
+    if pos120 <= 0.30:
+        score += 10
+        reasons.append(f"✅ 底部区间({pos120*100:.0f}%)")
+    elif pos120 <= 0.50:
+        score += 5
+        reasons.append(f"🟡 中低位({pos120*100:.0f}%)")
+    else:
+        if pos120 > 0.80:
+            score -= 5
+            reasons.append(f"⚠️ 高位风险({pos120*100:.0f}%)")
+        elif pos120 > 0.70:
+            score -= 3
+            reasons.append(f"⚠️ 偏高位({pos120*100:.0f}%)")
+        else:
+            reasons.append(f"❌ 中高位({pos120*100:.0f}%)")
+    
+    # ---- 7. Time symmetry (max 8) ----
+    ts = p.get("time_sym", 0)
+    if ts >= 0.60:
+        score += 8
+        reasons.append(f"✅ 时间对称({ts:.2f})")
+    elif ts >= 0.40:
+        score += 4
+        reasons.append(f"🟡 时间偏斜({ts:.2f})")
+    else:
+        reasons.append(f"❌ 时间不对({ts:.2f})")
+    
+    # ---- 8. RS recovery / breakout tendency (max 7) ----
+    rtn = p.get("rs_to_neck_pct", 99)
+    if rtn <= 3:
+        score += 7
+        reasons.append(f"✅ 右肩接近颈线(距{rtn:.1f}%)")
+    elif rtn <= 8:
+        score += 4
+        reasons.append(f"🟡 右肩距颈线{rtn:.1f}%")
+    elif p.get("rs_rising"):
+        score += 2
+        reasons.append(f"🟡 右肩上升中")
+    else:
+        reasons.append(f"❌ 右肩远离颈线({rtn:.1f}%)")
+    
+    # ---- Penalties ----
+    pd = p.get("prior_decline", 99)
+    if pd < 3:
+        score -= 15
+        reasons.append(f"⚠️ 前置跌幅不足({pd:.0f}%): 非真正下跌后反转")
+    elif pd < 5:
+        score -= 10
+        reasons.append(f"⚠️ 前置跌幅偏弱({pd:.0f}%)")
+    elif pd < 8:
+        score -= 5
+        reasons.append(f"⚠️ 前置跌幅一般({pd:.0f}%)")
+    else:
+        reasons.append(f"✅ 前置跌幅充分({pd:.0f}%)")
+    
+    lp = p.get("ls_pos", 50)
+    if lp > 75:
+        score -= 10
+        reasons.append(f"⚠️ 左肩高位({lp:.0f}%): 形态处于上涨区间")
+    elif lp > 60:
+        score -= 5
+        reasons.append(f"⚠️ 左肩偏高({lp:.0f}%)")
+    elif lp <= 35:
+        reasons.append(f"✅ 左肩低位({lp:.0f}%)")
+    
+    # Recent crash
+    t20 = lin_slope(closes[-20:], 20) if n >= 20 else 0
+    if t20 < -12:
+        score -= 20
+        reasons.append(f"⚠️ 近20日暴跌({t20:+.1f}%)")
+    elif t20 < -8:
+        score -= 10
+        reasons.append(f"⚠️ 近20日下跌({t20:+.1f}%)")
+    
+    # Volume expansion
+    if vr > 1.3:
+        score -= 15
+        reasons.append(f"⚠️ 量度异常放大({vr:.0%})")
+    
+    # RS too far from neckline
+    if rtn > 20:
+        score -= 10
+        reasons.append(f"⚠️ 右肩远离颈线({rtn:.1f}%)")
+    
+    # Too many extrema
+    if len(lows) > 15 or len(highs) > 15:
+        score -= 10
+        reasons.append(f"⚠️ 走势杂乱(谷{len(lows)}/峰{len(highs)})")
+    
+    # Head not truly lowest
+    v2_price = p.get("v2_price", 0)
+    v1_price = p.get("v1_price", 0)
+    v3_price = p.get("v3_price", 0)
+    if v1_price > 0 and v2_price > 0 and v3_price > 0:
+        if v2_price >= v1_price or v2_price >= v3_price:
+            score -= 30
+            reasons.append(f"⚠️ 头部非最低点")
+    
+    score = max(0, min(100, score))
+    p["reasons"] = reasons
+    return score
+
+
+def analyze_hs_bottom(code, name, etype, kline_data):
+    """Analyze an ETF for head-shoulder-bottom pattern."""
+    if not kline_data or len(kline_data) < 80:
+        return None
+    
+    records = []
+    for k in kline_data:
+        try:
+            records.append({
+                "date": k["date"],
+                "close": float(k["last"]),
+                "high": float(k["high"]),
+                "low": float(k["low"]),
+                "volume": float(k.get("volume", 0)),
+            })
+        except (KeyError, ValueError):
+            continue
+    
+    if len(records) < 80:
+        return None
+    
+    records.sort(key=lambda x: x["date"])
+    
+    closes = [r["close"] for r in records]
+    highs_p = [r["high"] for r in records]
+    lows_p = [r["low"] for r in records]
+    vols = [r["volume"] for r in records]
+    n = len(closes)
+    cur = closes[-1]
+    
+    # Find local extrema
+    valley_list, peak_list = find_local_extrema(closes)
+    
+    # Find head-shoulder pattern
+    pattern = find_head_shoulder_pattern(valley_list, peak_list, closes, vols)
+    
+    # ---- Always compute basic metrics ----
+    n120 = min(120, n)
+    n250 = min(250, n)
+    hi120, lo120 = max(highs_p[-n120:]), min(lows_p[-n120:])
+    hi250, lo250 = max(highs_p[-n250:]), min(lows_p[-n250:])
+    pos120 = (cur - lo120) / (hi120 - lo120) if hi120 > lo120 else 0.5
+    pos250 = (cur - lo250) / (hi250 - lo250) if hi250 > lo250 else 0.5
+    
+    t20 = lin_slope(closes, 20)
+    t60 = lin_slope(closes, 60) if n >= 60 else 0
+    
+    c5 = (closes[-1] - closes[-6]) / closes[-6] * 100 if n >= 6 else 0
+    c10 = (closes[-1] - closes[-11]) / closes[-11] * 100 if n >= 11 else 0
+    c20 = (closes[-1] - closes[-21]) / closes[-21] * 100 if n >= 21 else 0
+    
+    vol20 = sum(vols[-20:]) / 20 if n >= 20 else 0
+    vol60 = sum(vols[-60:]) / 60 if n >= 60 else 0
+    vol_ratio = vol20 / vol60 if vol60 > 0 else 1
+    
+    ma20 = sum(closes[-20:]) / 20 if n >= 20 else cur
+    ma60 = sum(closes[-60:]) / 60 if n >= 60 else cur
+    d_ma20 = (cur - ma20) / ma20 * 100
+    d_ma60 = (cur - ma60) / ma60 * 100
+    
+    base = {
+        "code": code, "name": name, "type": etype,
+        "current": round(cur, 2),
+        "pos120": round(pos120 * 100, 1),
+        "pos250": round(pos250 * 100, 1),
+        "t20": round(t20, 1),
+        "t60": round(t60, 1),
+        "c5": round(c5, 1), "c10": round(c10, 1), "c20": round(c20, 1),
+        "vol_ratio": round(vol_ratio, 2),
+        "d_ma20": round(d_ma20, 1),
+        "d_ma60": round(d_ma60, 1),
+        "num_valleys": len(valley_list),
+        "num_peaks": len(peak_list),
+    }
+    
+    if pattern is None:
+        base["score"] = 0
+        base["label"] = "⚪ 非头肩底"
+        base["has_pattern"] = False
+        base["reasons"] = [f"❌ 未找到符合条件的头肩底形态(共{len(valley_list)}谷{len(peak_list)}峰)"]
+        return base
+    
+    # Pattern found
+    base["has_pattern"] = True
+    base["score"] = pattern["score"]
+    base["reasons"] = pattern.get("reasons", [])
+    base["head_depth"] = pattern.get("head_depth", 0)
+    base["shoulder_sym"] = pattern.get("shoulder_sym", 0)
+    base["neck_slope"] = pattern.get("neck_slope", 0)
+    base["vol_rs_ls"] = pattern.get("vol_rs_ls", 1)
+    base["time_sym"] = pattern.get("time_sym", 0)
+    base["rs_to_neck_pct"] = pattern.get("rs_to_neck_pct", 99)
+    base["v1_idx"] = pattern.get("v1_idx")
+    base["v2_idx"] = pattern.get("v2_idx")
+    base["v3_idx"] = pattern.get("v3_idx")
+    base["peak1_idx"] = pattern.get("peak1_idx")
+    base["peak2_idx"] = pattern.get("peak2_idx")
+    base["v1_price"] = pattern.get("v1_price")
+    base["v2_price"] = pattern.get("v2_price")
+    base["v3_price"] = pattern.get("v3_price")
+    base["peak1_price"] = pattern.get("peak1_price")
+    base["peak2_price"] = pattern.get("peak2_price")
+    base["rs_rising"] = pattern.get("rs_rising", False)
+    
+    # Label
+    score = pattern["score"]
+    rtn = pattern.get("rs_to_neck_pct", 99)
+    
+    if score >= 72 and rtn <= 8:
+        base["label"] = "🟢 头肩底确认"
+    elif score >= 52 and rtn <= 12:
+        base["label"] = "🟢 头肩底形成中"
+    elif score >= 40:
+        base["label"] = "🟡 头肩底候选"
+    else:
+        base["label"] = "⚪ 非头肩底"
+
+    return base
