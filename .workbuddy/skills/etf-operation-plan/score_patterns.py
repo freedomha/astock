@@ -1899,3 +1899,158 @@ def analyze_2b(code, name, etype, kline_data):
     result["v3_filter_reason"] = qf_reason
 
     return result
+
+
+# ─── CLI Entry Point ──────────────────────────────────────────────────────
+
+def run_all_patterns(code, name, kline_data):
+    """Run all 5 pattern analyzers on a single ETF. Returns dict."""
+    results = {}
+
+    # Bowl bottom
+    try:
+        bowl_result = analyze_bowl_bottom(code, name, "ETF", kline_data)
+        if bowl_result:
+            results["bowl"] = {
+                "score": bowl_result.get("score", 0),
+                "label": bowl_result.get("label", "计算失败")
+            }
+        else:
+            results["bowl"] = {"score": 0, "label": "数据不足"}
+    except Exception as e:
+        results["bowl"] = {"score": 0, "label": "计算失败", "error": str(e)}
+
+    # Box consolidation
+    try:
+        box_result = analyze_box_consolidation(code, name, "ETF", kline_data)
+        if box_result:
+            results["box"] = {
+                "score": box_result.get("score", 0),
+                "label": box_result.get("label", "计算失败")
+            }
+        else:
+            results["box"] = {"score": 0, "label": "数据不足"}
+    except Exception as e:
+        results["box"] = {"score": 0, "label": "计算失败", "error": str(e)}
+
+    # W-bottom
+    try:
+        w_result = analyze_w_bottom(code, name, "ETF", kline_data)
+        if w_result:
+            results["w_bottom"] = {
+                "score": w_result.get("score", 0),
+                "label": w_result.get("label", "计算失败")
+            }
+        else:
+            results["w_bottom"] = {"score": 0, "label": "非W底"}
+    except Exception as e:
+        results["w_bottom"] = {"score": 0, "label": "计算失败", "error": str(e)}
+
+    # Head-shoulder bottom
+    try:
+        hs_result = analyze_hs_bottom(code, name, "ETF", kline_data)
+        if hs_result:
+            results["hs_bottom"] = {
+                "score": hs_result.get("score", 0),
+                "label": hs_result.get("label", "计算失败")
+            }
+        else:
+            results["hs_bottom"] = {"score": 0, "label": "数据不足"}
+    except Exception as e:
+        results["hs_bottom"] = {"score": 0, "label": "计算失败", "error": str(e)}
+
+    # 2B bottom
+    try:
+        two_b_result = analyze_2b(code, name, "ETF", kline_data)
+        if two_b_result:
+            results["2b"] = {
+                "score": two_b_result.get("score", 0),
+                "label": two_b_result.get("label", "计算失败")
+            }
+        else:
+            results["2b"] = {"score": 0, "label": "无2B信号"}
+    except Exception as e:
+        results["2b"] = {"score": 0, "label": "计算失败", "error": str(e)}
+
+    return results
+
+
+def resolve_name(code):
+    """Try to resolve ETF name from all_etfs_larggest.json."""
+    import os
+    # Try multiple possible locations
+    search_paths = [
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..",
+                     ".workbuddy", "skills", "etf-bowl-bottom-scanner", "all_etfs_larggest.json"),
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..",
+                     "all_etfs_larggest.json"),
+    ]
+    for etf_file in search_paths:
+        try:
+            if os.path.exists(etf_file):
+                with open(etf_file) as f:
+                    etfs = json.load(f)
+                for e in etfs:
+                    if e.get("code") == code:
+                        return e.get("name", code)
+        except Exception:
+            continue
+    return code
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Single-ETF five-pattern scorer")
+    parser.add_argument("--code", required=True, help="ETF code (e.g. sh518880)")
+    parser.add_argument("--kline-file", required=True, help="Path to K-line JSON file")
+    parser.add_argument("--pattern", choices=["bowl", "box", "w_bottom", "hs_bottom", "2b"],
+                        help="Run only one pattern (default: all)")
+    args = parser.parse_args()
+
+    # Load K-line data
+    with open(args.kline_file) as f:
+        raw = json.load(f)
+
+    # Normalize: westock-data kline returns a list directly
+    if isinstance(raw, list):
+        kline_data = raw
+    elif isinstance(raw, dict):
+        # Try common wrapper keys
+        kline_data = raw.get("klines", raw.get("data", raw))
+        if isinstance(kline_data, dict):
+            kline_data = kline_data.get("klines", [])
+    else:
+        print(json.dumps({"error": "Invalid K-line data format"}))
+        sys.exit(1)
+
+    name = resolve_name(args.code)
+
+    if args.pattern:
+        # Single pattern mode
+        pattern_map = {
+            "bowl": analyze_bowl_bottom,
+            "box": analyze_box_consolidation,
+            "w_bottom": analyze_w_bottom,
+            "hs_bottom": analyze_hs_bottom,
+            "2b": analyze_2b,
+        }
+        try:
+            result = pattern_map[args.pattern](args.code, name, "ETF", kline_data)
+            if result:
+                output = {args.pattern: {
+                    "score": result.get("score", 0),
+                    "label": result.get("label", "计算失败")
+                }}
+            else:
+                output = {args.pattern: {"score": 0, "label": "数据不足/未检测到"}}
+        except Exception as e:
+            output = {args.pattern: {"score": 0, "label": "计算失败", "error": str(e)}}
+    else:
+        output = run_all_patterns(args.code, name, kline_data)
+
+    output["code"] = args.code
+    output["name"] = name
+    print(json.dumps(output, ensure_ascii=False, indent=2))
+
+
+if __name__ == "__main__":
+    main()
