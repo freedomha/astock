@@ -686,3 +686,319 @@ def analyze_box_consolidation(code, name, etype, kline_data):
         "c5": round(c5, 1), "c10": round(c10, 1), "c20": round(c20_pct, 1),
         "reasons": reasons,
     }
+
+
+# ─── W-Bottom Scoring ─────────────────────────────────────────────────────
+
+def score_w_bottom(closes, volumes, lt_idx, lt_val, pk_idx, pk_val, rt_idx, rt_val, status):
+    """
+    Score a detected W-bottom on 8 dimensions (max ~97 pts, capped at 100).
+    Returns (score, label, reasons_list).
+    """
+    score = 0
+    reasons = []
+
+    # 1. Trough Symmetry (20 pts)
+    tdiff = abs(rt_val / lt_val - 1) * 100
+    if tdiff <= 1:
+        s = 20
+        reasons.append(f"极佳双底对称(差{tdiff:.1f}%)+20")
+    elif tdiff <= 3:
+        s = 17
+        reasons.append(f"良好双底对称(差{tdiff:.1f}%)+17")
+    elif tdiff <= 6:
+        s = 12
+        reasons.append(f"双底对称(差{tdiff:.1f}%)+12")
+    else:
+        s = 5
+        reasons.append(f"双底基本对称(差{tdiff:.1f}%)+5")
+    score += s
+
+    # 2. Recovery Magnitude (15 pts)
+    recovery = (pk_val / lt_val - 1) * 100
+    if recovery >= 15:
+        s = 15
+        reasons.append(f"强反弹({recovery:.1f}%)+15")
+    elif recovery >= 12:
+        s = 12
+        reasons.append(f"反弹较强({recovery:.1f}%)+12")
+    elif recovery >= 10:
+        s = 8
+        reasons.append(f"反弹适中({recovery:.1f}%)+8")
+    else:
+        s = 3
+        reasons.append(f"反弹偏弱({recovery:.1f}%)+3")
+    score += s
+
+    # 3. Right Trough Elevation (15 pts)
+    rt_ele = (rt_val / lt_val - 1) * 100
+    if rt_ele >= 3:
+        s = 15
+        reasons.append(f"右底抬高{rt_ele:.1f}%+15")
+    elif rt_ele >= 1:
+        s = 10
+        reasons.append(f"右底略高{rt_ele:.1f}%+10")
+    elif rt_ele >= 0:
+        s = 5
+        reasons.append(f"右底持平+5")
+    else:
+        s = 0
+        reasons.append(f"右底更低{rt_ele:.1f}%+0")
+    score += s
+
+    # 4. Volume Contraction (12 pts)
+    lt_start = max(0, lt_idx - 5)
+    lt_end = min(len(volumes), lt_idx + 6)
+    rt_start = max(0, rt_idx - 5)
+    rt_end = min(len(volumes), rt_idx + 6)
+    lvol = sum(volumes[lt_start:lt_end]) / max(1, lt_end - lt_start)
+    rvol = sum(volumes[rt_start:rt_end]) / max(1, rt_end - rt_start)
+    vr = rvol / lvol if lvol > 0 else 1
+    if vr <= 0.7:
+        s = 12
+        reasons.append(f"量能显著收缩(VR={vr:.2f})+12")
+    elif vr <= 0.9:
+        s = 9
+        reasons.append(f"量能收缩(VR={vr:.2f})+9")
+    elif vr <= 1.0:
+        s = 6
+        reasons.append(f"量能持平(VR={vr:.2f})+6")
+    else:
+        s = 2
+        reasons.append(f"量能略增(VR={vr:.2f})+2")
+    score += s
+
+    # 5. Prior Decline Depth (10 pts)
+    d_high = max(closes[:80])
+    d_low = min(closes[:80])
+    decline_pct = (d_high - d_low) / d_high * 100 if d_high > 0 else 0
+    if decline_pct >= 15:
+        s = 10
+        reasons.append(f"前期深跌({decline_pct:.1f}%)+10")
+    elif decline_pct >= 10:
+        s = 7
+        reasons.append(f"前期跌幅充分({decline_pct:.1f}%)+7")
+    elif decline_pct >= 5:
+        s = 3
+        reasons.append(f"前期小幅下跌({decline_pct:.1f}%)+3")
+    score += s
+
+    # 6. Time Symmetry (5 pts)
+    left_days = pk_idx - lt_idx
+    right_days = rt_idx - pk_idx
+    if left_days > 0 and right_days > 0:
+        ratio = left_days / right_days
+        if 0.7 <= ratio <= 1.3:
+            s = 5
+            reasons.append(f"时间对称({left_days}d/{right_days}d)+5")
+        elif 0.5 <= ratio <= 1.5:
+            s = 3
+            reasons.append(f"时间基本对称({left_days}d/{right_days}d)+3")
+        else:
+            s = 1
+            reasons.append(f"时间不对称({left_days}d/{right_days}d)+1")
+    else:
+        s = 0
+    score += s
+
+    # 7. Breakout Strength (10 pts, confirmed only)
+    if status == "确认":
+        bopct = (closes[-1] / pk_val - 1) * 100
+        if bopct >= 5:
+            s = 10
+            reasons.append(f"强势突破({bopct:.1f}%)+10")
+        elif bopct >= 3:
+            s = 7
+            reasons.append(f"有效突破({bopct:.1f}%)+7")
+        elif bopct >= 0:
+            s = 4
+            reasons.append(f"微弱突破({bopct:.1f}%)+4")
+    else:
+        s = 0
+    score += s
+
+    # 8. Formation Quality (10 pts)
+    q = 0
+    p1_slope = lin_slope(closes[:80], 40) or 0
+    if p1_slope < -0.3:
+        q += 3
+        reasons.append("平滑下跌+3")
+    elif p1_slope < -0.1:
+        q += 2
+        reasons.append("温和下跌+2")
+    elif p1_slope < 0:
+        q += 1
+    pk_surr = closes[max(0, pk_idx - 3):min(len(closes), pk_idx + 4)]
+    pk_avg = sum(pk_surr) / len(pk_surr) if pk_surr else pk_val
+    pk_ratio = pk_val / pk_avg if pk_avg > 0 else 1
+    if pk_ratio > 1.03:
+        q += 3
+        reasons.append("峰位突出+3")
+    elif pk_ratio > 1.01:
+        q += 2
+    else:
+        q += 1
+    rt_rec_high = max(closes[rt_idx:min(len(closes), rt_idx + 6)]) if rt_idx < len(closes) else rt_val
+    rt_rec_ratio = rt_rec_high / rt_val if rt_val > 0 else 1
+    if rt_rec_ratio > 1.03:
+        q += 4
+        reasons.append("右底V形反弹+4")
+    elif rt_rec_ratio > 1.01:
+        q += 3
+        reasons.append("右底反弹+3")
+    else:
+        q += 1
+    q = min(q, 10)
+    score += q
+
+    score = min(score, 100)
+
+    # Label grading
+    if score >= 55:
+        label = "W底确认" if status == "确认" else "W底形成中"
+    elif score >= 45:
+        label = "W底形成中" if status == "形成中" else "W底确认"
+    elif score >= 35:
+        label = "W底候选"
+    else:
+        label = "非W底"
+
+    return score, label, reasons
+
+
+def detect_w_bottom(records):
+    """
+    Phase-based W-bottom detection on 120-day window (oldest-first sorted records).
+
+    Returns dict with phase results and key points, or None if any phase fails.
+    """
+    n = len(records)
+    if n < 120:
+        return None
+
+    closes = [r["close"] for r in records]
+    volumes = [r["volume"] for r in records]
+
+    # Phase 1: Prior decline (T-120 to T-40)
+    p1_slope = lin_slope(closes[:80], 40)
+    if p1_slope is None or p1_slope > -0.005:
+        return None
+
+    # Phase 2: Left trough (T-40 to T-25, indices 80-95)
+    lt_idx, lt_val = None, float('inf')
+    for i in range(80, 96):
+        if closes[i] < lt_val:
+            lt_val = closes[i]
+            lt_idx = i
+
+    # Phase 3: Peak (from left trough to T-12, index up to 108)
+    pk_idx, pk_val = None, float('-inf')
+    for i in range(lt_idx + 1, 109):
+        if closes[i] > pk_val:
+            pk_val = closes[i]
+            pk_idx = i
+
+    recovery = (pk_val / lt_val - 1) * 100
+    if recovery < 8.0:
+        return None
+
+    # Phase 4: Right trough (T-12 to T, indices 108-120)
+    rt_idx, rt_val = None, float('inf')
+    for i in range(108, min(120, n)):
+        if closes[i] < rt_val:
+            rt_val = closes[i]
+            rt_idx = i
+
+    tdiff = abs(rt_val / lt_val - 1) * 100
+    if tdiff > 10.0:
+        return None
+
+    lt_vol = sum(volumes[max(0, lt_idx - 5):lt_idx + 6]) / max(1, min(n, lt_idx + 6) - max(0, lt_idx - 5))
+    rt_vol = sum(volumes[max(0, rt_idx - 5):rt_idx + 6]) / max(1, min(n, rt_idx + 6) - max(0, rt_idx - 5))
+    vratio = rt_vol / lt_vol if lt_vol > 0 else 1
+    if vratio > 1.2:
+        return None
+
+    # Phase 5: Breakout status
+    recent3 = closes[-3:]
+    above = sum(1 for c in recent3 if c > pk_val)
+    status = "确认" if (above >= 2 and closes[-1] > pk_val) else "形成中"
+
+    return {
+        "lt_idx": lt_idx,
+        "lt_val": lt_val,
+        "pk_idx": pk_idx,
+        "pk_val": pk_val,
+        "rt_idx": rt_idx,
+        "rt_val": rt_val,
+        "status": status,
+        "recovery": recovery,
+        "tdiff": tdiff,
+        "vratio": vratio,
+    }
+
+
+def analyze_w_bottom(code, name, etype, kline_data):
+    """Main analysis: detect W-bottom pattern and score it."""
+    if not kline_data or not isinstance(kline_data, list):
+        return None
+
+    records = []
+    for k in kline_data:
+        try:
+            records.append({
+                "date": k["date"],
+                "close": float(k["last"]),
+                "high": float(k["high"]),
+                "low": float(k["low"]),
+                "volume": float(k.get("volume", 0)),
+            })
+        except (KeyError, ValueError):
+            continue
+    if len(records) < 120:
+        return None
+    records.sort(key=lambda x: x["date"])
+
+    # Use most recent 120 days for pattern detection
+    window = records[-120:]
+    detection = detect_w_bottom(window)
+    if detection is None:
+        return None
+
+    closes = [r["close"] for r in window]
+    volumes = [r["volume"] for r in window]
+    score, label, reasons = score_w_bottom(
+        closes, volumes,
+        detection["lt_idx"], detection["lt_val"],
+        detection["pk_idx"], detection["pk_val"],
+        detection["rt_idx"], detection["rt_val"],
+        detection["status"]
+    )
+
+    d_high = max(closes[:80])
+    d_low = min(closes[:80])
+    decline_pct = (d_high - d_low) / d_high * 100 if d_high > 0 else 0
+
+    rt_ele = (detection["rt_val"] / detection["lt_val"] - 1) * 100
+
+    return {
+        "code": code,
+        "name": name,
+        "type": etype,
+        "score": score,
+        "label": label,
+        "status": detection["status"],
+        "current": round(records[-1]["close"], 3),
+        "left_trough": round(detection["lt_val"], 3),
+        "right_trough": round(detection["rt_val"], 3),
+        "peak": round(detection["pk_val"], 3),
+        "recovery_pct": round(detection["recovery"], 1),
+        "trough_diff_pct": round(detection["tdiff"], 1),
+        "vol_ratio": round(detection["vratio"], 2),
+        "rt_elevation_pct": round(rt_ele, 1),
+        "prior_decline_pct": round(decline_pct, 1),
+        "lt_date": window[detection["lt_idx"]]["date"],
+        "pk_date": window[detection["pk_idx"]]["date"],
+        "rt_date": window[detection["rt_idx"]]["date"],
+        "reasons": reasons,
+    }
