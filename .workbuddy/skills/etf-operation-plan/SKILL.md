@@ -68,9 +68,11 @@ PYTHON="/Users/aldiadmin/.workbuddy/binaries/python/versions/3.13.12/bin/python3
 # Current quote (use dangerouslyDisableSandbox: true)
 $NODE $WD/scripts/index.js quote <code> --raw > /tmp/op_quote.json
 
-# 250-day K-line
+# 250-day K-line (fresh fetch each run — no stale cache issue)
 $NODE $WD/scripts/index.js kline <code> --period day --limit 250 --raw > /tmp/op_kline.json
 ```
+
+**Data timing**: K-line is fetched fresh each run (no persistent cache). If run during market hours (9:30-15:00 Beijing time), today's bar is intraday (盘中) data — OHLCV only reflects partial session. For full post-close (收盘) data, run after 15:00.
 
 Quote fields to extract (from BatchResult wrapper): `price`, `prev_close`, `high`, `low`, `volume`, `amount`, `change_percent`, `chg_5d`, `chg_20d`, `chg_60d`, `chg_ytd`, `high_52week`, `low_52week`, `wb_ratio`
 
@@ -231,3 +233,4 @@ For multiple ETFs (e.g., both positions, or user specifies several):
 - Medium-to-long-term focus: weekly scenarios, not daily predictions
 - Re-run weekly or when significant market events occur
 - westock-data must use `dangerouslyDisableSandbox: true` in Bash calls
+- **Data freshness**: Unlike batch scanners, this skill fetches kline data fresh each run (no caching). Today's bar is intraday (盘中) during 9:30-15:00, post-close (收盘) after 15:00. For most accurate analysis, run after market close.
