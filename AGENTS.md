@@ -63,6 +63,13 @@ $PYTHON .workbuddy/skills/etf-2b-bottom-scanner/backtest.py
 $PYTHON .workbuddy/skills/etf-2b-bottom-scanner/backtest_500.py
 ```
 
+**Refresh intraday data (盘中刷新):** Append `--refresh` to any ETF `analyze.py` to force-refresh the latest trading day's kline bars. Use this after 15:00 when the cached data was fetched during market hours (e.g., 10:30 fetch). Without the flag, same-date bars are considered current and skipped.
+
+```bash
+# Run ETF scanner with intraday-to-close refresh
+$PYTHON .workbuddy/skills/etf-bowl-bottom-scanner/analyze.py --refresh
+```
+
 ### Data Fetching
 
 ```bash
@@ -162,6 +169,7 @@ The 7-layer analysis framework: core logic → trading position → catalyst int
 - **Data source has high transient failure rates** — always retry (up to 10x), reject `success:false`, empty arrays, and `null` strings
 - **Concept sector codes (pt02GNxxxx) cannot be used directly for K-lines** — they return `[]`. Use constituent stock K-lines to build an equal-weight/market-cap-weighted index instead. Shenwan industry codes (pt0180xxxx) work normally
 - `WD` and `NODE` environment variables do not persist across Bash calls — always use absolute paths
+- **Kline data fetched during market hours is intraday (盘中):** the `update_kline_data()` logic only compares dates, so a same-date bar fetched at 10:30 won't be refreshed at 15:01. Use `--refresh` to force-replace today's bar with post-close data.
 
 ### JSON Parsing Quirks (see `references/westock-data-parsing.md` for full details)
 - `quote --raw` with multiple codes returns `{success, status, data: [{symbol, data: {...}}], errors, metadata}` — NOT a plain list

@@ -360,7 +360,7 @@ def analyze_bowl_bottom(code, name, etype, kline_data):
     }
 
 
-def update_kline_data(kline_data, etfs, kline_file):
+def update_kline_data(kline_data, etfs, kline_file, refresh_today=False):
     """
     Check cached kline data and append latest records if any are missing.
 
@@ -372,6 +372,10 @@ def update_kline_data(kline_data, etfs, kline_file):
        prepend only records newer than the cached newest date.
     4. New ETFs not in cache are fetched and added whole.
     5. Save the merged result back to disk.
+
+    When refresh_today=True, ETFs whose latest cached date equals the
+    latest available date are also refreshed — this replaces intraday
+    (盘中) data with the latest bars from the data source.
 
     Returns the number of ETFs updated.
     """
@@ -388,6 +392,7 @@ def update_kline_data(kline_data, etfs, kline_file):
 
     # ---- Determine which ETFs need an update ----
     to_update = []
+    to_refresh = []  # ETFs whose today-bar needs refresh (same date, possibly intraday)
     for e in etfs:
         code = e["code"]
         cached = kline_data.get(code)
@@ -397,25 +402,35 @@ def update_kline_data(kline_data, etfs, kline_file):
         latest_cached_date = cached[0]["date"]  # newest-first
         if latest_cached_date < latest_available_date:
             to_update.append(code)
+        elif refresh_today and latest_cached_date == latest_available_date:
+            to_refresh.append(code)
 
-    if not to_update:
+    all_to_process = to_update + to_refresh
+    if not all_to_process:
+        if refresh_today:
+            print("  盘中数据已刷新为收盘数据")
         return 0
 
-    print(f"\n🔄 需要更新 {len(to_update)} 只ETF的K线数据 (最新交易日: {latest_available_date})")
+    refresh_desc = f" (+{len(to_refresh)} 只刷新今日盘中数据)" if to_refresh else ""
+    print(f"\n🔄 需要更新 {len(all_to_process)} 只ETF的K线数据 (最新交易日: {latest_available_date}){refresh_desc}")
 
     # ---- Fetch and merge in parallel ----
     updated = 0
     failed = 0
-    total = len(to_update)
+    total = len(all_to_process)
     with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
-        futures = {executor.submit(fetch_kline, code): code for code in to_update}
+        futures = {executor.submit(fetch_kline, code): code for code in all_to_process}
         for future in as_completed(futures):
             code = futures[future]
             try:
                 _, new_data = future.result()
                 if new_data and isinstance(new_data, list) and len(new_data) > 0:
                     cached = kline_data.get(code, [])
-                    if cached and isinstance(cached, list) and len(cached) > 0:
+                    if code in to_refresh:
+                        # Replace entire dataset — refreshes intraday bar with latest from source
+                        kline_data[code] = new_data
+                        updated += 1
+                    elif cached and isinstance(cached, list) and len(cached) > 0:
                         latest_cached_date = cached[0]["date"]
                         new_records = [r for r in new_data if r["date"] > latest_cached_date]
                         if new_records:
@@ -445,8 +460,11 @@ def update_kline_data(kline_data, etfs, kline_file):
 
 
 def main():
+    refresh_today = "--refresh" in sys.argv
     print("=" * 60)
     print("A股ETF碗底形态分析 (v1)")
+    if refresh_today:
+        print("🔄 盘中刷新模式: 同日期数据将用最新数据替换")
     print("=" * 60)
 
     # Step 1: Load ETFs
@@ -466,7 +484,7 @@ def main():
         print(f"已加载 {len(kline_data)} 只ETF K线数据")
 
         # Append latest data if available
-        updated = update_kline_data(kline_data, etfs, kline_file)
+        updated = update_kline_data(kline_data, etfs, kline_file, refresh_today)
         if updated > 0:
             print(f"已追加 {updated} 只ETF的最新记录")
         else:
