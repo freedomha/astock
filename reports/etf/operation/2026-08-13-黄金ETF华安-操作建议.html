@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>黄金ETF华安 - ETF操作建议 2026-08-13</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; background: #f5f7fa; color: #2c3e50; line-height: 1.6; }
+.header { background: linear-gradient(135deg, #c8912a, #34495e); color: #fff; padding: 32px 40px; }
+.header h1 { font-size: 26px; font-weight: 700; }
+.header .sub { margin-top: 6px; font-size: 14px; opacity: 0.85; }
+.container { max-width: 1080px; margin: 0 auto; padding: 24px 20px 60px; }
+.card { background: #fff; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+.card h2 { font-size: 18px; margin-bottom: 16px; padding-left: 10px; border-left: 4px solid #c8912a; }
+.up { color: #c0392b; font-weight: 600; }
+.down { color: #27ae60; font-weight: 600; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #eee; }
+th { background: #f8f9fb; color: #555; font-weight: 600; }
+.tag { display: inline-block; padding: 2px 10px; border-radius: 4px; font-size: 12px; font-weight: 600; }
+.tag-buy { background: #fdecea; color: #c0392b; }
+.tag-hold { background: #eef2f7; color: #4a5a6a; }
+.tag-reduce { background: #e8f5e9; color: #27ae60; }
+.tag-warn { background: #fff4e5; color: #b26a00; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.stat { background: #f8f9fb; border-radius: 10px; padding: 16px; text-align: center; }
+.stat .v { font-size: 22px; font-weight: 700; margin-top: 4px; }
+.scenario { border: 1px solid #eee; border-radius: 10px; padding: 16px; margin-bottom: 12px; }
+.scenario h3 { font-size: 15px; margin-bottom: 6px; }
+.decision { border: 2px solid #c8912a; background: #fdfbf7; }
+.decision td { font-size: 14px; }
+#chart { width: 100%; height: 300px; }
+.footer { text-align: center; color: #999; font-size: 12px; margin-top: 24px; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>黄金ETF华安 (sh518880) 操作建议</h1>
+  <div class="sub">2026-08-13 · 中期视角（场景1-3月 / 目标3-6月）· 数据来源：腾讯自选股 + 网络搜索 · 盘中数据</div>
+</div>
+<div class="container">
+
+  <div class="card">
+    <h2>一、持仓速览</h2>
+    <div class="grid2">
+      <div class="stat"><div>成本价</div><div class="v">8.637</div><div>300股 · 成本2591.10元</div></div>
+      <div class="stat"><div>现价</div><div class="v up">9.046</div><div>今日 -0.63%</div></div>
+      <div class="stat"><div>浮动盈亏</div><div class="v up">+122.70元</div><div>+4.74%</div></div>
+      <div class="stat"><div>市值</div><div class="v">2713.80元</div><div>量比 -19.58</div></div>
+    </div>
+    <p style="margin-top:14px;font-size:13px;color:#666;">近端涨跌：5日 +2.85% · 10日 +8.21% · 20日 +8.17% · 60日 -3.43%</p>
+  </div>
+
+  <div class="card">
+    <h2>二、技术关键位（中期）</h2>
+    <table>
+      <tr><th>位阶</th><th>价格</th><th>距现价</th><th>含义</th></tr>
+      <tr><td>S1 近3月支撑(60日低)</td><td>8.22</td><td class='up'>+10.0%</td><td style='color:#888'>60日最低点，跌破则中期走坏</td></tr><tr><td>S2 近6月支撑(120日低)</td><td>8.22</td><td class='up'>+10.0%</td><td style='color:#888'>120日最低点，底部失效</td></tr><tr><td>R1 近3月压力(60日高)</td><td>9.54</td><td class='up'>+5.5%</td><td style='color:#888'>60日最高点，突破则打开空间</td></tr><tr><td>R2 近6月压力(120日高)</td><td>11.42</td><td class='up'>+26.2%</td><td style='color:#888'>120日最高点，强压力</td></tr><tr><td>硬止损(52周低)</td><td>7.35</td><td class='up'>+23.1%</td><td style='color:#888'>趋势彻底走坏的底线</td></tr><tr><td>60MA 中期趋势线(3月)</td><td>8.75</td><td class='up'>+3.4%</td><td style='color:#888'>中期多空分水岭</td></tr><tr><td>120MA 中期趋势线(6月)</td><td>9.44</td><td class='down'>-4.2%</td><td style='color:#888'>中期趋势确认线，收复才转多</td></tr><tr><td>250d 位置锚</td><td>36.60</td><td style='color:#888'>36.6%</td><td style='color:#888'>1年区间位置，判断估值高低</td></tr><tr><td>成本锚点</td><td>8.64</td><td class='up'>+4.7%</td><td style='color:#888'>持仓盈亏平衡位</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>三、形态速评（五形态评分）</h2>
+    <table>
+      <tr><th>形态</th><th>评分</th><th>判定</th></tr>
+      <tr><td>碗底</td><td>24/100</td><td>观望</td></tr>
+      <tr><td>箱体震荡</td><td>64/100</td><td>箱顶观望</td></tr>
+      <tr><td>W底</td><td>0/100</td><td>非W底</td></tr>
+      <tr><td>头肩底</td><td>0/100</td><td>非头肩底</td></tr>
+      <tr><td>2B底部</td><td>0/100</td><td>无2B信号</td></tr>
+    </table>
+    <div id="chart"></div>
+  </div>
+
+  <div class="card">
+    <h2>四、场景推演（1-3个月）</h2>
+    <div class="scenario"><h3>趋势向好（1-3月）</h3><p style="color:#666;font-size:13px;">触发：放量站稳120MA(9.44)上方，金价续创新高</p><p style="margin-top:4px;font-size:13px;">动作：持有至9.54减1/3，回踩8.9-9.0补回，目标10.25</p></div><div class="scenario"><h3>区间整理（1-3月）</h3><p style="color:#666;font-size:13px;">触发：8.75-9.54高位震荡消化涨幅</p><p style="margin-top:4px;font-size:13px;">动作：持有不动，等缩量企稳；8.8-8.9可小幅加至目标仓</p></div><div class="scenario"><h3>趋势恶化（1-3月）</h3><p style="color:#666;font-size:13px;">触发：跌破60MA(8.75)且金价失守$4000</p><p style="margin-top:4px;font-size:13px;">动作：减至半仓；跌破8.22(S1)清仓离场</p></div>
+  </div>
+
+  <div class="card">
+    <h2>五、消息面速览</h2>
+    <table>
+      <tr><th>消息/事件</th><th>类型</th><th>影响</th><th>时效</th></tr>
+      <tr><td>央行连续21月购金，7月增持约20吨创单月纪录</td><td><span class="tag tag-buy">硬催化</span></td><td style='color:#666'>中期底部支撑强，金价中枢上移</td><td>持续</td></tr><tr><td>金价周涨超7%，机构看好中长期</td><td><span class="tag tag-buy">硬催化</span></td><td style='color:#666'>中期情绪偏多，短期注意超买</td><td>本周</td></tr><tr><td>今日国内金价955元/克，小幅回调0.02%</td><td><span class="tag tag-hold">中性</span></td><td style='color:#666'>正常波动，无突发利空</td><td>今日</td></tr><tr><td>年初金价从$5300高位暴跌18%</td><td><span class="tag tag-warn">风险事件</span></td><td style='color:#666'>波动极大，追高需谨慎</td><td>持续</td></tr>
+    </table>
+  </div>
+
+  <div class="card decision">
+    <h2>六、综合决策矩阵</h2>
+    <table>
+      <tr><th>维度</th><th>结论</th></tr>
+      <tr><td>方向</td><td><b>看多（中期趋势修复中）</b></td></tr>
+      <tr><td>核心逻辑</td><td>央行连续21月购金(7月+20吨创单月纪录)+美元走弱，构成中期底部支撑；价格已站上60MA(8.75)但仍在120MA(9.44)下方，属中期趋势修复初期，250日位置36.6%非高位，仍有修复空间。</td></tr>
+      <tr><td>仓位动作</td><td><span class="tag tag-reduce">持有为主，冲高减1/3锁盈</span></td></tr>
+      <tr><td>持有周期</td><td>2-6个月（趋势修复至收复120MA确认）</td></tr>
+      <tr><td>具体操作</td><td>9.54(近3月压力)上方减1/3；跌破8.75(60MA)收紧止损至8.80保本；8.22为中期底线，不破不清仓。</td></tr>
+      <tr><td>目标价(3-6月)</td><td>9.54 → 10.25（3-6个月）；放量站稳9.54后看前高11.42</td></tr>
+      <tr><td>下次复盘</td><td>放量站稳9.54（趋势加速）或跌破8.75（修复失败）时重估</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>七、风险监控</h2>
+    <table>
+      <tr><th>信号</th><th>当前</th><th>阈值</th><th>触发后动作</th></tr>
+      <tr><td>金价回落至$4000下方</td><td>$4246</td><td><$4000</td><td style='color:#c0392b'>减仓至半仓</td></tr><tr><td>跌破60MA(8.75)</td><td>9.046</td><td><8.75</td><td style='color:#c0392b'>收紧止损至8.80</td></tr><tr><td>跌破S1支撑8.22</td><td>9.046</td><td><8.22</td><td style='color:#c0392b'>清仓离场</td></tr><tr><td>跌破120MA(9.44)迟迟不收复</td><td>9.046</td><td>持续压制</td><td style='color:#c0392b'>降低目标至9.54</td></tr>
+    </table>
+  </div>
+
+  <div class="footer">
+    <p>数据时间戳：2026-08-13 14:03（盘中）。数据来源：腾讯自选股 + 公开网络信息。</p>
+    <p>本报告仅为量化决策辅助工具输出，不构成任何投资建议。投资有风险，入市需谨慎。</p>
+  </div>
+</div>
+<script>
+var chart = echarts.init(document.getElementById('chart'));
+chart.setOption({
+  title: { text: '近60日收盘价', left: 'center', textStyle: { fontSize: 13, color: '#666' } },
+  tooltip: { trigger: 'axis' },
+  grid: { left: 40, right: 20, top: 40, bottom: 30 },
+  xAxis: { type: 'category', data: ["05-21", "05-22", "05-25", "05-26", "05-27", "05-28", "05-29", "06-01", "06-02", "06-03", "06-04", "06-05", "06-08", "06-09", "06-10", "06-11", "06-12", "06-15", "06-16", "06-17", "06-18", "06-22", "06-23", "06-24", "06-25", "06-26", "06-29", "06-30", "07-01", "07-02", "07-03", "07-06", "07-07", "07-08", "07-09", "07-10", "07-13", "07-14", "07-15", "07-16", "07-17", "07-20", "07-21", "07-22", "07-23", "07-24", "07-27", "07-28", "07-29", "07-30", "07-31", "08-03", "08-04", "08-05", "08-06", "08-07", "08-10", "08-11", "08-12", "08-13"], boundaryGap: false },
+  yAxis: { type: 'value', scale: true },
+  series: [{ type: 'line', data: [9.45, 9.46, 9.51, 9.45, 9.35, 9.13, 9.4, 9.34, 9.41, 9.28, 9.29, 9.25, 8.95, 9.01, 8.74, 8.51, 8.66, 8.93, 8.95, 8.96, 8.91, 8.72, 8.54, 8.52, 8.29, 8.39, 8.45, 8.38, 8.27, 8.48, 8.67, 8.63, 8.6, 8.59, 8.54, 8.54, 8.42, 8.37, 8.37, 8.36, 8.31, 8.32, 8.47, 8.56, 8.56, 8.39, 8.5, 8.4, 8.39, 8.36, 8.43, 8.42, 8.41, 8.64, 8.8, 8.89, 9.01, 9.01, 9.1, 9.046], smooth: true, lineStyle: { width: 2, color: '#c8912a' }, areaStyle: { opacity: 0.15 }, itemStyle: { color: '#c8912a' } }]
+});
+window.addEventListener('resize', function(){ chart.resize(); });
+</script>
+</body>
+</html>
