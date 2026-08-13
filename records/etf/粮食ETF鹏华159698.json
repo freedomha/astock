@@ -12,14 +12,14 @@
     "entry_price": 0.8592,
     "shares": 2300,
     "entry_cost": 1976.16,
-    "current_price": 0.875,
-    "current_value": 2012.50,
-    "pnl": 36.34,
-    "pnl_pct": 1.84
+    "current_price": 0.87,
+    "current_value": 2001.0,
+    "pnl": 24.84,
+    "pnl_pct": 1.26
   },
   "market_data": {
-    "price": 0.875,
-    "day_change_pct": 0.57,
+    "price": 0.87,
+    "day_change_pct": -0.91,
     "amount_daily": 44150000,
     "fund_size": 839000000,
     "nav": 0.8586,
@@ -65,11 +65,26 @@
     "management_fee": 0.005,
     "custody_fee": 0.001,
     "top_holdings": [
-      {"name": "隆平高科", "weight_pct": 7.90},
-      {"name": "北大荒", "weight_pct": 6.67},
-      {"name": "诺普信", "weight_pct": 5.25},
-      {"name": "亚盛集团", "weight_pct": 4.00},
-      {"name": "兴发集团", "weight_pct": 3.96}
+      {
+        "name": "隆平高科",
+        "weight_pct": 7.9
+      },
+      {
+        "name": "北大荒",
+        "weight_pct": 6.67
+      },
+      {
+        "name": "诺普信",
+        "weight_pct": 5.25
+      },
+      {
+        "name": "亚盛集团",
+        "weight_pct": 4.0
+      },
+      {
+        "name": "兴发集团",
+        "weight_pct": 3.96
+      }
     ],
     "top5_weight_sum": 27.78
   },
@@ -103,11 +118,11 @@
         "note": "破250日最低0.81，底部结构完全失效"
       },
       "trend_stop": {
-        "level": 0.83,
+        "level": 0.86,
         "loss_pct": -3.4,
         "loss_amount": -67.16,
-        "action": "减半仓（留半仓观察）",
-        "note": "跌破MA20(0.844)确认反弹结束"
+        "action": "减半仓",
+        "note": "箱体上沿，收盘跌破则反弹结束"
       },
       "trailing_stop": {
         "level": "买入价下方3% = 0.833",
@@ -119,21 +134,21 @@
     },
     "take_profit": {
       "target_1": {
-        "level": 0.90,
+        "level": 0.9,
         "gain_pct": 4.7,
         "gain_amount": 93.84,
         "note": "MA60阻力位，可减1/3锁定利润",
         "action": "减1/3仓位"
       },
       "target_2": {
-        "level": 1.00,
+        "level": 1.0,
         "gain_pct": 16.4,
         "gain_amount": 323.84,
         "note": "MA120附近／心理整数关口",
         "action": "再减1/3，移损至0.90"
       },
       "target_3": {
-        "level": 1.10,
+        "level": 1.1,
         "gain_pct": 28.0,
         "gain_amount": 553.84,
         "note": "前期密集成交区上沿",
@@ -141,12 +156,21 @@
       }
     },
     "key_levels": {
-      "resistance": [0.90, 1.00, 1.10, 1.24],
-      "current_price": 0.875,
-      "support_add": [0.85, 0.84, 0.81],
+      "resistance": [
+        0.9,
+        1.0,
+        1.1,
+        1.24
+      ],
+      "current_price": 0.87,
+      "support_add": [
+        0.85,
+        0.84,
+        0.81
+      ],
       "ma20": 0.844,
       "ma60": 0.897,
-      "stop_trend": 0.83,
+      "stop_trend": 0.86,
       "stop_hard": 0.81,
       "highest_250d": 1.24,
       "lowest_250d": 0.81

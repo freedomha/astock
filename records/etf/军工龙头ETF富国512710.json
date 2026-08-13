@@ -11,16 +11,16 @@
     "entry_price": 0.6355,
     "shares": 3300,
     "entry_cost": 2097.15,
-    "current_price": 0.628,
-    "current_value": 2072.40,
-    "pnl": -24.75,
-    "pnl_pct": -1.18
+    "current_price": 0.631,
+    "current_value": 2082.3,
+    "pnl": -14.85,
+    "pnl_pct": -0.71
   },
   "market_data": {
-    "price": 0.628,
-    "prev_close": 0.64,
-    "day_change": -0.012,
-    "day_change_pct": -1.88,
+    "price": 0.631,
+    "prev_close": 0.628,
+    "day_change": 0.003,
+    "day_change_pct": 0.48,
     "open": 0.631,
     "high": 0.631,
     "low": 0.621,
@@ -28,5 +28,24 @@
     "amount": 175295663,
     "turnover_rate": null,
     "volume_ratio": null
+  },
+  "operation_plan": {
+    "stop_loss": {
+      "hard_stop": {
+        "level": 0.58,
+        "action": "清仓",
+        "note": "52周低0.575附近，跌破则底部失效"
+      },
+      "trend_stop": {
+        "level": 0.612,
+        "action": "减半仓",
+        "note": "MA20，跌破则短期反弹结束"
+      }
+    },
+    "key_levels": {
+      "current_price": 0.631,
+      "stop_trend": 0.612,
+      "stop_hard": 0.58
+    }
   }
 }

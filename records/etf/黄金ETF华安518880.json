@@ -10,17 +10,17 @@
     "entry_date": "2026-08-05",
     "entry_price": 8.637,
     "shares": 300,
-    "entry_cost": 2591.10,
-    "current_price": 8.64,
-    "current_value": 2592.00,
-    "pnl": 0.90,
-    "pnl_pct": 0.03
+    "entry_cost": 2591.1,
+    "current_price": 9.046,
+    "current_value": 2713.8,
+    "pnl": 122.7,
+    "pnl_pct": 4.74
   },
   "market_data": {
-    "price": 8.64,
-    "prev_close": 8.408,
-    "day_change": 0.232,
-    "day_change_pct": 2.76,
+    "price": 9.046,
+    "prev_close": 9.103,
+    "day_change": -0.057,
+    "day_change_pct": -0.63,
     "open": 8.459,
     "high": 8.644,
     "low": 8.442,
@@ -86,10 +86,10 @@
         "note": "52周低，破位意味着底部失效"
       },
       "trend_stop": {
-        "level": 7.60,
+        "level": 8.75,
         "loss_pct": -12.0,
-        "action": "清仓",
-        "note": "破近期平台下沿"
+        "action": "减半仓",
+        "note": "60MA中期趋势线，跌破则修复失败，止损上移至8.80"
       },
       "trailing_stop": {
         "level": "成本价下方3-5%",
@@ -100,7 +100,7 @@
     },
     "take_profit": {
       "target_1": {
-        "level": 9.50,
+        "level": 9.5,
         "gain_pct": 10.0,
         "action": "减1/3仓位"
       },
@@ -111,10 +111,18 @@
       }
     },
     "key_levels": {
-      "resistance": [9.0, 9.5, 10.0],
-      "current_price": 8.64,
-      "support_add": [8.3, 8.2, 8.0],
-      "stop_trend": 7.60,
+      "resistance": [
+        9.0,
+        9.5,
+        10.0
+      ],
+      "current_price": 9.046,
+      "support_add": [
+        8.3,
+        8.2,
+        8.0
+      ],
+      "stop_trend": 8.75,
       "stop_hard": 7.35
     }
   },
@@ -122,6 +130,11 @@
     "main_risk": "美联储政策不确定性，若通胀回升导致加息预期重现，金价可能继续承压",
     "premium_risk": "当前溢价2.65%，可接受；＞5%需警惕",
     "liquidity_risk": "低（规模926亿，日成交20亿+）",
-    "key_monitor": ["FOMC会议纪要", "CPI/PCE数据", "美元指数", "资金流向"]
+    "key_monitor": [
+      "FOMC会议纪要",
+      "CPI/PCE数据",
+      "美元指数",
+      "资金流向"
+    ]
   }
 }
