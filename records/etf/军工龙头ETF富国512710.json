@@ -1,51 +1,13 @@
 {
   "name": "军工龙头ETF富国",
   "code": "sh512710",
-  "exchange": "上海主板",
-  "tracking_index": "",
-  "fund_manager": "富国基金",
-  "created": "2026-08-11",
-  "data_source": "腾讯自选股(westock-data)",
-  "position": {
-    "entry_date": "2026-08-10",
-    "entry_price": 0.6355,
-    "shares": 3300,
-    "entry_cost": 2097.15,
-    "current_price": 0.631,
-    "current_value": 2082.3,
-    "pnl": -14.85,
-    "pnl_pct": -0.71
-  },
-  "market_data": {
-    "price": 0.631,
-    "prev_close": 0.628,
-    "day_change": 0.003,
-    "day_change_pct": 0.48,
-    "open": 0.631,
-    "high": 0.631,
-    "low": 0.621,
-    "volume": 2807200,
-    "amount": 175295663,
-    "turnover_rate": null,
-    "volume_ratio": null
-  },
-  "operation_plan": {
-    "stop_loss": {
-      "hard_stop": {
-        "level": 0.58,
-        "action": "清仓",
-        "note": "52周低0.575附近，跌破则底部失效"
-      },
-      "trend_stop": {
-        "level": 0.612,
-        "action": "减半仓",
-        "note": "MA20，跌破则短期反弹结束"
-      }
-    },
-    "key_levels": {
-      "current_price": 0.631,
-      "stop_trend": 0.612,
-      "stop_hard": 0.58
+  "trades": [
+    {
+      "date": "2026-08-10",
+      "action": "buy",
+      "price": 0.6355,
+      "shares": 3300,
+      "amount": 2097.15
     }
-  }
+  ]
 }

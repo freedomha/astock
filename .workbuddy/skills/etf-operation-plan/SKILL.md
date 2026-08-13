@@ -1,93 +1,225 @@
 ---
 name: etf-operation-plan
-description: Generate a medium-term (multi-week to ~6 months) operation plan for A-share ETFs based on current positions, real-time market data, technical patterns, and market news. Focuses on trend-following position management and holding-period decisions, de-emphasizing daily/intraday noise. Outputs a focused HTML report with specific price levels, holding scenarios, and stop/profit discipline. Triggers on requests like "持仓接下来怎么操作", "帮我做操作计划", "XXETF接下来怎么做", "看看持仓怎么调整".
+description: Generate a medium-term (multi-week to ~6 months) operation plan for A-share ETFs anchored on a trend-state machine (T0-T8, with T3a/T3b) using complete-week direction, asset-type-specific drivers with mandatory source citation, and a five-gate decision framework that hard-constrains actions by trend state (no auxiliary pattern may override the primary trend). Outputs a focused HTML report with data status (daily vs weekly completeness), multi-caliber position state, trend state + migration, scenario framework, observation zones, layered exits, and re-evaluation triggers. Triggers on requests like "持仓接下来怎么操作", "帮我做操作计划", "XXETF接下来怎么做", "看看持仓怎么调整".
 ---
 
 # ETF Operation Plan（ETF操作计划）
 
 ## Overview
 
-Generate an actionable medium-term operation plan for A-share ETFs. Unlike `etf-deep-analysis` (which produces a comprehensive thesis-driven research report), this skill focuses on the **"how should I manage this position over the coming weeks-to-months?"** question, anchored to current position data.
+Generate an actionable medium-term operation plan for A-share ETFs. Unlike `etf-deep-analysis` (comprehensive thesis-driven research), this skill answers **"how should I manage this position over the coming weeks-to-months?"**, anchored to current position data.
 
-**Time horizon**: analysis and recommendations use a medium-term lens (multi-week to ~6-month holding period). Daily/intraday price noise is explicitly de-emphasized; the plan is built around trend direction, position sizing across a full holding cycle, and stop/profit discipline. Never predict next-day moves.
+**核心设计原则（v3）**：
 
-**Three-layer time framework** (use these consistently throughout the report):
-| Layer | Horizon | Used for |
-|-------|---------|----------|
-| 短期观察 | 1-4 周 | 近期催化、量价确认、触发价位的跟踪 |
-| 场景推演 | 1-3 个月 | 三情景（向好/整理/恶化）的主推演周期 |
-| 目标价 | 3-6 个月 | 中期目标与止盈/止损空间锚定 |
+1. **趋势状态是主决策层，且不可被辅助层覆盖** — 五种底部形态降级为辅助证据。操作建议首先由中长期趋势状态决定，形态评分只做微调，**严禁**出现「趋势 T0 却因箱体/碗底分数高而低吸」的矛盾。动作由**硬约束矩阵**（见下）强制。
+2. **周线定方向，日线定执行，盘中报价只决定触发提醒** — 周线判断使用**最后一个完整自然交易周**，当前未完成周仅作「预览」，不触发 T3/T4/T7/T8 的最终迁移。
+3. **状态机 + 防抖动** — 趋势状态有历史持久化与合法迁移规则，避免周线边界来回切换；普通升级需连续 2 个完整周线确认。
+4. **不同资产类型用不同驱动模板，且新闻必须可追溯** — 先识别资产类型（并区分商品期货 ETF 与商品/农业股票 ETF），再加载对应驱动；每个外部事实必须带来源证据，无来源时降级为「无充分可验证驱动」。
+5. **五层门控** — 数据门 → 趋势门 → 资产逻辑门 → 风险收益门 → 组合门，逐层过滤后才生成操作计划。
 
 **Output:** `reports/etf/operation/{YYYYMMDD}-{ETF简称}-操作建议.html`
 
 ## Prerequisites
 
 - `westock-data` for ETF price/K-line data
-- `score_patterns.py` (bundled with this skill) for five-pattern technical scoring
-- `WebSearch` for market news and catalysts
+- `score_patterns.py` (bundled) — five-pattern technical scoring, **auxiliary layer**
+- `trend_analysis.py` (bundled) — trend-state machine (T0-T8 + T3a/T3b) + weekly features + state persistence, **primary layer**
+- `WebSearch` for asset-type-specific news/catalysts（必须记录来源）
 
-## Quick Start
+## Trend-State Model（主决策层）
 
-```bash
-WD="/Applications/WorkBuddy.app/Contents/Resources/app.asar.unpacked/resources/builtin-skills/westock-data"
-NODE="/Users/aldiadmin/.workbuddy/binaries/node/versions/22.22.2/bin/node"
-PYTHON="/Users/aldiadmin/.workbuddy/binaries/python/versions/3.13.12/bin/python3"
+`trend_analysis.py` 分类出九态（T3 含 T3a/T3b 子态），并输出状态机迁移信息。
 
-# Step 1: Identify target ETF(s) from records/etf/*.json or user input
+| 状态 | 名称 | 含义 |
+|------|------|------|
+| T0 | 长期下降 | 周线向下 + 空头排列 + 低点降低 |
+| T1 | 下降减速 | 周线仍向下，但日线下跌减速或反弹 |
+| T2 | 底部构建 | 近低位 + 低点抬高，筑底中 |
+| T3a | 反转初步确认 | 价格结构转强，但 MA60 仍下行 |
+| T3b | 反转初步确认 | 价格结构转强，MA60 走平或转上 |
+| T4 | 中期上升确认 | 多头排列 + MA60/120 向上 + HH/HL + 周线向上 |
+| T5 | 上升加速 | T4 基础上动量强劲、扩张 |
+| T6 | 高位整理 | 近高位、动量走平 |
+| T7 | 趋势衰竭 | 高位滞涨/动能背离 |
+| T8 | 结构破坏 | 周线结构失效，中期逻辑破位 |
 
-# Step 2: Fetch real-time data
-$NODE $WD/scripts/index.js quote <code> --raw > /tmp/op_quote.json
-$NODE $WD/scripts/index.js kline <code> --period day --limit 250 --raw > /tmp/op_kline.json
+### 硬约束矩阵（动作由趋势状态强制决定，报告层不得自由覆盖）
 
-# Step 3: Run pattern scoring
-$PYTHON .codebuddy/skills/etf-operation-plan/score_patterns.py \
-  --code <code> --kline-file /tmp/op_kline.json > /tmp/op_scores.json
+| 状态 | 核心仓位 | 战术仓位 | 禁止动作 |
+|------|---------|---------|---------|
+| T0 | 降低或退出 | **禁止新增** | 低吸、补仓、摊低成本、增加核心仓、维持核心仓并加仓 |
+| T1 | 观察或降低 | **禁止新增** | 低吸、补仓、摊低成本、把反弹当反转加仓 |
+| T2 | 原核心仓可观察 | 仅小额试仓 | 重仓抄底 |
+| T3a | 维持为主 | 小额、等待回踩 | 积极加仓 |
+| T3b | 维持 | 可分批增加 | 追高 |
+| T4 | 维持 | 回踩增加 | 追高 |
+| T5 | 维持 | 不追高 | 追高 |
+| T6 | 维持或降战术仓 | 不新增 | 追高 |
+| T7 | 保护收益、降低 | 减少 | 任何新增 |
+| T8 | 降低或退出 | **禁止新增** | 任何新增 |
 
-# Step 4: WebSearch for news/catalysts (run in parallel)
-# WebSearch: "<ETF名称> 最新消息 2026"
-# WebSearch: "<ETF跟踪主题/标的> 政策 催化"
+**例外模式**：T0/T1 若要输出「低吸/补仓/加仓」，必须显式进入例外模式，并写出：例外原因、最大风险预算、退出条件。默认不启用。
 
-# Step 5-9: Compute position metrics, key levels, scenarios, decision, risk
-# Step 10: Generate HTML → reports/etf/operation/
-# Step 11: Present report path to user
+**强制校验**（生成报告前必须自查）：
+```python
+if trend_state in ("T0", "T1"):
+    prohibit = {"低吸", "补仓", "摊低成本", "增加核心仓", "维持核心仓并加仓"}
+    # 操作计划不得出现上述任何动作，除非显式声明例外模式
 ```
+
+### 状态机与合法迁移
+
+`trend_analysis.py --state-file <path> --save-state` 持久化每只 ETF 的上一次状态与连续周数。输出：
+
+| 字段 | 含义 |
+|------|------|
+| previous_state | 上次状态 |
+| effective_state | 本次生效状态（应用迁移规则后） |
+| consecutive_weeks | 连续保持周数 |
+| migration_type | initial / same / normal_advance / jump / degradation / breakdown / blocked |
+| confirmation | confirmed / pending |
+| note | 迁移说明 |
+
+迁移规则：
+- 生命周期 `T0→T1→T2→T3→T4→T5→T6→T7→T8`
+- **普通升级**：连续 2 个完整周线确认
+- **进入 T8**：重大破位，立即降级生效
+- **T0 直接跳 T4/T5**：原则上禁止（逐级确认）
+- **T7 恢复 T4**：必须经 T6 或满足特别恢复条件
+- 状态切换有防抖动：未达到连续确认要求时，保持上一状态（`pending`）
+
+### 周线数据完整性
+
+`data_quality` 拆两个字段：
+```json
+{"daily_bar_status": "complete", "weekly_bar_status": "incomplete_current_week"}
+```
+
+- `daily_bar_status`：`intraday`（盘中）或 `complete`（收盘后）
+- `weekly_bar_status`：`complete`（最后一根日线为周五且非盘中）或 `incomplete_current_week`（周中运行，当周未完成）
+
+趋势主判断（周线斜率、10/20/40 周均线、周线突破/失效、T0-T8 分类）**只用最后一个完整自然交易周**。当前周数据仅作为 `weekly.preview`「预览状态」，**不得**直接触发 T3/T4/T7/T8 的最终迁移（重大结构破坏除外）。
+
+## Asset Type & Driver Templates（模块 3）
+
+**必须先识别资产类型，再加载对应驱动**。识别时**必须看跟踪指数与成分权重，不能只看基金名称关键词**。
+
+### 资产类别与暴露映射
+
+区分四类，避免把商品价格直接当作股票 ETF 的强催化：
+
+| 资产类别 | `asset_class` | 说明 |
+|----------|---------------|------|
+| 商品现货/期货 ETF | `commodity_futures_etf` | 直接持有期货/现货（如黄金、豆粕、原油） |
+| 商品生产商股票 ETF | `equity_sector_etf`（commodity producer） | 持有上游资源股 |
+| 农业产业链股票 ETF | `equity_sector_etf`（agri chain） | 持有种业/加工/贸易等产业链公司 |
+| 主题概念 ETF | `theme_etf` | 概念主题，成分与名称直觉可能不一致 |
+
+每个非现货 ETF 必须输出暴露映射：
+```json
+{
+  "asset_class": "equity_sector_etf",
+  "theme": "grain_industry",
+  "direct_commodity_exposure": "low_or_indirect",
+  "main_transmission_channels": ["input_cost", "product_price", "inventory_gain_loss", "policy"]
+}
+```
+注意：商品价格上涨对农业/商品股票**不总是单向利好**——原料型企业成本上升、种业/上游受益、加工企业毛利承压。驱动分析必须先查跟踪指数和成分权重。
+
+### 驱动模板
+
+| 资产类型 | 中长期主要关注点 | 驱动搜索模板 | 建议基准 |
+|----------|------------------|--------------|----------|
+| 黄金 | 金价、实际利率、美元、人民币汇率、跟踪误差 | 金价、实际利率、美元 | 人民币黄金现货或跟踪标的 |
+| 债券 | 利率曲线、久期、信用利差 | 利率、国债收益率、货币政策 | 对应久期债券指数 |
+| 商品(现货) | 期现结构、展期收益、库存、供需 | 库存、供需、期现价差 | 商品指数 |
+| 跨境 | 底层指数、汇率、时区差、溢折价、额度 | 底层指数、汇率、溢折价 | 底层指数 + 汇率 |
+| 红利 | 股息稳定性、利率环境、行业集中度 | 股息率、利率环境 | 宽基 + 红利母指数 |
+| 宽基 | 盈利周期、估值、流动性、风险偏好 | 盈利增速、估值分位、流动性 | 沪深300或中证全指 |
+| 行业 | 行业盈利、政策、供需、库存、产能 | 景气度、政策、供需、库存 | 中证全指 + 一级行业指数 |
+
+### 相对强弱的基准要求
+
+`trend_analysis` 支持可选 `--benchmark-file`。**有基准**才可称为「相对强弱」；**无基准**时只能输出「自身动量改善」（`relative_strength.self_momentum`），不得称「相对强弱改善」。
+
+## 催化剂证据结构（强制引用与事实校验）
+
+报告中的每个外部事实必须附带结构化来源。**没有结构化来源时，只允许输出**：
+
+> 当前未取得足够可验证的宏观驱动数据，操作判断以价格趋势为主。
+
+```json
+{
+  "claim": "实际利率下降有利于黄金",
+  "source_title": "...",
+  "publisher": "...",
+  "published_at": "...",
+  "retrieved_at": "...",
+  "url": "...",
+  "evidence_type": "hard_data | soft_opinion | risk_event",
+  "asset_link": "direct | indirect | unrelated",
+  "freshness_days": 3,
+  "verified_by_second_source": true
+}
+```
+
+**新闻不作为交易触发器**，只作为：趋势解释、风险提醒、复评触发器。禁止「看到利好新闻就把 T0 改成低吸」。
+
+## 风险边界（波动率自适应，替代「结构位下方 2%」）
+
+不同资产波动差异大，固定 2% 不等价。结构失效位缓冲用：
+
+```python
+buffer = max(tick_size * n, atr20 * atr_multiplier, structural_level * minimum_pct)
+```
+
+并配合「连续 N 日收盘确认」或「完整周线确认」。`trend_analysis` 已输出 `volatility.atr20` 供计算。
+
+- 价格距离：用 ATR 或实现波动率归一化
+- 结构破位：价格位 + 0.5~1.0 ATR 缓冲
+- 均线转向：斜率除以同期波动率
+- 突破确认：收盘突破 + 持续期 + 成交量完整性
+
+## 五层门控决策框架
+
+操作计划必须依次通过五层门，任一层不过即降级输出。
+
+### Gate 1：数据门
+以下任一情况**禁止新增仓位建议**（输出「仅观察，不生成新增仓位动作」）：
+- K 线不足（<120 日）
+- 当前周未完成且状态刚切换
+- 行情时间异常
+- 新闻没有来源
+- 跟踪标的无法确认
+- 价格或成交量存在异常跳点
+
+### Gate 2：趋势门
+见「硬约束矩阵」。趋势状态直接决定核心/战术仓位动作与禁止动作。
+
+### Gate 3：资产逻辑门
+不看是否有利好新闻，判断：
+1. 底层驱动是否仍成立
+2. 是否直接作用于 ETF 成分（经暴露映射）
+3. 是否已被价格计入
+4. 是否与技术趋势一致
+
+### Gate 4：风险收益门
+只有 `目标观察区空间 / 结构失效风险 >= 2` 才输出「增加战术仓」。不足时：即使趋势向上，也只持有，不新增。
+
+### Gate 5：组合门
+- **单标的模式**：只判断该持仓内部动作（默认）
+- **组合模式**：加入总资产、目标权重、风险预算、相关性后，才能判断「是否重仓 / 加 20% / 行业集中度 / 黄金超配 / 共同风险暴露」
+
+缺少组合总资产或目标仓位时，**不得输出「加仓 20% 总资产」**，只能输出「相对目标仓位的动作」。
 
 ## Workflow
 
 ### Step 1: Identify Target ETF(s)
 
-Read `records/etf/*.json` for current holdings — these are the primary targets. Each file is named `{ETF简称}{code}.json` and contains `name`, `code`, and a `position` block (`entry_date`, `entry_price`, `shares`, `entry_cost`). Also accept user-specified ETF code if explicitly requested.
+读 `records/etf/*.json`。每文件 `{ETF简称}{code}.json` 只存 `name`/`code`/`trades[]`。**`records/etf` 是纯交易流水，绝不回写现价/盈亏/止损位**。
 
-```python
-import json, glob, os
-
-def load_positions(records_dir="records/etf"):
-    """Load all current holdings from the records/etf directory."""
-    positions = []
-    for path in sorted(glob.glob(os.path.join(records_dir, "*.json"))):
-        with open(path) as f:
-            rec = json.load(f)
-        pos = rec.get("position", {})
-        positions.append({
-            "code": rec["code"],
-            "name": rec["name"],
-            "entry_date": pos.get("entry_date"),
-            "entry_price": pos.get("entry_price"),
-            "shares": pos.get("shares"),
-            "entry_cost": pos.get("entry_cost"),
-        })
-    return positions
-
-# No positions on record → prompt user for ETF code
-positions = load_positions()
-if not positions:
-    # ask user which ETF to analyze
-    pass
-
-# Resolve code -> name (fallback) from all_etfs_larggest.json
-with open('all_etfs_larggest.json') as f:
-    etfs = json.load(f)
-name = next((e['name'] for e in etfs if e.get('code') == code), code)
+```json
+{"date": "2026-08-05", "action": "buy", "price": 8.637, "shares": 300, "amount": 2591.10}
 ```
 
 ### Step 2: Fetch Real-Time Data
@@ -95,194 +227,156 @@ name = next((e['name'] for e in etfs if e.get('code') == code), code)
 ```bash
 WD="/Applications/WorkBuddy.app/Contents/Resources/app.asar.unpacked/resources/builtin-skills/westock-data"
 NODE="/Users/aldiadmin/.workbuddy/binaries/node/versions/22.22.2/bin/node"
-PYTHON="/Users/aldiadmin/.workbuddy/binaries/python/versions/3.13.12/bin/python3"
-
-# Current quote (use dangerouslyDisableSandbox: true)
 $NODE $WD/scripts/index.js quote <code> --raw > /tmp/op_quote.json
-
-# 250-day K-line (fresh fetch each run — no stale cache issue)
 $NODE $WD/scripts/index.js kline <code> --period day --limit 250 --raw > /tmp/op_kline.json
 ```
+（westock-data 必须 `dangerouslyDisableSandbox: true`）
 
-**Data timing**: K-line is fetched fresh each run (no persistent cache). If run during market hours (9:30-15:00 Beijing time), today's bar is intraday (盘中) data — OHLCV only reflects partial session. For full post-close (收盘) data, run after 15:00.
-
-Quote fields to extract (from BatchResult wrapper): `price`, `prev_close`, `high`, `low`, `volume`, `amount`, `change_percent`, `chg_5d`, `chg_20d`, `chg_60d`, `chg_ytd`, `high_52week`, `low_52week`, `wb_ratio`
-
-### Step 3: Run Pattern Scoring
+### Step 3: Trend-State Machine（PRIMARY，含周线完整性）
 
 ```bash
-$PYTHON .codebuddy/skills/etf-operation-plan/score_patterns.py \
+PYTHON="/Users/aldiadmin/.workbuddy/binaries/python/versions/3.13.12/bin/python3"
+STATE=".workbuddy/skills/etf-operation-plan/trend_state_history.json"
+$PYTHON .workbuddy/skills/etf-operation-plan/trend_analysis.py \
+  --code <code> --kline-file /tmp/op_kline.json \
+  --state-file $STATE --save-state > /tmp/op_trend.json
+# 盘中加 --intraday；有基准加 --benchmark-file <bench.json>
+```
+
+提取：`trend_state`（含 `sub_state`）、`data_quality`（daily/weekly bar status）、`weekly`（含 `preview`）、`ma`、`structure`、`relative_strength`（`self_momentum` vs `benchmark`）、`state_machine`（迁移信息）。
+
+**当 `weekly_bar_status == "incomplete_current_week"`**：趋势判断以 `weekly`（完整周）为准，`weekly.preview` 仅作提示，不触发最终迁移。
+
+### Step 4: Five-Pattern Scoring（AUXILIARY）
+
+```bash
+$PYTHON .workbuddy/skills/etf-operation-plan/score_patterns.py \
   --code <code> --kline-file /tmp/op_kline.json > /tmp/op_scores.json
 ```
+输出每种形态：是否检测到、形成阶段、是否确认、失效位置、证据原因、冲突信号。不比较绝对分数，不把多个相关底部形态当多份独立证据。**形态分不可覆盖趋势状态动作**（见硬约束矩阵）。
 
-Extract `bowl`, `box`, `w_bottom`, `hs_bottom`, `2b` scores and labels from the JSON output.
+### Step 5: Asset-Type Drivers（必须带来源）
 
-### Step 4: Fetch News & Catalysts
+按资产类型模板 WebSearch，每个事实记录 `catalyst_evidence`（来源标题/机构/发布时间/抓取时间/URL/类型/资产关联/新鲜度/是否交叉验证）。无来源则降级输出「无充分可验证驱动」。
 
-Run WebSearch in parallel (use AskUserQuestion or Agent tool as needed):
-
-```
-WebSearch: "<ETF名称> 最新消息 2026"
-WebSearch: "<ETF跟踪主题/标的> 政策 催化 2026"
-```
-
-Classify each result:
-- **硬催化**: Price movements, policy documents, earnings revisions — tangible, quantifiable
-- **软催化**: Analyst opinions, sentiment shifts, concept rotation — reference only
-- **风险事件**: Regulatory risks, macro headwinds, sector headwinds
-
-If no meaningful news found, note: "当前无重大催化，技术面为主要决策依据"
-
-### Step 5: Compute Position Metrics
-
-From `records/etf/*.json` (the `position` block) or user-provided position data:
-- Entry price, shares, cost (`position.entry_price`, `position.shares`, `position.entry_cost`)
-- P&L = (current - entry_price) * shares
-- P&L% = (current / entry_price - 1) * 100
+### Step 6: Position Metrics（多成本口径）
 
 ```python
-# The records file also carries an operation_plan block (stop_loss / take_profit /
-# key_levels) and risk block from prior deep-analysis — reuse these as prior
-# reference when building the new plan, but recompute with today's fresh quote.
-for p in positions:
-    with open(f"records/etf/{p['name']}{p['code']}.json") as f:
-        rec = json.load(f)
-    prior_plan = rec.get("operation_plan", {})
-    prior_risk = rec.get("risk", {})
+import json, glob, os
+def load_positions(records_dir="records/etf"):
+    positions = []
+    for path in sorted(glob.glob(os.path.join(records_dir, "*.json"))):
+        rec = json.load(open(path))
+        shares = 0; book = 0.0; invested = 0.0; recovered = 0.0; realized = 0.0
+        for t in rec.get("trades", []):
+            if t["action"] == "buy":
+                invested += t["amount"]; book += t["amount"]; shares += t["shares"]
+            elif t["action"] == "sell":
+                avg = book / shares if shares > 0 else 0.0
+                realized += (t["amount"] - avg * t["shares"])
+                book -= avg * t["shares"]; recovered += t["amount"]; shares -= t["shares"]
+        if shares > 0:
+            positions.append({"code": rec["code"], "name": rec["name"], "shares": shares,
+                              "book_avg_cost": book/shares,
+                              "break_even": (invested-recovered)/shares,
+                              "realized_pnl": realized})
+    return positions
 ```
+输出五项：剩余份额、账面持仓均价、资金回本价、已实现盈亏、未实现盈亏（= (现价−账面均价)×份额）、总盈亏。
 
-### Step 6: Compute Key Technical Levels
+### Step 7: Key Levels & Layered Exits（模块 5）
 
-From the 250-day K-line data, compute:
+关键位：S1(60日低)/S2(120日低)/R1(60日高)/R2(120日高)/MA60/MA120/250日位置/成本锚/结构支撑位。
 
-| Level | Calculation | Label |
-|-------|-------------|-------|
-| S1 | 60-day low | 近3月支撑 |
-| S2 | 120-day low | 近6月支撑 |
-| R1 | 60-day high | 近3月压力 |
-| R2 | 120-day high | 近6月压力 |
-| Hard Stop | 52-week low (from quote) | 底部失效 |
-| 60MA | 60-day moving average | 中期趋势线(3月) |
-| 120MA | 120-day moving average | 中期趋势线(6月) |
-| 250d Position | (current - 250d low) / (250d high - 250d low) | 1年位置锚 |
-| Cost Anchor | Entry price | 成本锚点 |
+三层退出（**不用 52 周低点作统一硬止损**）：
 
-Each level: price, distance from current (%), one-sentence meaning. For the medium-term lens, weight the 120MA and 250d position heavily — they determine whether the multi-week trend is up, sideways, or down, independent of daily noise.
+| 层级 | 用途 | 动作 |
+|------|------|------|
+| 趋势观察位 | 接近时提高观察频率 | 不立即交易 |
+| 结构失效位 | 中期高低点结构/重要区间被破坏 | 降低战术仓位 |
+| 灾难保护位 | 极端行情最终退出 | 降低核心仓位/清仓 |
 
-```python
-import json
-with open('/tmp/op_kline.json') as f:
-    bars = json.load(f)
-bars.sort(key=lambda b: b.get('date', ''))
-closes = [float(b['last']) for b in bars]
-highs_all = [float(b['high']) for b in bars]
-lows_all = [float(b['low']) for b in bars]
+结构失效位 = 结构支撑 + 波动率缓冲（`buffer` 公式）+ 收盘确认 + 持续时间确认。**避免仅因盘中瞬间跌破而清仓**。
 
-n = len(closes)
-current = closes[-1]
+### Step 8: Scenarios（1-3 个月，无未经校准概率）
 
-s1 = min(lows_all[-60:])
-s2 = min(lows_all[-120:])
-r1 = max(highs_all[-60:])
-r2 = max(highs_all[-120:])
-ma60 = sum(closes[-60:]) / 60
-ma120 = sum(closes[-120:]) / 120 if n >= 120 else None
-pos_250d = ((current - min(lows_all)) / (max(highs_all) - min(lows_all)) * 100
-            if n >= 250 and max(highs_all) != min(lows_all) else None)
-```
+| 情景 | 触发条件 | 动作 |
+|------|----------|------|
+| 主场景 | 延续当前趋势状态 | 对应硬约束矩阵动作 |
+| 备选场景 | 相邻状态迁移 | 调整战术仓位 |
+| 失效场景 | 结构失效位破坏/资产逻辑失效 | 降低核心仓位 |
 
-### Step 7: Scenario Analysis (Medium-Term Outlook, 1-3 months)
+每情景附：确认条件、失效条件、仓位后果、**证据强度（高/中/低）**、**数据完整度（高/中/低）**。**不输出未经回测校准的百分比**。
 
-Based on current price relative to key levels, pattern scores, and news, project **1-3 month scenarios** — NOT next-day moves. Judge the multi-week trend direction and its durability, not intraday swings.
+### Step 9: Decision Matrix（模块 6，经五层门控）
 
-| Scenario | Trigger Condition | Action |
-|----------|-------------------|--------|
-| **趋势向好** | Stands above 60MA/120MA, pattern score improving, positive catalyst, trend intact | Hold / add to target position, raise trailing stop to lock gains |
-| **区间整理** | Between S1-R1, no pattern change, mixed signals | Hold; use dips toward support to build position toward target size |
-| **趋势恶化** | Breaks hard stop or S2 support, or core thesis/catalyst fails | Execute stop-loss / reduce discipline |
+| 维度 | 输出 |
+|------|------|
+| 趋势状态 | T0-T8 + 子态 + 迁移信息 |
+| 方向 | 看多/中性/看空（多周期） |
+| 核心逻辑 | 一句话验证中长期逻辑 |
+| 核心仓位动作 | 维持/降低/清仓（受硬约束矩阵） |
+| 战术仓位动作 | 回踩加/突破减/观望（受硬约束矩阵） |
+| 持有期 | 多周至 ~6 个月 |
+| 具体操作 | 触发价 + 分批定量（绝不一把梭） |
+| 观察区间 | 3-6 个月目标观察区（见 Step 10） |
+| 下次复评 | 复评条件（见 Step 11） |
 
-Each scenario must state:
-1. **Timeframe** — e.g. "next 1-3 months"
-2. **Estimated probability** — reference ATR-based band width + pattern quality
-3. **Position-sizing consequence** — add/hold/reduce expressed as % of target position (staged, never all-in/out at once)
+### Step 10: Target Observation Zones（模块 8，3-6 个月）
 
-### Step 8: Decision Matrix
+不给单一目标价，给「第一观察区/第二观察区/趋势跟随退出条件」。方法可追溯：
+1. 前期中长期压力区（120/250 日高点或成交密集区）
+2. 箱体量度空间
+3. W 底/头肩底量度空间
+4. 波动率区间（±N×ATR）
+5. 风险收益比约束（≥1:2 才值得战术加仓）
 
-For each ETF, produce:
+方法不一致时输出区间并降置信。风险收益门（Gate 4）校验：`目标空间 / 结构失效风险 >= 2`。
 
-| Dimension | Output |
-|-----------|--------|
-| Direction | 看多 / 中性 / 看空 (multi-week trend, not today) |
-| Core Logic | One-line validation of the medium-term position thesis |
-| Position Action | 加仓 / 持有 / 减仓 / 清仓 |
-| Holding Period | Expected holding period (multi-week to ~6 months) to thesis resolution |
-| Specific Operation | Trigger price + staged, quantitative action (never all-in/out) |
-| Target Price | Medium-term (3-6 month) target + logic |
-| Next Review | When/conditions to re-evaluate |
+### Step 11: Re-Evaluation（模块 7）
 
-### Step 9: Risk Monitor
+四类复评：定期（月度/完整月线形成后）、事件（重大政策/指数调整/利率汇率变化）、价格（触支撑/压力/失效位）、趋势（周线状态变化/MA120 方向变化/相对强弱反转）。
 
-3-5 high-priority watch signals:
+### Step 12: Generate HTML Report
 
-| Signal | Current | Threshold | Action if Triggered |
-|--------|---------|-----------|---------------------|
-| (e.g.) Gold < $3800 | $4084 | < $3800 | Exit gold ETF |
-| (e.g.) Premium > 5% | 2.65% | > 5% | Reduce 1/3 |
+保存到 `reports/etf/operation/{YYYYMMDD}-{ETF简称}-操作建议.html`。两阶段 f-string（CSS/JS 字面花括号用 `{{`/`}}`）。
 
-### Step 10: Generate HTML Report
+**HTML 结构（10 节）**：
+1. **数据状态** — 行情时间、最后完整交易日、daily_bar_status、weekly_bar_status、是否含盘中数据、K线数
+2. **持仓状态** — 剩余份额、账面均价、资金回本价、已实现/未实现/总盈亏、相对目标仓位
+3. **ETF属性和核心驱动** — 资产类型（含暴露映射）、跟踪标的、驱动、风险变量、驱动状态、**catalyst_evidence 来源**
+4. **中长期趋势状态** — 周线趋势（完整周）、日线趋势、均线排列与斜率、高低点结构、相对强弱/自身动量、回撤与波动、**状态机迁移信息**（上周/本周/连续周数/迁移类型/确认）
+5. **技术结构和形态** — 支撑/压力区、突破/失效位（含波动率缓冲）、五形态辅助评分、冲突说明
+6. **未来1-3个月情景** — 主/备选/失效 + 确认/失效条件 + 证据强度与数据完整度
+7. **操作计划** — 核心/战术/预留仓位动作（受硬约束矩阵）、分批触发、不应采取的动作、最大可接受风险
+8. **未来3-6个月观察区间** — 第一/第二观察区 + 计算方法 + 趋势跟随退出
+9. **下次复评条件** — 定期/价格/趋势/事件
+10. **风险和限制** — 数据限制、模型限制、未校准指标、免责
 
-Save to `reports/etf/operation/{YYYYMMDD}-{ETF简称}-操作建议.html`.
+**Style**：红涨绿跌（`.up #c0392b` / `.down #27ae60`）、浅色背景、ECharts、卖方标签、章节「一、二、…」。
 
-Use two-phase f-string approach:
-1. Pre-compute all dynamic data as Python variables
-2. Build HTML with f-string template (use `{{` / `}}` for literal braces in CSS/JS)
+**JS 语法检查（交付前强制）**：抽取 `<script>` 块 → `node --check`，零错误才交付。
 
-**HTML Structure:**
+### Step 13: Present Report
 
-1. **Header** — ETF name, code, date
-2. **一、持仓速览卡片** — Cost/Current/P&L/P&L%, color-coded
-3. **二、技术关键位** — Table of S1/S2/R1/R2/Hard Stop/60MA/120MA/250d Position/Cost Anchor, with distance from current (%)
-4. **三、形态速评** — Five-pattern score table, highlight most relevant pattern
-5. **四、场景推演** — Three scenario cards (bullish/range/bearish), each with a 1-3 month timeframe: trigger conditions, probability, staged position action
-6. **五、消息面速览** — News table: item, type (硬催化/软催化/风险事件), impact, timeframe. If none: "当前无重大催化"
-7. **六、综合决策矩阵** — Decision table (bold, prominent): direction/logic/action/holding-period/operation/target/next-review
-8. **七、风险监控** — Watch signals table: signal/current/threshold/triggered action
-9. **八、免责声明** — Data sources, "不构成投资建议", data timestamp
-
-**Style Rules:**
-- A-share convention: red = up (涨), green = down (跌) — `.up {color: #c0392b}`, `.down {color: #27ae60}`
-- Light background (`#f5f7fa`), gradient header in ETF-appropriate color
-- ECharts CDN for any charts
-- HTML tables for structured data
-- Sell-side tags: `<span class="tag tag-buy">买入</span>`, `<span class="tag tag-hold">标配</span>`
-- Section numbering: 一、二、三、...
-
-**JS syntax check (mandatory before delivery):**
-```bash
-# Extract <script> blocks, save to temp .js, then:
-node --check /tmp/_op_check.js
-# Must pass with zero errors before presenting to user
-```
-
-### Step 11: Present Report
-
-1. Present file path as deliverable
-2. Chat summary: ETF name, pattern status, direction, specific operation
-3. Do NOT paste HTML content in chat
+交付路径 + 聊天摘要（ETF、趋势状态+迁移、方向、具体操作）。不粘贴 HTML。
 
 ## Multi-ETF Handling
 
-For multiple ETFs (e.g., both positions, or user specifies several):
-- Process sequentially through Steps 2-10 for each ETF
-- Data fetching (Step 2) and news search (Step 4) can be parallelized across ETFs
-- Each ETF gets its own HTML report at `reports/etf/operation/{YYYYMMDD}-{ETF简称}-操作建议.html`
+多 ETF：每只依次走 Step 2-12；数据抓取与新闻搜索可并行；每只独立 HTML。
 
 ## Important Notes
 
-- Uses Chinese stock market convention: red = up (涨), green = down (跌)
-- Not investment advice — tool for decision support
-- Data sourced from 腾讯自选股 (westock-data) + web search
-- **Medium-term lens**: analyze and recommend on a multi-week-to-~6-month horizon — de-emphasize daily/intraday noise, never predict next-day moves; position actions are staged over a holding cycle
-- Re-run monthly, or when significant market/catalyst events occur (not daily)
-- westock-data must use `dangerouslyDisableSandbox: true` in Bash calls
-- **Data freshness**: Unlike batch scanners, this skill fetches kline data fresh each run (no caching). Today's bar is intraday (盘中) during 9:30-15:00, post-close (收盘) after 15:00. For most accurate analysis, run after market close.
+- A 股红涨绿跌；非投资建议；数据源 westock-data + WebSearch
+- **趋势状态是主决策层，硬约束矩阵不可被形态分覆盖**（T0/T1 禁止低吸/补仓/摊低成本）
+- **周线用完整自然交易周**，当前周仅预览
+- **状态机防抖动**：普通升级需连续 2 周确认，T8 破位立即生效
+- **新闻必须带来源**，无来源降级输出；新闻不作交易触发器
+- **区分商品期货 ETF 与商品/农业股票 ETF**，看跟踪指数与成分权重
+- **相对强弱需明确基准**，无基准只称「自身动量」
+- **风险边界用波动率自适应**，不用固定 2%
+- **五层门控**：数据→趋势→资产逻辑→风险收益→组合
+- 复评四类触发，非「每月一次」
+- `records/etf` 仅存交易流水；操作计划写入 HTML 或 memory
+- westock-data Bash 必须 `dangerouslyDisableSandbox: true`
+- 状态持久化文件：`.workbuddy/skills/etf-operation-plan/trend_state_history.json`（每次运行 `--save-state` 更新）
