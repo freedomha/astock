@@ -24,7 +24,9 @@ Generate an actionable medium-term operation plan for A-share ETFs. Unlike `etf-
 - `westock-data` for ETF price/K-line data
 - `score_patterns.py` (bundled) — five-pattern technical scoring, **auxiliary layer**
 - `trend_analysis.py` (bundled) — trend-state machine (T0-T8 + T3a/T3b) + weekly features + state persistence, **primary layer**
+- `operation_engine.py` (bundled) — machine-readable action decision with 3 program-level validations, **execution layer**
 - `WebSearch` for asset-type-specific news/catalysts（必须记录来源）
+- `records/portfolio_config.json` — 组合配置（可选；缺失时只输出百分比动作，不输出绝对金额）
 
 ## Trend-State Model（主决策层）
 
@@ -212,6 +214,102 @@ buffer = max(tick_size * n, atr20 * atr_multiplier, structural_level * minimum_p
 
 缺少组合总资产或目标仓位时，**不得输出「加仓 20% 总资产」**，只能输出「相对目标仓位的动作」。
 
+## 组合配置（区分目标仓位与当前仓位）
+
+交易流水（`records/etf/*.json`）只有份额与成本，不含总资产、目标权重、风险预算。为输出绝对买卖数量，需独立配置 `records/portfolio_config.json`：
+
+```json
+{
+  "portfolio_value": 100000,
+  "max_portfolio_drawdown_pct": 10,
+  "positions": {
+    "sh518880": {"role": "core_hedge", "target_weight_pct": 10, "max_weight_pct": 15, "risk_budget_pct": 0.8},
+    "sh512710": {"role": "tactical", "target_weight_pct": 5, "max_weight_pct": 8, "risk_budget_pct": 0.5}
+  }
+}
+```
+
+据此计算：
+
+```
+目标市值 = 组合总资产 × 目标权重
+仓位缺口 = 目标市值 − 当前市值
+单次可买金额 = min(仓位缺口 × 当前状态增仓比例, 本次最大风险预算 / 单份价格风险)
+单份价格风险 = 计划买入价 − 结构失效价
+最大风险预算 = 组合总资产 × 本标的风险预算比例
+```
+
+**无配置时**：只输出明确价位与「目标仓位百分比动作」，**不生成绝对买卖份额**。
+
+## 操作引擎（机器可判定的六项输出）
+
+每份报告最终输出六项**机器可判定字段**，由 `operation_engine.py` 计算，报告正文只解释、不另行生成结论：
+
+```yaml
+current_action: HOLD | ADD | REDUCE | EXIT | WAIT
+action_reason: 当前生效趋势状态及核心证据
+trigger_condition: 触发动作的可计算条件（增/减/退，各带 order size）
+order_size: 本次调整占目标仓位的比例（有组合配置时附绝对金额）
+invalidation_condition: 本次操作逻辑失效条件
+next_review_trigger: 下一次重新计算条件
+```
+
+不要只输出「回踩增加 / 跌破后减少 / 趋势转强后再买」，必须落到可执行条件与具体比例。示例：
+
+```
+当前动作：不新增，维持现有仓位
+增加条件（全部满足）：完整周线由 T2/T3a 迁移为 T3b；MA60 斜率走平或转正；
+  日线回踩 MA20/MA60 后收盘重新站回；reward/risk >= 2
+  满足后首次增加目标仓位 20%；第二周继续确认且未明显扩张，再增加 20%
+降低条件：连续两日收盘低于结构失效位 → 降低战术仓 50%
+退出条件：完整周线进入 T8 或跌破灾难保护位 → 退出剩余战术仓（核心仓由组合用途决定）
+```
+
+## 三道程序级强制校验（代码执行，非报告声明）
+
+`operation_engine.py` 强制执行，任一失败即降级动作：
+
+### 1. 动作合法性校验
+```python
+validate_action(effective_state, position_role, proposed_action)
+# T0 + ADD => 拒绝；T1 + AVERAGE_DOWN => 拒绝；T5 + CHASE => 拒绝；
+# T7 + ADD => 拒绝；T8 + ADD => 拒绝
+```
+
+### 2. 风险收益校验
+```python
+reward = first_observation_price - planned_entry
+risk = planned_entry - structural_invalidation_price
+rr = reward / risk          # 仅 rr >= 2 才允许增加战术仓
+```
+
+### 3. 仓位数量校验
+```
+建议买入金额 <= 目标仓位缺口
+建议买入金额 <= 单次增仓上限
+预计损失 <= 单标的风险预算
+调整后权重 <= 最大权重
+```
+任一失败 → 自动降级为 HOLD 或减少下单数量。
+
+## 今日操作卡（HTML 顶部必含）
+
+每份 HTML 顶部先给「今日操作卡」，不让用户从十章节找结论：
+
+```
+今日操作卡
+当前状态：T1 下降减速，effective，持续 2 个完整周
+当前动作：持有，不新增
+已有仓位：300 份，当前占目标仓位 60%
+增加触发：完整周线进入 T3b 且日线回踩 MA60 后重新站稳 → 首次增加目标仓位 20%
+降低触发：连续 2 日收盘低于 MA60 → 降低战术仓 25%
+退出触发：完整周线进入 T8，或单日收盘跌破灾难保护位超过 1 ATR
+禁止动作：T1 不追高、不补仓、不因新闻增加仓位
+下次复评：周五收盘后，或提前触及上述触发位
+```
+
+趋势、形态、基本面、新闻全部用于**解释这张卡**，不得让报告正文重新自由生成不同结论。
+
 ## Workflow
 
 ### Step 1: Identify Target ETF(s)
@@ -308,14 +406,24 @@ def load_positions(records_dir="records/etf"):
 
 每情景附：确认条件、失效条件、仓位后果、**证据强度（高/中/低）**、**数据完整度（高/中/低）**。**不输出未经回测校准的百分比**。
 
-### Step 9: Decision Matrix（模块 6，经五层门控）
+### Step 9: Decision Matrix（模块 6，经五层门控 + 三道程序校验）
+
+调用 `operation_engine.py` 输出机器可判定六项字段（`current_action`/`action_reason`/`trigger_conditions`/`order_size`/`invalidation_condition`/`next_review_trigger`），并强制执行三道校验（动作合法性 / 风险收益 / 仓位数量）。
+
+```bash
+$PYTHON .workbuddy/skills/etf-operation-plan/operation_engine.py \
+  --state T1 --role core_hedge --code sh518880 \
+  --config records/portfolio_config.json \
+  --shares 300 --book-cost 8.637 --price 9.042 \
+  --invalidation 8.16 --entry 8.75 --observation 9.44 --atr20 0.126 --ma60-dir down
+```
 
 | 维度 | 输出 |
 |------|------|
 | 趋势状态 | T0-T8 + 子态 + 迁移信息 |
 | 方向 | 看多/中性/看空（多周期） |
 | 核心逻辑 | 一句话验证中长期逻辑 |
-| 核心仓位动作 | 维持/降低/清仓（受硬约束矩阵） |
+| 仓位动作 | HOLD/ADD/REDUCE/EXIT/WAIT（引擎决定，受三道校验） |
 | 战术仓位动作 | 回踩加/突破减/观望（受硬约束矩阵） |
 | 持有期 | 多周至 ~6 个月 |
 | 具体操作 | 触发价 + 分批定量（绝不一把梭） |
@@ -341,17 +449,19 @@ def load_positions(records_dir="records/etf"):
 
 保存到 `reports/etf/operation/{YYYYMMDD}-{ETF简称}-操作建议.html`。两阶段 f-string（CSS/JS 字面花括号用 `{{`/`}}`）。
 
-**HTML 结构（10 节）**：
+**HTML 结构**：
+- **顶部「今日操作卡」** — 当前状态、当前动作、已有仓位（占目标仓位%）、增加/降低/退出触发（带 order size）、禁止动作、下次复评、程序校验摘要
+- **正文 10 节**（仅解释今日操作卡，不另行生成结论）：
 1. **数据状态** — 行情时间、最后完整交易日、daily_bar_status、weekly_bar_status、是否含盘中数据、K线数
 2. **持仓状态** — 剩余份额、账面均价、资金回本价、已实现/未实现/总盈亏、相对目标仓位
 3. **ETF属性和核心驱动** — 资产类型（含暴露映射）、跟踪标的、驱动、风险变量、驱动状态、**catalyst_evidence 来源**
-4. **中长期趋势状态** — 周线趋势（完整周）、日线趋势、均线排列与斜率、高低点结构、相对强弱/自身动量、回撤与波动、**状态机迁移信息**（上周/本周/连续周数/迁移类型/确认）
+4. **中长期趋势状态** — 周线趋势（完整周）、日线趋势、均线排列与斜率、高低点结构、相对强弱/自身动量、回撤与波动、**状态机迁移信息**
 5. **技术结构和形态** — 支撑/压力区、突破/失效位（含波动率缓冲）、五形态辅助评分、冲突说明
 6. **未来1-3个月情景** — 主/备选/失效 + 确认/失效条件 + 证据强度与数据完整度
-7. **操作计划** — 核心/战术/预留仓位动作（受硬约束矩阵）、分批触发、不应采取的动作、最大可接受风险
+7. **操作计划** — 仓位动作（核心/战术/预留，受硬约束矩阵）、分批触发、不应采取的动作、最大可接受风险
 8. **未来3-6个月观察区间** — 第一/第二观察区 + 计算方法 + 趋势跟随退出
 9. **下次复评条件** — 定期/价格/趋势/事件
-10. **风险和限制** — 数据限制、模型限制、未校准指标、免责
+10. **风险和限制** — 数据限制、模型限制、未校准指标、组合配置提醒、免责
 
 **Style**：红涨绿跌（`.up #c0392b` / `.down #27ae60`）、浅色背景、ECharts、卖方标签、章节「一、二、…」。
 
@@ -377,6 +487,9 @@ def load_positions(records_dir="records/etf"):
 - **风险边界用波动率自适应**，不用固定 2%
 - **五层门控**：数据→趋势→资产逻辑→风险收益→组合
 - 复评四类触发，非「每月一次」
-- `records/etf` 仅存交易流水；操作计划写入 HTML 或 memory
+- **动作由 `operation_engine.py` 决定**：六项机器可判定字段 + 三道程序校验（动作合法性/风险收益/仓位数量），任一失败自动降级
+- **今日操作卡是最终结论**，HTML 顶部必含，正文只解释
+- `records/etf` 仅存交易流水；`records/portfolio_config.json` 存组合配置（总资产/目标权重/风险预算），缺失时只输出百分比动作
+- 操作计划写入 HTML 或 memory
 - westock-data Bash 必须 `dangerouslyDisableSandbox: true`
 - 状态持久化文件：`.workbuddy/skills/etf-operation-plan/trend_state_history.json`（每次运行 `--save-state` 更新）

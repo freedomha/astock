@@ -679,10 +679,22 @@ def apply_state_machine(code, raw_trend, state_file, save_state):
 
     eff_code, eff_sub, mtype, conf, note = migrate(prev, raw_code, raw_sub)
 
-    # consecutive-week counting: new state resets to 1; blocked/same state keeps counting
+    # consecutive-week counting: counts DISTINCT weeks the state has held.
+    # Same-week re-runs must NOT increment (anti-jitter / 防抖动).
     consecutive = 1
     if prev and prev.get("state") == eff_code:
-        consecutive = prev.get("consecutive_weeks", 0) + 1
+        prev_upd = prev.get("last_update")
+        new_week = True
+        if prev_upd:
+            try:
+                lu = dt.date.fromisoformat(prev_upd[:10])
+                new_week = lu.isocalendar()[:2] != dt.date.today().isocalendar()[:2]
+            except ValueError:
+                new_week = True
+        if new_week:
+            consecutive = prev.get("consecutive_weeks", 0) + 1
+        else:
+            consecutive = max(prev.get("consecutive_weeks", 1), 1)
 
     machine = {
         "previous_state": prev.get("state") if prev else None,

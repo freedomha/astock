@@ -15,9 +15,6 @@ table{width:100%;border-collapse:collapse;font-size:13px}
 th,td{padding:8px 10px;border-bottom:1px solid #eef1f5;text-align:left;vertical-align:top}
 th{background:#f8fafc;color:#5a6b7b;font-weight:600;white-space:nowrap}
 .up{color:#c0392b;font-weight:600}.down{color:#27ae60;font-weight:600}
-.tag{display:inline-block;padding:2px 10px;border-radius:12px;font-size:12px;margin:2px}
-.tag-buy{background:#fdecea;color:#c0392b}.tag-hold{background:#eef4ff;color:#2c5aa0}
-.tag-reduce{background:#eafaf0;color:#1e7e45}.tag-clear{background:#fdecea;color:#c0392b}
 .state-badge{display:inline-block;padding:4px 14px;border-radius:14px;font-size:14px;font-weight:700;color:#fff;background:#2c3e50}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .kpi{font-size:22px;font-weight:700;margin:2px 0}
@@ -26,12 +23,30 @@ th{background:#f8fafc;color:#5a6b7b;font-weight:600;white-space:nowrap}
 .chart{width:100%;height:320px}
 .disc{color:#8896a6;font-size:12px;margin-top:24px;padding-top:12px;border-top:1px solid #eef1f5}
 .warn{color:#c0392b;font-weight:600}
+.actioncard{border:2px solid #2c3e50;border-radius:12px;background:#fff;padding:20px 24px;margin-bottom:20px;box-shadow:0 2px 6px rgba(0,0,0,.08)}
+.actioncard .act-title{font-size:18px;font-weight:800;color:#1a2a3a;margin:0 0 12px}
+.action-badge{display:inline-block;padding:6px 18px;border-radius:18px;font-size:16px;font-weight:800;color:#fff}
+.act-row{margin:8px 0}
+.act-label{display:inline-block;min-width:88px;color:#5a6b7b;font-weight:600;font-size:13px;vertical-align:top}
+.act-val{display:inline-block;max-width:calc(100% - 100px);vertical-align:top}
+.act-trigger{margin:3px 0;font-size:13px}
 </style></head>
 <body><div class="wrap">
 
 <div class="header">
   <h1>军工龙头ETF富国 中长期持仓操作计划</h1>
   <div class="sub">代码 sh512710 · 2026-08-13 · 数据源：腾讯自选股 + WebSearch（带来源）</div>
+</div>
+
+<div class="actioncard">
+  <p class="act-title">今日操作卡 <span class="muted">（正文仅解释本卡，不另行生成结论）</span></p>
+  <div class="act-row"><span class="act-label">当前状态</span><span class="act-val">T0 长期下降，initial，持续 1 个完整周</span></div>
+  <div class="act-row"><span class="act-label">当前动作</span><span class="act-val"><span class="action-badge" style="background:#7f8c8d">退出</span> T0 长期下降：周线向下+空头排列+低点降低，中期趋势向下</span></div>
+  <div class="act-row"><span class="act-label">已有仓位</span><span class="act-val">3300 份，当前占目标仓位 2.1%（基于组合配置，模板值待核实）</span></div>
+  <div class="act-trigger"><span class="act-label">降低触发</span><span class="act-val">连续 2 日收盘低于结构失效位（0.572） → 降低战术仓位 50%</span></div><div class="act-trigger"><span class="act-label">退出触发</span><span class="act-val">完整周线进入 T8，或单日收盘跌破灾难保护位（0.556，超 1 ATR） → 退出剩余战术仓位（核心仓位是否退出由组合用途决定）</span></div>
+  <div class="act-row"><span class="act-label">禁止动作</span><span class="act-val">加仓、摊低成本/补仓、追高（不追高、不补仓、不因新闻加仓）</span></div>
+  <div class="act-row"><span class="act-label">下次复评</span><span class="act-val">周五收盘后（完整周线形成后重新计算），或提前触及上述任意触发位</span></div>
+  <div class="muted" style="margin-top:8px">程序校验：动作合法性：T0 + ADD => 拒绝 / T0 + AVERAGE_DOWN => 拒绝 / T0 + CHASE => 拒绝。</div>
 </div>
 
 <div class="card"><h2>一、数据状态</h2><table>
@@ -50,7 +65,7 @@ th{background:#f8fafc;color:#5a6b7b;font-weight:600;white-space:nowrap}
   <div><div class="muted">已实现盈亏</div><div class="kpi"><span class="">+0.00</span></div></div>
   <div><div class="muted">未实现盈亏</div><div class="kpi"><span class="down">-37.95</span>（<span class="down">-1.81</span>%）</div></div>
 </div>
-<div class="muted" style="margin-top:8px">总盈亏 = <span class="down">-37.95</span> · 建仓日 2026-08-10 · 未提供组合总资产与目标仓位，动作均相对目标仓位表述</div>
+<div class="muted" style="margin-top:8px">总盈亏 = <span class="down">-37.95</span> · 建仓日 2026-08-10 · 组合配置为模板值，绝对金额需核实 portfolio_value</div>
 </div>
 
 <div class="card"><h2>三、ETF属性和核心驱动</h2><table>
@@ -94,12 +109,12 @@ th{background:#f8fafc;color:#5a6b7b;font-weight:600;white-space:nowrap}
     <tr><td>R2 近6月压力</td><td>0.930</td><td>+49.0%</td><td>120日高点</td></tr>
     <tr><td>MA60</td><td>0.656</td><td>+5.1%</td><td>中期趋势线(down)</td></tr>
     <tr><td>MA120</td><td>0.727</td><td>+16.5%</td><td>中期趋势线(down)</td></tr>
-    <tr><td>250日位置</td><td>11%</td><td>—</td><td>1年位置锚</td></tr>
+    <tr><td>结构失效位</td><td>0.572</td><td>-8.3%</td><td>结构支撑−0.5×ATR20</td></tr>
     <tr><td>成本锚</td><td>0.636</td><td>+1.8%</td><td>账面持仓均价</td></tr>
 </table>
 <h2 style="margin-top:16px">五形态辅助评分（不覆盖趋势状态）</h2>
 <table><tr><th>形态</th><th>分数</th><th>判定</th></tr><tr><td>圆弧底</td><td>68</td><td>⚪ 观望</td></tr><tr><td>箱体</td><td>18</td><td>🔴 下跌趋势</td></tr><tr><td>W底</td><td>0</td><td>非W底</td></tr><tr><td>头肩底</td><td>0</td><td>⚪ 非头肩底</td></tr><tr><td>2B底</td><td>0</td><td>无2B信号</td></tr></table>
-<p class="muted">形态冲突说明：圆弧底68分(观望)与趋势状态T0冲突：形态分高但属下降趋势中的减速信号，不可当作底部反转证据，禁止左侧抄底。</p>
+<p class="muted">形态冲突说明：圆弧底68分(观望)与T0冲突：形态分高但属下降趋势中的减速信号，禁止左侧抄底。</p>
 </div>
 
 <div class="card"><h2>六、未来1-3个月情景</h2>
@@ -107,9 +122,9 @@ th{background:#f8fafc;color:#5a6b7b;font-weight:600;white-space:nowrap}
 <p class="muted">不使用未经回测校准的概率，仅以主/备选/失效三情景 + 证据强度表述。</p>
 </div>
 
-<div class="card"><h2>七、操作计划（经五层门控）</h2>
-<p><b>核心仓位动作：</b>核心仓位重新评估/降低——T0长期下降，不宜作为核心多头持仓</p>
-<p><b>战术仓位动作：</b></p><ul><li>T0状态禁止新增：不低吸、不补仓、不摊低成本</li><li>反弹至MA60（0.656）附近：减仓</li><li>收盘跌破结构失效位（0.58−0.5×ATR20≈0.572）且持续N日确认：退出</li></ul>
+<div class="card"><h2>七、操作计划（经五层门控 + 三道程序校验）</h2>
+<p><b>仓位动作（tactical）：</b>退出战术仓位——T0长期下降，战术仓位无趋势依据；反弹至MA60（0.656）附近离场</p>
+<p><b>战术仓位动作：</b></p><ul><li>T0状态禁止新增：不低吸、不补仓、不摊低成本</li><li>反弹至MA60（0.656）附近：减仓离场</li><li>收盘跌破结构失效位（0.58−0.5×ATR20≈0.572）且持续N日确认：退出</li></ul>
 <p><b>不应采取的动作：</b><br>['不因bowl形态68分而左侧抄底（趋势仍是T0）', '不在下降趋势中摊低加仓']</p>
 <p><b>最大可接受风险：</b>结构失效位 = 0.58 − 0.5×ATR20(0.016) ≈ 0.572（需收盘+持续确认）</p>
 </div>
@@ -125,8 +140,9 @@ th{background:#f8fafc;color:#5a6b7b;font-weight:600;white-space:nowrap}
 <div class="card"><h2>十、风险和限制</h2>
 <table>
   <tr><th>数据限制</th><td>250日K线；周线由日线重采样；当前周未完成不参与趋势判断</td></tr>
-  <tr><th>模型限制</th><td>T0-T8为启发式分类，非统计推断；状态机为首周初始化，迁移需连续确认</td></tr>
+  <tr><th>模型限制</th><td>T0-T8为启发式分类；状态机迁移需连续确认</td></tr>
   <tr><th>未校准指标</th><td>情景未附概率、证据强度为主观判断</td></tr>
+  <tr><th>配置提醒</th><td>组合配置（portfolio_value/权重/风险预算）为模板值，绝对金额需核实后使用</td></tr>
   <tr><th>免责</th><td>决策支持工具，不构成投资建议</td></tr>
 </table>
 </div>
