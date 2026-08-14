@@ -16,5 +16,23 @@
     "sub_state": null,
     "consecutive_weeks": 1,
     "last_update": "2026-08-14"
+  },
+  "sh516110": {
+    "state": "T1",
+    "sub_state": null,
+    "consecutive_weeks": 1,
+    "last_update": "2026-08-14"
+  },
+  "sz159611": {
+    "state": "T1",
+    "sub_state": null,
+    "consecutive_weeks": 1,
+    "last_update": "2026-08-14"
+  },
+  "sh560620": {
+    "state": "T1",
+    "sub_state": null,
+    "consecutive_weeks": 1,
+    "last_update": "2026-08-14"
   }
 }

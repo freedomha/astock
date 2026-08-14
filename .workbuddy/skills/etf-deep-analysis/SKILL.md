@@ -1,6 +1,6 @@
 ---
 name: etf-deep-analysis
-description: Deep analysis of an A-share ETF with structured investment recommendations. Produces a professional HTML research report covering ETF timing (bowl-bottom / position-in-range), holdings quality, fund flow sentiment, discount/premium analysis, peer comparison, theme catalysts, and actionable allocation advice. Triggers on requests to deeply analyze a specific ETF, such as "深入分析XXETF", "分析旅游ETF", "XXETF现在什么状态", "帮我看看XXETF能不能买".
+description: Deep analysis of an A-share ETF with structured investment recommendations. Produces a professional HTML research report covering ETF timing (bowl-bottom / position-in-range), holdings quality, fund flow sentiment, discount/premium analysis, peer comparison, theme catalysts, and actionable allocation advice with a position-building protocol (建仓协议): preconditions, action mapping, staged entry plan, and position conclusion matrix. Triggers on requests to deeply analyze a specific ETF, such as "深入分析XXETF", "分析旅游ETF", "XXETF现在什么状态", "帮我看看XXETF能不能买".
 ---
 
 # ETF Deep Analysis（ETF深度分析）
@@ -230,7 +230,7 @@ One of: **买入/加仓** | **持有/标配** | **观察/等待** | **减仓/回
 
 Must include:
 - Recommended position size (as % of total portfolio)
-- Entry strategy (一次性 / 分批 / 定投)
+- Entry strategy — apply the **Position Building Protocol** (建仓协议) below: run preconditions → map score to action → output staged entry plan
 - Stop-loss level
 - Target return and holding period
 - Key risk to monitor that would invalidate the thesis
@@ -313,7 +313,7 @@ with open('reports/etf/XXXETF深度分析-YYYYMMDD.html', 'w', encoding='utf-8')
 8. **Catalyst timeline** — table with 催化事件/类型(hard/soft)/概率/影响/时间窗口
 9. **Bull vs Bear** — two-column layout: 多头逻辑 (left, green) vs 空头逻辑 (right, red)
 10. **Risk callout** — prominent box: 主要风险 + monitoring signal
-11. **配置建议** — explicit recommendation table: 方向/建议/仓位/入场方式/止损/目标/持有期
+11. **配置建议** — explicit recommendation table: 方向/建议/仓位/入场方式/止损/目标/持有期 + **建仓结论矩阵** (Position Conclusion Matrix)
 12. **免责声明** — sources + 不构成投资建议 + 数据截止时间
 
 **Style rules:**
@@ -343,6 +343,66 @@ Every analysis conclusion must map to one of:
 - **观察动作**: `观察名单` | `等待确认` | `重新评估` | `放弃`
 - **入场策略**: `一次性建仓` | `分批买入` | `定投` | `网格交易`
 - **卖研风格**: `超配` | `标配` | `低配` | `左侧` | `回避`
+
+## Position Building Protocol（建仓协议）
+
+This protocol upgrades the report from a research document to an actionable **建仓操作手册**. Every 建仓/加仓 recommendation must pass the preconditions, map to a position action, output a staged entry plan, and include the 建仓结论矩阵.
+
+### Position Building Preconditions（建仓前置过滤器）
+
+Before giving any 建仓/加仓 recommendation, check the following **hard gates**. If ANY gate fails, the default action is `观察`/`回避` unless explicitly overridden:
+
+1. **Equity ETF only** — Must be an equity ETF (股票型/主题型/行业型). Skip 建仓 analysis for money market ETFs (银华日利等) and bond ETFs.
+2. **Fund size > 500M preferred** — Institutional-grade size (> 500M RMB) preferred. (衔接 基金规模风险 section)
+3. **Size < 100M → 观察/回避** — If fund size < 100M RMB, default action = 观察/回避 unless liquidity is explicitly acceptable (e.g., small size but high daily turnover).
+4. **Liquidity sufficiency** — Average daily turnover amount (日均成交额) must be sufficient for the user's intended position. Rule of thumb: intended position ≤ 10% of average daily turnover; otherwise reduce the position or wait.
+5. **NAV availability** — NAV or a reliable proxy (IOPV / underlying index level) must be available for discount/premium calculation. If unavailable, the discount/premium analysis is downgraded to qualitative only.
+6. **K-line integrity** — If K-line data is incomplete or cannot be parsed reliably, the recommendation must be downgraded to `观察`.
+7. **ETF-specific weakness check** — If the ETF is near its 250-day low but the underlying index is NOT, mark as **ETF-specific weakness** (fund flow, tracking error, dividend withholding), NOT a sector-bottom opportunity. (衔接 Tracking Error section)
+
+### Position Action Mapping（建仓动作分层）
+
+Map the bowl-bottom score + hard overrides to a concrete position action:
+
+| Score | Position Action |
+|-------|-----------------|
+| < 50 | 观察/不建仓 |
+| 50–58 | 加入观察名单，仅允许小额试仓或等待确认 |
+| 58–65 | 左侧试仓，建议 1%–3% |
+| 65–75 | 分批建仓，建议 3%–5% |
+| > 75 | 可加到标准仓位，但仍需结合资金流和催化确认 |
+
+**Hard overrides (override the score-based action):**
+- If `trend_20d < -6%` → override to **等待确认** (下跌中继)
+- If `drawdown_120d > -5%` → **prohibit new position** unless the catalyst is strong (near highs)
+- If fund size < 100M → override to **回避** or **观察**
+- If any Precondition gate fails → **观察/回避**
+
+### Entry Plan（分批买入规则）
+
+For any 建仓 recommendation, always output a staged entry plan:
+
+- **First tranche (首仓)**: 30%–40% of the planned ETF allocation
+- **Second tranche (第二笔)**: after price stabilizes above the 20MA or a higher low is confirmed
+- **Third tranche (第三笔)**: after 60MA reclaim or catalyst confirmation
+- **Stop adding (停止加仓)**: if price breaks the prior low with volume expansion
+- **一次性建仓** is only allowed when: score is high (>75), liquidity is strong, AND the catalyst is near-term. Never recommend 一次性建仓 by default.
+
+### Position Conclusion Matrix（建仓结论矩阵）
+
+Every report must include this table in the 配置建议 section:
+
+| 项目 | 结论 |
+|------|------|
+| 是否适合建仓 | 是 / 否 / 等待 |
+| 建仓类型 | 左侧试仓 / 分批建仓 / 右侧确认 / 不建仓 |
+| 建议首仓 | x% |
+| 计划总仓位 | x% |
+| 加仓触发 | 条件 A、B、C |
+| 停止加仓 | 条件 A、B、C |
+| 止损条件 | 价格 / 逻辑 / 结构 |
+| 复盘频率 | 每周 / 每月 |
+| 结论可信度 | 高 / 中 / 低 |
 
 ## ETF-Specific Considerations
 
