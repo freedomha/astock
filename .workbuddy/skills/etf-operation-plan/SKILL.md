@@ -16,6 +16,7 @@ Generate an actionable medium-term operation plan for A-share ETFs. Unlike `etf-
 3. **状态机 + 防抖动** — 趋势状态有历史持久化与合法迁移规则，避免周线边界来回切换；普通升级需连续 2 个完整周线确认。
 4. **不同资产类型用不同驱动模板，且新闻必须可追溯** — 先识别资产类型（并区分商品期货 ETF 与商品/农业股票 ETF），再加载对应驱动；每个外部事实必须带来源证据，无来源时降级为「无充分可验证驱动」。
 5. **五层门控** — 数据门 → 趋势门 → 资产逻辑门 → 风险收益门 → 组合门，逐层过滤后才生成操作计划。
+6. **交易成本是决策链的一环（小资金致命项）** — ETF 免印花税，但佣金（默认万2.5，**单笔最低5元**）+ 单边价差（约0.05%）+ 最小交易单位（**1手=100份**）必须在增仓决策中显式核算：千元以下订单单边成本可超 0.5%，最低佣金会吞噬小资金分批加仓的预期收益。增仓动作必须通过**成本门**（单边成本占比 / 成本占预期收益 / 成本调整后 RR / 最小手数），任一失败自动降级为持有。
 
 **Output:** `reports/etf/operation/{YYYYMMDD}-{ETF简称}-操作建议.html`
 
@@ -39,11 +40,17 @@ $PYTHON .workbuddy/skills/etf-operation-plan/backtest.py
 $PYTHON .workbuddy/skills/etf-operation-plan/backtest.py --use-confirmed   # 暴露上调需连续2周确认，验证防抖动价值
 $PYTHON .workbuddy/skills/etf-operation-plan/backtest.py --code sh518880    # 单只ETF
 $PYTHON .workbuddy/skills/etf-operation-plan/backtest.py --max-etfs 20      # 快速验证
+# 交易成本参数（默认取自 records/portfolio_config.json["costs"] / portfolio_value，可覆盖）：
+$PYTHON .workbuddy/skills/etf-operation-plan/backtest.py \
+  --commission-rate 0.00025 --min-commission 5 --half-spread 0.0005 \
+  --impact-pct 0 --lot-size 100 --position-value 30000
 ```
+
+**交易成本模型（v2 起默认计入，官方口径）**：ETF 免印花税；佣金 `max(最低5元, 成交额×佣金率)` + 成交额×(单边价差0.05% + 冲击成本)；份额按 **1 手=100 份**取整，买不足 1 手不成交；策略期末清仓、买入持有含一次建仓+一次清仓成本。**同时输出 net（含成本）与 gross（无成本）**，`cost_drag = gross − net` 即成本拖累；`--position-value` 为单标的策略名义本金（越小 → 最低佣金拖累越明显，默认取 `portfolio_config.portfolio_value`）。
 
 **三部分输出**：
 1. **Part 1 状态信号统计** — 每个历史时点分类趋势状态，统计后续 5/10/20/40/60 日收益（均值/胜率/中位数/最好/最差），并与全样本基线对比超额收益。用于判断各状态是否真正预示后续走势（如 T3b 应显著为正，T2/T0 是否真的是底部）。
-2. **Part 2 策略模拟** — 按硬约束矩阵把 effective 状态映射为仓位暴露（T0/T1 空仓 → T3b 75% → T4/T5/T6 满仓 → T7 50% → T8 空仓），模拟长期多头策略与买入持有对比（总收益/年化/最大回撤/年化波动/夏普/平均暴露/跑赢占比）。
+2. **Part 2 策略模拟** — 按硬约束矩阵把 effective 状态映射为仓位暴露（T0/T1 空仓 → T3b 75% → T4/T5/T6 满仓 → T7 50% → T8 空仓），模拟长期多头策略与买入持有对比（总收益/年化/最大回撤/年化波动/夏普/平均暴露/跑赢占比/**成本拖累/交易次数**）。
 3. **Part 3 关键迁移分析** — 迁移进入 T3b/T4（升级）、T8（破位）、T0/T1（转弱）后的 20/40 日收益，验证关键迁移的可执行性。
 
 **实现口径**（与实盘一致）：
@@ -52,13 +59,14 @@ $PYTHON .workbuddy/skills/etf-operation-plan/backtest.py --max-etfs 20      # �
 - 周线只用**最后一个完整自然交易周**，当周仅作 preview，无未来函数。
 - 默认数据 `etf_kline_data_500.json`（346 ETF × 500 日），缺失时回退 250 日文件；暴露映射 `EXPOSURE` 在脚本内可调。
 
-**输出**：stdout 汇总表 + `backtest_trend_state_results.json`（config / state_signal_stats / baseline_stats / strategy_summary / transitions / per_etf / signals）。
+**输出**：stdout 汇总表 + `backtest_trend_state_results.json`（config 含 cost_model/position_value / state_signal_stats / baseline_stats / strategy_summary / transitions / per_etf / signals）。
 
 **解读注意**：
 - Part 1 是「状态后无条件持有 N 日」的平均，不等于实盘分批/回踩操作；不代表未来收益承诺。
 - 历史结果可能显示策略总收益低于买入持有但回撤/波动显著更小——操作计划框架是**风险控制型**框架（低暴露期在空仓），解读时应同时看收益与回撤。
 - 货币基金类 ETF（如 511990 华宝添益）价格近乎平坦，会以 T0/T2 低频出现且收益近零，解读时注意剔除。
 - A 股 ETF 存在均值回归特征，T0/T1（长期下降）后的平均收益未必为负——「禁止新增」的价值在于控制回撤而非预测反弹，不要在 T0/T1 因「看起来要反弹」而低吸。
+- 成本拖累在小名义本金下显著（15000 元、万2.5/最低5元时约 2-4% 总收益），且**交易越频繁拖累越大**——这印证操作计划的「分批/低换手」约束。
 
 ## Trend-State Model（主决策层）
 
@@ -237,8 +245,8 @@ buffer = max(tick_size * n, atr20 * atr_multiplier, structural_level * minimum_p
 3. 是否已被价格计入
 4. 是否与技术趋势一致
 
-### Gate 4：风险收益门
-只有 `目标观察区空间 / 结构失效风险 >= 2` 才输出「增加战术仓」。不足时：即使趋势向上，也只持有，不新增。
+### Gate 4：风险收益门（含交易成本）
+只有 `(目标观察区空间 − 每股交易成本) / 结构失效风险 >= 2` 才输出「增加战术仓」；同时增仓金额须通过成本门（单边成本占比 ≤1%、成本占预期收益 ≤15%、可买手数 ≥ 1 手）。不足时：即使趋势向上，也只持有，不新增——小资金下千元级订单被最低 5 元佣金吞噬时，即使方向正确也不经济。
 
 ### Gate 5：组合门
 - **单标的模式**：只判断该持仓内部动作（默认）
@@ -254,6 +262,15 @@ buffer = max(tick_size * n, atr20 * atr_multiplier, structural_level * minimum_p
 {
   "portfolio_value": 100000,
   "max_portfolio_drawdown_pct": 10,
+  "costs": {
+    "commission_rate": 0.00025,
+    "min_commission": 5.0,
+    "half_spread": 0.0005,
+    "impact_pct": 0.0,
+    "lot_size": 100,
+    "max_cost_pct_of_trade": 1.0,
+    "max_cost_pct_of_reward": 15.0
+  },
   "positions": {
     "sh518880": {"role": "core_hedge", "target_weight_pct": 10, "max_weight_pct": 15, "risk_budget_pct": 0.8},
     "sh512710": {"role": "tactical", "target_weight_pct": 5, "max_weight_pct": 8, "risk_budget_pct": 0.5}
@@ -261,7 +278,9 @@ buffer = max(tick_size * n, atr20 * atr_multiplier, structural_level * minimum_p
 }
 ```
 
-据此计算：
+`costs` 字段为**交易成本参数**（官方口径：ETF 免印花税；佣金默认万2.5、**单笔最低5元**；单边买卖价差约0.05%，最小报价0.001元；二级市场最小交易单位 **1手=100份**；一级市场申赎最小单位为几十万~几百万份，散户不参与申赎）。成本参数来源顺序：CLI > `costs` > 内置默认。
+
+据此计算（**增仓金额先扣成本、再按手数取整**）：
 
 ```
 目标市值 = 组合总资产 × 目标权重
@@ -269,9 +288,18 @@ buffer = max(tick_size * n, atr20 * atr_multiplier, structural_level * minimum_p
 单次可买金额 = min(仓位缺口 × 当前状态增仓比例, 本次最大风险预算 / 单份价格风险)
 单份价格风险 = 计划买入价 − 结构失效价
 最大风险预算 = 组合总资产 × 本标的风险预算比例
+可买手数 = floor(单次可买金额 / 计划买入价 / 100)   # 不足 1 手（100份）不成交
+成交金额 = 可买手数 × 100 × 计划买入价
+单笔成本 = max(最低佣金, 成交金额×佣金率) + 成交金额×(单边价差+冲击成本)
 ```
 
-**无配置时**：只输出明确价位与「目标仓位百分比动作」，**不生成绝对买卖份额**。
+**成本门（引擎第 4 道校验，任一失败增仓自动降级为持有）**：
+- 可买手数 ≥ 1 手（不足 1 手 = 低于最小交易单位）
+- 单边成本占成交额 ≤ `max_cost_pct_of_trade`（默认 1%：拦截最低 5 元佣金主导的千元以下订单）
+- 成本占预期收益 ≤ `max_cost_pct_of_reward`（默认 15%）
+- 成本调整后 RR = (第一观察区 − 计划买入价 − 每股成本) / (计划买入价 − 结构失效价) ≥ 2
+
+**无配置时**：只输出明确价位与「目标仓位百分比动作」，**不生成绝对买卖份额**（无法核算金额级成本）。
 
 ## 操作引擎（机器可判定的六项输出）
 
@@ -281,7 +309,7 @@ buffer = max(tick_size * n, atr20 * atr_multiplier, structural_level * minimum_p
 current_action: HOLD | ADD | REDUCE | EXIT | WAIT
 action_reason: 当前生效趋势状态及核心证据
 trigger_condition: 触发动作的可计算条件（增/减/退，各带 order size）
-order_size: 本次调整占目标仓位的比例（有组合配置时附绝对金额）
+order_size: 本次调整占目标仓位的比例（有组合配置时附：可买手数/成交金额/单笔成本/单边成本占比/每股成本/成本占预期收益/成本调整后RR；减/退动作附退出成本预估）
 invalidation_condition: 本次操作逻辑失效条件
 next_review_trigger: 下一次重新计算条件
 ```
@@ -297,7 +325,7 @@ next_review_trigger: 下一次重新计算条件
 退出条件：完整周线进入 T8 或跌破灾难保护位 → 退出剩余战术仓（核心仓由组合用途决定）
 ```
 
-## 三道程序级强制校验（代码执行，非报告声明）
+## 四道程序级强制校验（代码执行，非报告声明）
 
 `operation_engine.py` 强制执行，任一失败即降级动作：
 
@@ -308,11 +336,12 @@ validate_action(effective_state, position_role, proposed_action)
 # T7 + ADD => 拒绝；T8 + ADD => 拒绝
 ```
 
-### 2. 风险收益校验
+### 2. 风险收益校验（成本调整后）
 ```python
 reward = first_observation_price - planned_entry
 risk = planned_entry - structural_invalidation_price
-rr = reward / risk          # 仅 rr >= 2 才允许增加战术仓
+rr_net = (reward - cost_per_share) / risk   # 每股成本从收益中扣除
+# 仅 rr_net >= 2 才允许增加战术仓
 ```
 
 ### 3. 仓位数量校验
@@ -323,6 +352,19 @@ rr = reward / risk          # 仅 rr >= 2 才允许增加战术仓
 调整后权重 <= 最大权重
 ```
 任一失败 → 自动降级为 HOLD 或减少下单数量。
+
+### 4. 交易成本校验（小资金致命项）
+```python
+validate_cost(shares, trade_price, commission_rate, min_commission, half_spread,
+              impact_pct, lot_size, planned_entry, first_observation,
+              structural_invalidation, max_cost_pct_of_trade, max_cost_pct_of_reward)
+# 任一失败 → 增仓降级为 HOLD：
+# ① shares < 1 手（100份）→ "低于最小交易单位"
+# ② 单边成本占成交额 > max_cost_pct_of_trade(默认1%) → 最低佣金主导的千元以下订单
+# ③ 成本占预期收益 > max_cost_pct_of_reward(默认15%)
+# ④ 成本调整后 RR < 2
+# cost = max(最低佣金, 成交额×佣金率) + 成交额×(单边价差+冲击成本)
+```
 
 ## 今日操作卡（HTML 顶部必含）
 
@@ -337,10 +379,11 @@ rr = reward / risk          # 仅 rr >= 2 才允许增加战术仓
 降低触发：连续 2 日收盘低于 MA60 → 降低战术仓 25%
 退出触发：完整周线进入 T8，或单日收盘跌破灾难保护位超过 1 ATR
 禁止动作：T1 不追高、不补仓、不因新闻增加仓位
+程序校验摘要：动作合法性 ✓ / 风险收益 ✗(rr<2) / 仓位数量 ✓ / 交易成本 ✗(增仓金额低于1手或成本占比超阈值 → 增仓降级为持有)
 下次复评：周五收盘后，或提前触及上述触发位
 ```
 
-> 注：上例为战术仓示例。触发措辞由 `operation_engine.py` 按 role 输出——核心仓显示「降低核心仓/退出剩余核心仓（是否清仓由组合用途决定）」，战术仓显示「降低战术仓/退出剩余战术仓（核心仓位是否退出由组合用途决定）」。报告生成时直接引用引擎输出的 `size_desc`，不得自行改写。
+> 注：上例为战术仓示例。触发措辞由 `operation_engine.py` 按 role 输出——核心仓显示「降低核心仓/退出剩余核心仓（是否清仓由组合用途决定）」，战术仓显示「降低战术仓/退出剩余战术仓（核心仓位是否退出由组合用途决定）」。报告生成时直接引用引擎输出的 `size_desc`，不得自行改写。当增仓动作被成本门降级时，操作卡须写明成本原因（如「本次增仓 560 元，单边成本 0.94%→成本占预期收益 6.6%，低于 1 手」），并把「增加触发」改写为「待成本可行后再执行」。
 
 趋势、形态、基本面、新闻全部用于**解释这张卡**，不得让报告正文重新自由生成不同结论。
 
@@ -440,9 +483,9 @@ def load_positions(records_dir="records/etf"):
 
 每情景附：确认条件、失效条件、仓位后果、**证据强度（高/中/低）**、**数据完整度（高/中/低）**。**不输出未经回测校准的百分比**。
 
-### Step 9: Decision Matrix（模块 6，经五层门控 + 三道程序校验）
+### Step 9: Decision Matrix（模块 6，经五层门控 + 四道程序校验）
 
-调用 `operation_engine.py` 输出机器可判定六项字段（`current_action`/`action_reason`/`trigger_conditions`/`order_size`/`invalidation_condition`/`next_review_trigger`），并强制执行三道校验（动作合法性 / 风险收益 / 仓位数量）。
+调用 `operation_engine.py` 输出机器可判定六项字段（`current_action`/`action_reason`/`trigger_conditions`/`order_size`/`invalidation_condition`/`next_review_trigger`），并强制执行四道校验（动作合法性 / 风险收益 / 仓位数量 / 交易成本）。
 
 ```bash
 $PYTHON .workbuddy/skills/etf-operation-plan/operation_engine.py \
@@ -450,6 +493,9 @@ $PYTHON .workbuddy/skills/etf-operation-plan/operation_engine.py \
   --config records/portfolio_config.json \
   --shares 300 --book-cost 8.637 --price 9.042 \
   --invalidation 8.16 --entry 8.75 --observation 9.44 --atr20 0.126 --ma60-dir down
+# 交易成本参数默认取自 config["costs"]，可 CLI 覆盖：
+#   --commission-rate 0.00025 --min-commission 5 --half-spread 0.0005 \
+#   --lot-size 100 --max-cost-pct-of-trade 1.0 --max-cost-pct-of-reward 15.0
 ```
 
 | 维度 | 输出 |
@@ -457,7 +503,7 @@ $PYTHON .workbuddy/skills/etf-operation-plan/operation_engine.py \
 | 趋势状态 | T0-T8 + 子态 + 迁移信息 |
 | 方向 | 看多/中性/看空（多周期） |
 | 核心逻辑 | 一句话验证中长期逻辑 |
-| 仓位动作 | HOLD/ADD/REDUCE/EXIT/WAIT（引擎决定，受三道校验） |
+| 仓位动作 | HOLD/ADD/REDUCE/EXIT/WAIT（引擎决定，受四道校验） |
 | 战术仓位动作 | 回踩加/突破减/观望（受硬约束矩阵） |
 | 持有期 | 多周至 ~6 个月 |
 | 具体操作 | 触发价 + 分批定量（绝不一把梭） |
@@ -521,7 +567,8 @@ $PYTHON .workbuddy/skills/etf-operation-plan/operation_engine.py \
 - **风险边界用波动率自适应**，不用固定 2%
 - **五层门控**：数据→趋势→资产逻辑→风险收益→组合
 - 复评四类触发，非「每月一次」
-- **动作由 `operation_engine.py` 决定**：六项机器可判定字段 + 三道程序校验（动作合法性/风险收益/仓位数量），任一失败自动降级
+- **动作由 `operation_engine.py` 决定**：六项机器可判定字段 + 四道程序校验（动作合法性/风险收益/仓位数量/交易成本），任一失败自动降级
+- **交易成本已入决策链与回测**：佣金 `max(最低5元, 成交额×佣金率)` + 单边价差(0.05%) + 冲击成本 + 最小交易单位(1手=100份)；ETF 免印花税；增仓须通过成本门（单边成本占比≤1%、成本占预期收益≤15%、成本调整后RR≥2、≥1手），小资金下千元级订单常被最低佣金拦截而降级为持有
 - **今日操作卡是最终结论**，HTML 顶部必含，正文只解释
 - `records/etf` 仅存交易流水；`records/portfolio_config.json` 存组合配置（总资产/目标权重/风险预算），缺失时只输出百分比动作
 - 操作计划写入 HTML 或 memory

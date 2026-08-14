@@ -62,10 +62,11 @@ $PYTHON .workbuddy/skills/etf-2b-bottom-scanner/generate_report.py
 $PYTHON .workbuddy/skills/etf-2b-bottom-scanner/backtest.py
 $PYTHON .workbuddy/skills/etf-2b-bottom-scanner/backtest_500.py
 
-# ETF Operation Plan — 趋势状态机回测（状态信号统计 + 硬约束策略模拟）
+# ETF Operation Plan — 趋势状态机回测（状态信号统计 + 硬约束策略模拟，含交易成本）
 $PYTHON .workbuddy/skills/etf-operation-plan/backtest.py
 $PYTHON .workbuddy/skills/etf-operation-plan/backtest.py --use-confirmed  # 暴露上调需连续2周确认
 $PYTHON .workbuddy/skills/etf-operation-plan/backtest.py --code sh518880   # 单只ETF
+$PYTHON .workbuddy/skills/etf-operation-plan/backtest.py --commission-rate 0.00025 --min-commission 5 --half-spread 0.0005 --position-value 30000  # 覆盖成本参数/名义本金
 ```
 
 **Refresh intraday data (盘中刷新):** Append `--refresh` to any ETF `analyze.py` to force-refresh the latest trading day's kline bars. Use this after 15:00 when the cached data was fetched during market hours (e.g., 10:30 fetch). Without the flag, same-date bars are considered current and skipped.

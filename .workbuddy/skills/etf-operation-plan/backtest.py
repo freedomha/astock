@@ -29,7 +29,16 @@ Usage:
   python3 .workbuddy/skills/etf-operation-plan/backtest.py \
       [--kline-file <path>] [--code sh518880] [--max-etfs N] \
       [--eval-step 5] [--min-history 150] [--use-confirmed] \
+      [--commission-rate 0.00025] [--min-commission 5] [--half-spread 0.0005] \
+      [--impact-pct 0] [--lot-size 100] [--position-value 20000] \
       [--output backtest_trend_state_results.json]
+
+交易成本模型（官方口径：ETF 免印花税；佣金万2.5-3 最低5元/笔；最小交易单位 1手=100份）：
+  每笔交易成本 = max(最低佣金, 成交额×佣金率) + 成交额×(单边价差 + 冲击成本)
+  - 份额按 1 手（lot_size）取整，买不足 1 手不成交（最小交易单位）。
+  - 同时输出 net（含成本）与 gross（无成本），cost_drag = gross − net。
+  - 买入持有基准计入一次建仓 + 一次清仓成本。
+  成本参数来源：CLI > records/portfolio_config.json["costs"] > 内置默认。
 """
 
 import argparse
@@ -63,6 +72,15 @@ EXPOSURE = {
 
 STATE_ORDER = ["T0", "T1", "T2", "T3a", "T3b", "T4", "T5", "T6", "T7", "T8"]
 FORWARD_DAYS = [5, 10, 20, 40, 60]
+
+# ─── 交易成本默认参数（官方口径，可用 CLI / portfolio_config.json["costs"] 覆盖）────
+COST_DEFAULTS = {
+    "commission_rate": 0.00025,  # 佣金万2.5（全佣含规费），官方区间万0.5-3
+    "min_commission": 5.0,       # 单笔最低佣金5元
+    "half_spread": 0.0005,       # 单边买卖价差 0.05%（1-2 tick，官方最小报价0.001元）
+    "impact_pct": 0.0,           # 冲击成本占成交额%（默认0，散户订单远小于盘口）
+    "lot_size": 100,             # 最小交易单位 1手=100份（上交所官方）
+}
 
 
 def eff_key(eff_code, eff_sub):
@@ -289,19 +307,88 @@ def compute_metrics(daily_rets, exposure_series, rf=0.0):
     }
 
 
-def simulate_strategy(closes, daily, n):
+def simulate_strategy(closes, daily, n, cost, position_value):
+    """份额制策略模拟，含交易成本模型（小资金最低佣金/价差/冲击/最小交易单位）。
+
+    daily: 每日活跃暴露键（effective 状态 → 目标暴露）。
+    每日 close 按目标暴露调整份额（决策于前一日 close，当日 close 成交，保守无未来函数），
+    份额按 1 手取整；买不足 1 手不成交（最小交易单位）；期末清仓。
+    每笔交易成本 = max(最低佣金, 成交额×佣金率) + 成交额×(单边价差+冲击)，从净值扣除。
+    净值曲线逐日构建（盈亏与成本折叠进当日收益），net/gross 天数对齐。
+
+    Returns (net_metrics, gross_metrics, bh_metrics, trade_count, cost_drag_pct, total_cost_pct).
+    net = 含成本；gross = 同份额路径但不扣成本；bh = 买入持有（一次建仓+一次清仓成本）。
+    """
     start = next((i for i in range(n) if daily[i] is not None), None)
     if start is None or start + 1 >= n:
-        return None, None
+        return None, None, None, 0, 0.0, 0.0
+    lot = cost["lot_size"]
 
-    s_rets, b_rets, exposures = [], [], []
-    for i in range(start + 1, n):
-        dr = closes[i] / closes[i - 1] - 1
-        exp = EXPOSURE[daily[i]]
-        b_rets.append(dr)
-        s_rets.append(exp * dr)
-        exposures.append(exp)
-    return compute_metrics(s_rets, exposures), compute_metrics(b_rets, [1.0] * len(b_rets))
+    def trade_cost(amount):
+        return max(cost["min_commission"], amount * cost["commission_rate"]) \
+            + amount * (cost["half_spread"] + cost["impact_pct"])
+
+    shares = 0
+    eq_net, eq_gross = 1.0, 1.0
+    eq_net_curve, eq_gross_curve = [], []
+    exp_by_day = []
+    trades = 0
+    total_cost_frac = 0.0
+
+    for i in range(start, n):
+        prev_close = closes[i - 1] if i > start else closes[i]
+        exp_by_day.append(shares * prev_close / position_value if shares else 0.0)
+
+        # 当日盈亏（持仓份额 × close[i-1] → close[i]），首日仅建仓不计盈亏
+        if i > start and shares > 0:
+            pnl = shares * (closes[i] - closes[i - 1]) / position_value
+            eq_net *= (1 + pnl)
+            eq_gross *= (1 + pnl)
+
+        # 在当日 close 调整到目标暴露（决策基于前一日 close 算出的状态）
+        price = closes[i]
+        target_shares = int(EXPOSURE[daily[i]] * position_value / price / lot) * lot
+        if target_shares != shares:
+            amount = abs(target_shares - shares) * price
+            if amount > 0:
+                cf = trade_cost(amount) / position_value
+                eq_net *= (1 - cf)
+                total_cost_frac += cf
+                trades += 1
+            shares = target_shares
+
+        eq_net_curve.append(eq_net)
+        eq_gross_curve.append(eq_gross)
+
+    # 期末清仓（net 扣成本，gross 不扣；两曲线同步追加保持天数对齐）
+    if shares > 0:
+        cf = trade_cost(shares * closes[-1]) / position_value
+        eq_net *= (1 - cf)
+        total_cost_frac += cf
+        trades += 1
+        eq_net_curve.append(eq_net)
+        eq_gross_curve.append(eq_gross)
+        exp_by_day.append(shares * closes[-1] / position_value)
+
+    net_rets = [eq_net_curve[j] / eq_net_curve[j - 1] - 1 for j in range(1, len(eq_net_curve))]
+    gross_rets = [eq_gross_curve[j] / eq_gross_curve[j - 1] - 1 for j in range(1, len(eq_gross_curve))]
+    net_m = compute_metrics(net_rets, exp_by_day[:len(net_rets)]) if net_rets else None
+    gross_m = compute_metrics(gross_rets, exp_by_day[:len(gross_rets)]) if gross_rets else None
+
+    # 买入持有（一次建仓 + 一次清仓成本，公平对比）
+    bh_pairs = []
+    buy_shares = int(position_value / closes[start] / lot) * lot
+    if buy_shares > 0:
+        bh_pairs.append((-trade_cost(buy_shares * closes[start]) / position_value, 1.0))
+        for i in range(start + 1, n):
+            bh_pairs.append((buy_shares * (closes[i] - closes[i - 1]) / position_value, 1.0))
+        bh_pairs.append((-trade_cost(buy_shares * closes[-1]) / position_value, 1.0))
+    bh_m = compute_metrics([p[0] for p in bh_pairs], [p[1] for p in bh_pairs]) if bh_pairs else None
+
+    cost_drag = 0.0
+    if gross_m and net_m:
+        cost_drag = round(gross_m["total_return_pct"] - net_m["total_return_pct"], 2)
+    return net_m, gross_m, bh_m, trades, cost_drag, round(total_cost_frac * 100, 2)
 
 
 # ─── Part 3: 关键迁移事件 ──────────────────────────────────────────────────
@@ -423,14 +510,19 @@ def backtest_etf(code, records, cfg):
     seq = simulate_state_machine([s for _, s in evals])
     signals = build_signal_records(evals, seq, closes, n, code)
     daily = build_daily_exposure(evals, seq, n, cfg.use_confirmed)
-    strat_metrics, bh_metrics = simulate_strategy(closes, daily, n)
+    net_m, gross_m, bh_m, trades, cost_drag, total_cost_pct = simulate_strategy(
+        closes, daily, n, cfg.cost, cfg.position_value)
     transitions = collect_transitions(evals, seq, closes, n)
 
     return {
         "signals": signals,
-        "strategy": strat_metrics,
-        "buyhold": bh_metrics,
+        "strategy": net_m,
+        "strategy_gross": gross_m,
+        "buyhold": bh_m,
         "transitions": transitions,
+        "trade_count": trades,
+        "cost_drag_pct": cost_drag,
+        "total_cost_pct": total_cost_pct,
     }
 
 
@@ -445,6 +537,14 @@ def main():
                    help="暴露上调需连续 2 周确认（验证防抖动），下调立即生效；T8 立即")
     p.add_argument("--output", default=os.path.join(_skill_dir, "backtest_trend_state_results.json"),
                    help="输出 JSON 路径")
+    # 交易成本参数（默认取自 records/portfolio_config.json["costs"]，否则内置官方默认）
+    p.add_argument("--commission-rate", type=float, default=None, help="佣金费率（万2.5=0.00025）")
+    p.add_argument("--min-commission", type=float, default=None, help="单笔最低佣金（元）")
+    p.add_argument("--half-spread", type=float, default=None, help="单边买卖价差（占价格比例，0.05%=0.0005）")
+    p.add_argument("--impact-pct", type=float, default=None, help="冲击成本占成交额比例")
+    p.add_argument("--lot-size", type=int, default=None, help="最小交易单位（1手=100份）")
+    p.add_argument("--position-value", type=float, default=None,
+                   help="单标的策略名义本金（默认取 portfolio_config.portfolio_value，否则 20000）；越小最低佣金拖累越明显")
     args = p.parse_args()
 
     kline_file = args.kline_file
@@ -463,10 +563,34 @@ def main():
     with open(kline_file) as f:
         raw_data = json.load(f)
 
+    # 交易成本参数：CLI > records/portfolio_config.json["costs"] > 内置官方默认
+    cost = dict(COST_DEFAULTS)
+    position_value = 20000
+    pcfg_path = os.path.join(_project_root, "records", "portfolio_config.json")
+    if os.path.exists(pcfg_path):
+        try:
+            with open(pcfg_path) as f:
+                pcfg = json.load(f)
+            if isinstance(pcfg.get("costs"), dict):
+                cost.update(pcfg["costs"])
+            if pcfg.get("portfolio_value"):
+                position_value = pcfg["portfolio_value"]
+        except Exception:
+            pass
+    for k, v in (("commission_rate", args.commission_rate), ("min_commission", args.min_commission),
+                 ("half_spread", args.half_spread), ("impact_pct", args.impact_pct),
+                 ("lot_size", args.lot_size)):
+        if v is not None:
+            cost[k] = v
+    if args.position_value:
+        position_value = args.position_value
+
     cfg = argparse.Namespace(
         eval_step=args.eval_step,
         min_history=args.min_history,
         use_confirmed=args.use_confirmed,
+        cost=cost,
+        position_value=position_value,
     )
 
     items = list(raw_data.items())
@@ -481,10 +605,14 @@ def main():
     print(f"加载 K 线: {kline_file}")
     print(f"回测配置: eval_step={args.eval_step}  min_history={args.min_history}"
           f"  use_confirmed={args.use_confirmed}")
+    print(f"成本模型: 佣金 {cost['commission_rate']*10000:.1f}‱(最低{cost['min_commission']:.0f}元) "
+          f"单边价差 {cost['half_spread']*100:.2f}% 冲击 {cost['impact_pct']*100:.2f}% "
+          f"最小{cost['lot_size']}份 | 名义本金 {position_value:.0f}元")
     print(f"ETF 数: {len(items)}")
 
     all_signals = []
-    strat_list, bh_list = [], []
+    strat_list, gross_list, bh_list = [], [], []
+    cost_drag_list, trade_list = [], []
     per_etf = {}
     transitions_all = defaultdict(list)
     n_done = 0
@@ -499,10 +627,18 @@ def main():
         all_signals.extend(res["signals"])
         if res["strategy"] and res["buyhold"]:
             strat_list.append(res["strategy"])
+            if res["strategy_gross"]:
+                gross_list.append(res["strategy_gross"])
             bh_list.append(res["buyhold"])
+            cost_drag_list.append(res["cost_drag_pct"])
+            trade_list.append(res["trade_count"])
             per_etf[code] = {
                 "strategy": res["strategy"],
+                "strategy_gross": res["strategy_gross"],
                 "buyhold": res["buyhold"],
+                "trade_count": res["trade_count"],
+                "cost_drag_pct": res["cost_drag_pct"],
+                "total_cost_pct": res["total_cost_pct"],
             }
         for to_state, evs in res["transitions"].items():
             transitions_all[to_state].extend(evs)
@@ -534,11 +670,15 @@ def main():
                     if s["total_return_pct"] > b["total_return_pct"])
     strategy_avg["win_vs_buyhold_ratio"] = round(win_vs_bh / len(strat_list) * 100, 1) if strat_list else 0.0
     strategy_avg["etfs"] = len(strat_list)
+    strategy_avg["cost_drag_pct"] = round(sum(cost_drag_list) / len(cost_drag_list), 2) if cost_drag_list else 0.0
+    strategy_avg["avg_trade_count"] = round(sum(trade_list) / len(trade_list), 1) if trade_list else 0.0
     print_strategy(strategy_avg, buyhold_avg, len(strat_list))
 
     if len(strat_list) > 0:
-        print(f"\n策略跑赢买入持有的 ETF 占比: {strategy_avg['win_vs_buyhold_ratio']:.1f}% "
+        print(f"策略跑赢买入持有的 ETF 占比: {strategy_avg['win_vs_buyhold_ratio']:.1f}% "
               f"({win_vs_bh}/{len(strat_list)})")
+        print(f"平均成本拖累(策略总收益 gross→net): {strategy_avg['cost_drag_pct']:+.2f}% | "
+              f"平均交易次数: {strategy_avg['avg_trade_count']}")
 
     trans_summary = summarize_transitions(transitions_all)
     print_transitions(trans_summary)
@@ -546,8 +686,11 @@ def main():
     if args.code and per_etf:
         code = args.code
         print(f"\n单 ETF 详情: {code}")
-        print(f"  策略:   {json.dumps(per_etf[code]['strategy'], ensure_ascii=False)}")
-        print(f"  持有:   {json.dumps(per_etf[code]['buyhold'], ensure_ascii=False)}")
+        print(f"  策略(net): {json.dumps(per_etf[code]['strategy'], ensure_ascii=False)}")
+        print(f"  策略(gross): {json.dumps(per_etf[code]['strategy_gross'], ensure_ascii=False)}")
+        print(f"  买入持有: {json.dumps(per_etf[code]['buyhold'], ensure_ascii=False)}")
+        print(f"  交易次数: {per_etf[code]['trade_count']} | 成本拖累: {per_etf[code]['cost_drag_pct']:+.2f}% | "
+              f"总成本占比: {per_etf[code]['total_cost_pct']}%")
 
     # 保存
     output = {
@@ -558,6 +701,8 @@ def main():
             "use_confirmed": args.use_confirmed,
             "exposure_map": EXPOSURE,
             "forward_days": FORWARD_DAYS,
+            "cost_model": cost,
+            "position_value": position_value,
             "etfs": n_done,
         },
         "state_signal_stats": state_stats,
