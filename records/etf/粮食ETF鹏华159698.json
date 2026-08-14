@@ -8,6 +8,13 @@
       "price": 0.8592,
       "shares": 2300,
       "amount": 1976.16
+    },
+    {
+      "date": "2026-08-14",
+      "action": "sell",
+      "price": 0.856,
+      "shares": 1100,
+      "amount": 941.6
     }
   ]
 }

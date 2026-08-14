@@ -1,25 +1,25 @@
 {
-  "_note": "稳健偏好、中长期投资。portfolio_value 为总资产（本金15000）；max_portfolio_drawdown_pct=6 对应稳健回撤容忍。黄金为避险核心，军工/粮食为长期核心仓——当前 T0（下降趋势），引擎对核心仓给出 REDUCE（降低）而非 EXIT（退出）；target 为长期目标，趋势转好（T3+）后再分批加仓。",
+  "_note": "进取偏好、中长期投资。portfolio_value 为总资产（本金15000）；max_portfolio_drawdown_pct=15 对应进取回撤容忍。黄金为避险核心，军工/粮食为长期核心仓——当前 T0（下降趋势），引擎对核心仓给出 REDUCE（降低）而非 EXIT（退出）；target 为长期目标，趋势转好（T3+）后再分批加仓。",
   "portfolio_value": 15000,
-  "max_portfolio_drawdown_pct": 6,
+  "max_portfolio_drawdown_pct": 15,
   "positions": {
     "sh518880": {
       "role": "core_hedge",
       "target_weight_pct": 20,
       "max_weight_pct": 25,
-      "risk_budget_pct": 0.5
+      "risk_budget_pct": 0.8
     },
     "sh512710": {
       "role": "core_growth",
-      "target_weight_pct": 15,
-      "max_weight_pct": 18,
-      "risk_budget_pct": 0.5
+      "target_weight_pct": 20,
+      "max_weight_pct": 25,
+      "risk_budget_pct": 0.8
     },
     "sz159698": {
       "role": "core_value",
-      "target_weight_pct": 15,
-      "max_weight_pct": 18,
-      "risk_budget_pct": 0.5
+      "target_weight_pct": 20,
+      "max_weight_pct": 25,
+      "risk_budget_pct": 0.8
     }
   }
 }

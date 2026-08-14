@@ -123,9 +123,12 @@ def validate_sizing(proposed_amount, target_gap, single_add_cap,
 
 # ─── Trigger templates ─────────────────────────────────────────────────────
 def build_triggers(state_code, sub_state, structural_invalidation, planned_entry,
-                   first_observation, ma60_dir, atr20):
+                   first_observation, ma60_dir, atr20, role="core"):
     """Generate add/reduce/exit triggers with order sizes, tied to state."""
     triggers = []
+    core = is_core(role)
+    # Core positions are held for portfolio purpose; tactical ones are traded around
+    pos_label = "核心仓" if core else "战术仓"
 
     # ADD triggers — only for states that can add, subject to RR gate
     if state_code in CAN_ADD:
@@ -141,7 +144,7 @@ def build_triggers(state_code, sub_state, structural_invalidation, planned_entry
             "type": "add",
             "condition": " 且 ".join(cond_parts),
             "size_pct": 20,
-            "size_desc": "首次增加目标仓位 20%（第二周继续确认且未明显扩张，再增加 20%）",
+            "size_desc": f"首次增加{pos_label}目标仓位 20%（第二周继续确认且未明显扩张，再增加 20%）",
         })
 
     # REDUCE trigger
@@ -150,7 +153,7 @@ def build_triggers(state_code, sub_state, structural_invalidation, planned_entry
             "type": "reduce",
             "condition": f"连续 2 日收盘低于结构失效位（{structural_invalidation}）",
             "size_pct": 50,
-            "size_desc": "降低战术仓位 50%",
+            "size_desc": f"降低{pos_label} 50%",
         })
 
     # EXIT trigger
@@ -162,7 +165,8 @@ def build_triggers(state_code, sub_state, structural_invalidation, planned_entry
         "type": "exit",
         "condition": exit_cond,
         "size_pct": 100,
-        "size_desc": "退出剩余战术仓位（核心仓位是否退出由组合用途决定）",
+        "size_desc": ("退出剩余核心仓（是否清仓由组合用途决定）" if core
+                      else "退出剩余战术仓（核心仓位是否退出由组合用途决定）"),
     })
 
     return triggers
@@ -273,7 +277,7 @@ def decide(state_code, sub_state=None, role="core", config=None, code=None,
 
     # Build trigger conditions
     triggers = build_triggers(state_code, sub_state, structural_invalidation,
-                              planned_entry, first_observation, ma60_dir, atr20)
+                              planned_entry, first_observation, ma60_dir, atr20, role)
 
     # Forbidden actions summary
     forbidden = sorted(FORBIDDEN.get(state_code, set()))
