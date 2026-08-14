@@ -25,8 +25,40 @@ Generate an actionable medium-term operation plan for A-share ETFs. Unlike `etf-
 - `score_patterns.py` (bundled) — five-pattern technical scoring, **auxiliary layer**
 - `trend_analysis.py` (bundled) — trend-state machine (T0-T8 + T3a/T3b) + weekly features + state persistence, **primary layer**
 - `operation_engine.py` (bundled) — machine-readable action decision with 3 program-level validations, **execution layer**
+- `backtest.py` (bundled) — 趋势状态机回测（状态信号统计 + 硬约束策略模拟），验证「趋势状态是主决策层」是否在历史上成立
 - `WebSearch` for asset-type-specific news/catalysts（必须记录来源）
 - `records/portfolio_config.json` — 组合配置（可选；缺失时只输出百分比动作，不输出绝对金额）
+
+## Backtest（回测）
+
+回测本技能的核心决策层——**趋势状态机 + 硬约束矩阵**，验证「趋势状态是主决策层」在历史上是否成立。
+
+```bash
+PYTHON="/Users/aldiadmin/.workbuddy/binaries/python/versions/3.13.12/bin/python3"
+$PYTHON .workbuddy/skills/etf-operation-plan/backtest.py
+$PYTHON .workbuddy/skills/etf-operation-plan/backtest.py --use-confirmed   # 暴露上调需连续2周确认，验证防抖动价值
+$PYTHON .workbuddy/skills/etf-operation-plan/backtest.py --code sh518880    # 单只ETF
+$PYTHON .workbuddy/skills/etf-operation-plan/backtest.py --max-etfs 20      # 快速验证
+```
+
+**三部分输出**：
+1. **Part 1 状态信号统计** — 每个历史时点分类趋势状态，统计后续 5/10/20/40/60 日收益（均值/胜率/中位数/最好/最差），并与全样本基线对比超额收益。用于判断各状态是否真正预示后续走势（如 T3b 应显著为正，T2/T0 是否真的是底部）。
+2. **Part 2 策略模拟** — 按硬约束矩阵把 effective 状态映射为仓位暴露（T0/T1 空仓 → T3b 75% → T4/T5/T6 满仓 → T7 50% → T8 空仓），模拟长期多头策略与买入持有对比（总收益/年化/最大回撤/年化波动/夏普/平均暴露/跑赢占比）。
+3. **Part 3 关键迁移分析** — 迁移进入 T3b/T4（升级）、T8（破位）、T0/T1（转弱）后的 20/40 日收益，验证关键迁移的可执行性。
+
+**实现口径**（与实盘一致）：
+- 复用 `trend_analysis.py` 分类管线，不重复实现算法。
+- 含状态机迁移规则：`migrate()` 合法迁移 + 连续周确认，连续周按**评估时点**的 ISO 周计数（同周不递增，不用今天日期）。
+- 周线只用**最后一个完整自然交易周**，当周仅作 preview，无未来函数。
+- 默认数据 `etf_kline_data_500.json`（346 ETF × 500 日），缺失时回退 250 日文件；暴露映射 `EXPOSURE` 在脚本内可调。
+
+**输出**：stdout 汇总表 + `backtest_trend_state_results.json`（config / state_signal_stats / baseline_stats / strategy_summary / transitions / per_etf / signals）。
+
+**解读注意**：
+- Part 1 是「状态后无条件持有 N 日」的平均，不等于实盘分批/回踩操作；不代表未来收益承诺。
+- 历史结果可能显示策略总收益低于买入持有但回撤/波动显著更小——操作计划框架是**风险控制型**框架（低暴露期在空仓），解读时应同时看收益与回撤。
+- 货币基金类 ETF（如 511990 华宝添益）价格近乎平坦，会以 T0/T2 低频出现且收益近零，解读时注意剔除。
+- A 股 ETF 存在均值回归特征，T0/T1（长期下降）后的平均收益未必为负——「禁止新增」的价值在于控制回撤而非预测反弹，不要在 T0/T1 因「看起来要反弹」而低吸。
 
 ## Trend-State Model（主决策层）
 
@@ -495,3 +527,4 @@ $PYTHON .workbuddy/skills/etf-operation-plan/operation_engine.py \
 - 操作计划写入 HTML 或 memory
 - westock-data Bash 必须 `dangerouslyDisableSandbox: true`
 - 状态持久化文件：`.workbuddy/skills/etf-operation-plan/trend_state_history.json`（每次运行 `--save-state` 更新）
+- 回测口径：`backtest.py` 用 effective 状态（含迁移/连续周确认），周线仅用完整自然交易周，与实盘一致
