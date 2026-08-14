@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>黄金ETF华安 操作建议 2026-08-14</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+<style>body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;background:#f5f7fa;color:#2c3e50;margin:0;padding:24px;line-height:1.6}
+.wrap{max-width:960px;margin:0 auto}
+.header{background:linear-gradient(135deg,#b8860b,#1a2a3a);color:#fff;border-radius:12px;padding:24px 28px;margin-bottom:20px}
+.header h1{margin:0 0 6px;font-size:22px}
+.header .sub{opacity:.85;font-size:13px}
+.card{background:#fff;border-radius:10px;padding:20px 24px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.card h2{font-size:16px;margin:0 0 14px;padding-left:10px;border-left:4px solid #b8860b;color:#1a2a3a}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:8px 10px;border-bottom:1px solid #eef1f5;text-align:left;vertical-align:top}
+th{background:#f8fafc;color:#5a6b7b;font-weight:600;white-space:nowrap}
+.up{color:#c0392b;font-weight:600}.down{color:#27ae60;font-weight:600}
+.state-badge{display:inline-block;padding:4px 14px;border-radius:14px;font-size:14px;font-weight:700;color:#fff;background:#b8860b}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.kpi{font-size:22px;font-weight:700;margin:2px 0}
+.muted{color:#8896a6;font-size:12px}
+.reasons li{margin:4px 0}
+.chart{width:100%;height:320px}
+.disc{color:#8896a6;font-size:12px;margin-top:24px;padding-top:12px;border-top:1px solid #eef1f5}
+.warn{color:#c0392b;font-weight:600}
+.actioncard{border:2px solid #b8860b;border-radius:12px;background:#fff;padding:20px 24px;margin-bottom:20px;box-shadow:0 2px 6px rgba(0,0,0,.08)}
+.actioncard .act-title{font-size:18px;font-weight:800;color:#1a2a3a;margin:0 0 12px}
+.action-badge{display:inline-block;padding:6px 18px;border-radius:18px;font-size:16px;font-weight:800;color:#fff}
+.act-row{margin:8px 0}
+.act-label{display:inline-block;min-width:88px;color:#5a6b7b;font-weight:600;font-size:13px;vertical-align:top}
+.act-val{display:inline-block;max-width:calc(100% - 100px);vertical-align:top}
+.act-trigger{margin:3px 0;font-size:13px}
+</style></head>
+<body><div class="wrap">
+
+<div class="header">
+  <h1>黄金ETF华安 中长期持仓操作计划</h1>
+  <div class="sub">代码 sh518880 · 2026-08-14 · 数据源：westock-data + WebSearch（带来源）</div>
+</div>
+
+<div class="actioncard">
+  <p class="act-title">今日操作卡 <span class="muted">（正文仅解释本卡，不另行生成结论）</span></p>
+  <div class="act-row"><span class="act-label">当前状态</span><span class="act-val">反转初步确认（effective T3/T3a，迁移 jump，pending，连续 1 周）</span></div><div class="act-row"><span class="act-label">当前动作</span><span class="act-val"><span class="action-badge" style="background:#2c5aa0">持有</span> T3a 反转初步确认(MA60仍向下)：价格结构转强但MA60仍下行，反转初步确认</span></div><div class="act-row"><span class="act-label">已有仓位</span><span class="act-val">300 份，当前占目标仓位 17.9%（组合 portfolio_value=15000，目标 20%）</span></div><div class="act-trigger"><span class="act-label">add触发</span><span class="act-val">完整周线状态迁移为 T3b 且 MA60 斜率走平或转正 且 日线回踩 MA20/MA60 附近后收盘重新站回 且 reward/risk（9.44−8.75 vs 8.75−8.156）>= 2（成本调整后） 且 通过交易成本门（单边成本占比/成本占预期收益/最小1手） → 首次增加核心仓目标仓位 20%（第二周继续确认且未明显扩张，再增加 20%）</span></div>
+<div class="act-trigger"><span class="act-label">reduce触发</span><span class="act-val">连续 2 日收盘低于结构失效位（8.156） → 降低核心仓 50%</span></div>
+<div class="act-trigger"><span class="act-label">exit触发</span><span class="act-val">完整周线进入 T8，或单日收盘跌破灾难保护位（8.028，超 1 ATR） → 退出剩余核心仓（是否清仓由组合用途决定）</span></div><div class="act-row"><span class="act-label">禁止动作</span><span class="act-val">T3a 不积极加仓、不追高</span></div><div class="act-row"><span class="act-label">下次复评</span><span class="act-val">周五收盘后（完整周线形成后重新计算），或提前触及上述任意触发位</span></div><div class="muted" style="margin-top:8px">程序校验：动作合法性 ✗(T3a + CHASE => 拒绝) / 风险收益 n/a / 仓位数量 ✓ / 交易成本 通过</div>
+</div>
+
+<div class="card"><h2>一、数据状态</h2><table>
+      <tr><th>行情时间</th><td>2026-08-14</td><th>最后完整交易日</th><td>2026-08-14</td></tr>
+      <tr><th>日线状态</th><td>complete</td><th>周线状态</th><td>complete</td></tr>
+      <tr><th>有效K线数</th><td>250</td><th>数据完整度</th><td>高（完整自然交易周）</td></tr>
+    </table></div>
+<div class="card"><h2>二、持仓状态</h2><div class="grid2">
+      <div><div class="muted">剩余份额</div><div class="kpi">300</div></div>
+      <div><div class="muted">账面持仓均价</div><div class="kpi">8.637</div></div>
+      <div><div class="muted">资金回本价</div><div class="kpi">8.637</div></div>
+      <div><div class="muted">当前价</div><div class="kpi">8.946</div></div>
+      <div><div class="muted">已实现盈亏</div><div class="kpi"><span class="">+0.00</span></div></div>
+      <div><div class="muted">未实现盈亏</div><div class="kpi"><span class="up">+92.70（<span class="up">+3.58%</span>）</span></div></div>
+    </div>
+    <div class="muted" style="margin-top:8px">总盈亏 = <span class="up">+92.70</span> · 基于组合配置 portfolio_value=15000（目标权重/风险预算见 records/portfolio_config.json）</div></div>
+<div class="card"><h2>三、ETF属性和核心驱动</h2>
+<table>
+  <tr><th>资产类型</th><td>黄金（commodity_futures_etf，直接持有上海金交所 Au9999 现货）</td></tr>
+  <tr><th>中长期驱动</th><td>国际金价底部企稳后技术突破：现货金 2026-08-07 约 4257 美元/盎司，8/6 单日大涨约 5% 完成技术面突破；7 月过山车式震荡磨底后，宏观情绪转向是中期关键变量。</td></tr>
+  <tr><th>主要风险变量</th><td>美元实际利率上行主导本轮金价调整；若美联储降息节奏不及预期、地缘缓和、美元走强，反弹可能夭折。</td></tr>
+  <tr><th>当前驱动状态</th><td>中性偏多——金价反转初步确认（周线转上），但中期未确认（MA60 仍下行）。</td></tr>
+</table>
+<h2 style="margin-top:16px">催化剂证据（含来源）</h2>
+<table><tr><th>事实主张</th><th>来源标题</th><th>机构/时间</th><th>类型</th><th>链接</th><th>资产关联</th></tr><tr><td>2026-08 金价已触底，静待宏观情绪转向；美元实际利率上升主导本轮金价调整</td><td>报告精读：2026年8月金价已触底</td><td>未来智库 vzkoo · 2026-08-03</td><td>soft_opinion</td><td><a href="https://www.vzkoo.com/read/1132497546000001cf1cac7e1a60.html">链接</a></td><td>direct</td></tr><tr><td>2026-08-07 现货黄金约 4257 美元/盎司，8月6日金价短期大涨约5%，完成技术面突破</td><td>黄金未来趋势深度解析：2026-2027年投行目标价</td><td>新浪财经 · 2026-08-07</td><td>hard_data</td><td><a href="https://k.sina.cn/article_7879923611_1d5ae179b06801uis0.html">链接</a></td><td>direct</td></tr><tr><td>2026-07 金价过山车式震荡、磨底；机构研判未来高点取决于美联储降息节奏与地缘局势</td><td>2026年8月黄金走势分析——宏观与微观双重视角</td><td>东方财富财富号 · 2026-08-02</td><td>hard_data</td><td><a href="https://caifuhao.eastmoney.com/news/20260802153132758190470">链接</a></td><td>direct</td></tr></table>
+</div>
+<div class="card"><h2>四、中长期趋势状态</h2><p><span class="state-badge">趋势状态：反转初步确认</span>
+    <span style="margin-left:8px" class="muted">置信度 medium · 证据强度 高</span></p>
+    <ul class="reasons"><li>周线转上(slope +1.1%)</li><li>价格站上MA60(+2.3%)</li><li>低点抬高，但MA60仍向下（T3a，反转初步确认，需等待MA60走平/转上）</li></ul>
+    <table>
+        <tr><th>上次状态</th><td>T1</td><th>本次状态</th><td>T3(T3a) 反转初步确认</td></tr>
+        <tr><th>连续保持</th><td>1 周</td><th>迁移类型</th><td>jump（pending）</td></tr>
+        <tr><th>迁移说明</th><td colspan="3">跨级前进，需更强证据（≥2个完整周线）</td></tr>
+    </table>
+    <table>
+      <tr><th>周线方向（完整周）</th><td>up（斜率 1.1%）</td><th>周线10/20周均线</th><td>8.614 / 9.151</td></tr>
+      <tr><th>均线排列</th><td colspan="3">price > ma60 < ma120 > ma250</td></tr>
+      <tr><th>MA60/120斜率</th><td>-4.27% / -3.68%</td><th>高低点结构</th><td>higher_high_higher_low</td></tr>
+      <tr><th>自身动量</th><td>improving（无基准，非相对强弱）</td><th>回撤（自250日高）</th><td>-25.33%（deep）</td></tr>
+      <tr><th>趋势扩张</th><td>not_extended</td><th>波动率</th><td>normal（ATR20=0.1279）</td></tr>
+    </table>
+    <div class="chart" id="chart"></div></div>
+<div class="card"><h2>五、技术结构和形态</h2><table>
+      <tr><th>关键位</th><th>价格</th><th>距现价</th><th>含义</th></tr><tr><td>S1 近3月支撑</td><td>8.220</td><td class="down">-8.1%</td><td>60日低点</td></tr><tr><td>S2 近6月支撑</td><td>8.220</td><td class="down">-8.1%</td><td>120日低点</td></tr><tr><td>R1 近3月压力</td><td>9.540</td><td class="up">+6.6%</td><td>60日高点</td></tr><tr><td>R2 近6月压力</td><td>11.420</td><td class="up">+27.7%</td><td>120日高点</td></tr><tr><td>MA60</td><td>8.743</td><td class="down">-2.3%</td><td>中期趋势线(down)</td></tr><tr><td>MA120</td><td>9.429</td><td class="up">+5.4%</td><td>中期趋势线</td></tr><tr><td>结构失效位</td><td>8.156</td><td class="down">-8.8%</td><td>结构支撑−0.5×ATR20</td></tr><tr><td>成本锚</td><td>8.637</td><td class="down">-3.5%</td><td>账面持仓均价</td></tr>
+    </table><h2 style="margin-top:16px">五形态辅助评分（不覆盖趋势状态）</h2><table><tr><td>bowl</td><td>36</td><td>⚪ 观望</td></tr><tr><td>box</td><td>64</td><td>🟡 箱顶观望</td></tr><tr><td>w_bottom</td><td>0</td><td>非W底</td></tr><tr><td>hs_bottom</td><td>0</td><td>⚪ 非头肩底</td></tr><tr><td>2b</td><td>0</td><td>无2B信号</td></tr></table>
+    <p class="muted">形态冲突说明：五形态为辅助证据，不得覆盖趋势状态；箱顶观望(box 64)、碗底观望(bowl 36)，形态分不构成加仓理由，反转需周线确认</p></div>
+<div class="card"><h2>六、未来1-3个月情景</h2><table><tr><td><b>主场景：反转初步确认延续</b></td><td>周线转上(+1.1%)、价格站上 MA60(+2.3%)，但 MA60 仍下行(-4.3%)，未确认</td><td>维持核心仓持有，不追高（T3a 禁止积极加仓）</td><td>收盘跌破结构失效位 8.156 连续 2 日</td></tr><tr><td><b>备选场景：回踩后升级 T3b</b></td><td>回踩 MA60(8.74)/MA20 后收盘站回，且完整周线迁移 T3b、MA60 走平/转上</td><td>首次增加核心仓目标仓位 20%（仍需成本门通过）</td><td>跌破结构失效位 8.156</td></tr><tr><td><b>失效场景：结构破坏</b></td><td>完整周线跌破前低(8.22)进入 T8</td><td>降低核心仓 50%，再破灾难保护位 8.028 退出剩余核心仓</td><td>重新站回 8.156 上方</td></tr></table>
+    <p class="muted">不使用未经回测校准的概率，仅以主/备选/失效三情景 + 证据强度表述；证据强度：主=中、备=中、失效=高（结构失效位可计算）。</p></div>
+<div class="card"><h2>七、操作计划（经五层门控 + 四道程序校验）</h2><p><b>仓位动作（避险核心仓）：</b>持有观察（反转初步确认：不追高，不积极加仓）——现有核心仓暂持，等待完整周线迁移 T3b 与 MA60 走平/转正确认反转</p><p><b>核心仓动作：</b></p><ul><li>增加触发：完整周线迁移 T3b 且 MA60 走平/转正 且 日线回踩 MA20/MA60 后收盘站回 且 rr_net≥2 且通过成本门 → 首次增加核心仓目标仓位 20%</li><li>当前缺口 2684→3000 元（17.9%→20%），单次增仓上限约 63 元 &lt; 1 手（约 895 元）→ 成本门不可行，暂不加仓</li><li>降低触发：连续 2 日收盘低于结构失效位 8.156 → 降低核心仓 50%</li><li>退出触发：完整周线进入 T8 或单日收盘跌破灾难保护位 8.028 → 退出剩余核心仓</li></ul><p><b>不应采取的动作：</b>不追高、不因金价技术突破新闻而加仓、不把 T3a 当 T3b 积极加仓</p><p><b>最大可接受风险：</b>结构失效位 = 8.22 − 0.5×ATR20(0.1279) ≈ 8.156（需收盘+持续确认）</p></div>
+<div class="card"><h2>八、未来3-6个月观察区间</h2><table><tr><td>第一观察区</td><td>9.16 - 9.44</td><td>60日高(9.16) + MA120(9.43) 压力区，突破后为反转确认信号</td></tr><tr><td>第二观察区</td><td>9.9 - 10.2</td><td>前期中继平台/更早高点区，仅 T3b 确认后参考</td></tr><tr><td>趋势跟随退出</td><td>收盘跌破 8.156 且周线继续向下</td><td>结构失效位确认</td></tr></table></div>
+<div class="card"><h2>九、下次复评条件</h2><table><tr><td>定期</td><td>月度或完整月线形成后</td></tr><tr><td>价格</td><td>触及 8.156 / 8.74(MA60) / 9.16</td></tr><tr><td>趋势</td><td>周线迁移 T3b、MA60 斜率走平/转正</td></tr><tr><td>事件</td><td>美联储利率决议、实际利率/美元突变</td></tr></table></div>
+<div class="card"><h2>十、风险和限制</h2><table>
+      <tr><th>数据限制</th><td>250日K线；周线由日线重采样；当前完整自然交易周（2026-08-14 周五）已计入</td></tr>
+      <tr><th>模型限制</th><td>T0-T8为启发式分类；状态机迁移需连续确认（普通升级 2 个完整周线，T8 立即生效）</td></tr>
+      <tr><th>未校准指标</th><td>情景未附概率、证据强度为主观判断</td></tr>
+      <tr><th>交易成本</th><td>成本门：佣金 max(5元, 万2.5) + 单边价差 0.05% + 最小 1手=100份；本次为非加仓动作或增仓被成本门拦截（见操作卡）</td></tr>
+      <tr><th>配置依据</th><td>组合配置 portfolio_value=15000、目标权重/最大权重/风险预算见 records/portfolio_config.json；进取配置（回撤容忍15%，风险预算0.8%）</td></tr>
+      <tr><th>免责</th><td>决策支持工具，不构成投资建议</td></tr>
+    </table></div>
+
+<div class="disc">数据源：westock-data + WebSearch（来源见第三节） · 生成 2026-08-14 · 不构成投资建议</div>
+</div>
+<script>
+var data = {"dates": ["2025-08-05", "2025-08-06", "2025-08-07", "2025-08-08", "2025-08-11", "2025-08-12", "2025-08-13", "2025-08-14", "2025-08-15", "2025-08-18", "2025-08-19", "2025-08-20", "2025-08-21", "2025-08-22", "2025-08-25", "2025-08-26", "2025-08-27", "2025-08-28", "2025-08-29", "2025-09-01", "2025-09-02", "2025-09-03", "2025-09-04", "2025-09-05", "2025-09-08", "2025-09-09", "2025-09-10", "2025-09-11", "2025-09-12", "2025-09-15", "2025-09-16", "2025-09-17", "2025-09-18", "2025-09-19", "2025-09-22", "2025-09-23", "2025-09-24", "2025-09-25", "2025-09-26", "2025-09-29", "2025-09-30", "2025-10-09", "2025-10-10", "2025-10-13", "2025-10-14", "2025-10-15", "2025-10-16", "2025-10-17", "2025-10-20", "2025-10-21", "2025-10-22", "2025-10-23", "2025-10-24", "2025-10-27", "2025-10-28", "2025-10-29", "2025-10-30", "2025-10-31", "2025-11-03", "2025-11-04", "2025-11-05", "2025-11-06", "2025-11-07", "2025-11-10", "2025-11-11", "2025-11-12", "2025-11-13", "2025-11-14", "2025-11-17", "2025-11-18", "2025-11-19", "2025-11-20", "2025-11-21", "2025-11-24", "2025-11-25", "2025-11-26", "2025-11-27", "2025-11-28", "2025-12-01", "2025-12-02", "2025-12-03", "2025-12-04", "2025-12-05", "2025-12-08", "2025-12-09", "2025-12-10", "2025-12-11", "2025-12-12", "2025-12-15", "2025-12-16", "2025-12-17", "2025-12-18", "2025-12-19", "2025-12-22", "2025-12-23", "2025-12-24", "2025-12-25", "2025-12-26", "2025-12-29", "2025-12-30", "2025-12-31", "2026-01-05", "2026-01-06", "2026-01-07", "2026-01-08", "2026-01-09", "2026-01-12", "2026-01-13", "2026-01-14", "2026-01-15", "2026-01-16", "2026-01-19", "2026-01-20", "2026-01-21", "2026-01-22", "2026-01-23", "2026-01-26", "2026-01-27", "2026-01-28", "2026-01-29", "2026-01-30", "2026-02-02", "2026-02-03", "2026-02-04", "2026-02-05", "2026-02-06", "2026-02-09", "2026-02-10", "2026-02-11", "2026-02-12", "2026-02-13", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02", "2026-04-03", "2026-04-07", "2026-04-08", "2026-04-09", "2026-04-10", "2026-04-13", "2026-04-14", "2026-04-15", "2026-04-16", "2026-04-17", "2026-04-20", "2026-04-21", "2026-04-22", "2026-04-23", "2026-04-24", "2026-04-27", "2026-04-28", "2026-04-29", "2026-04-30", "2026-05-06", "2026-05-07", "2026-05-08", "2026-05-11", "2026-05-12", "2026-05-13", "2026-05-14", "2026-05-15", "2026-05-18", "2026-05-19", "2026-05-20", "2026-05-21", "2026-05-22", "2026-05-25", "2026-05-26", "2026-05-27", "2026-05-28", "2026-05-29", "2026-06-01", "2026-06-02", "2026-06-03", "2026-06-04", "2026-06-05", "2026-06-08", "2026-06-09", "2026-06-10", "2026-06-11", "2026-06-12", "2026-06-15", "2026-06-16", "2026-06-17", "2026-06-18", "2026-06-22", "2026-06-23", "2026-06-24", "2026-06-25", "2026-06-26", "2026-06-29", "2026-06-30", "2026-07-01", "2026-07-02", "2026-07-03", "2026-07-06", "2026-07-07", "2026-07-08", "2026-07-09", "2026-07-10", "2026-07-13", "2026-07-14", "2026-07-15", "2026-07-16", "2026-07-17", "2026-07-20", "2026-07-21", "2026-07-22", "2026-07-23", "2026-07-24", "2026-07-27", "2026-07-28", "2026-07-29", "2026-07-30", "2026-07-31", "2026-08-03", "2026-08-04", "2026-08-05", "2026-08-06", "2026-08-07", "2026-08-10", "2026-08-11", "2026-08-12", "2026-08-13", "2026-08-14"], "closes": [7.46, 7.47, 7.48, 7.51, 7.43, 7.4, 7.42, 7.42, 7.4, 7.41, 7.39, 7.37, 7.39, 7.38, 7.43, 7.45, 7.45, 7.47, 7.49, 7.65, 7.67, 7.77, 7.75, 7.78, 7.85, 7.97, 7.95, 7.92, 7.95, 7.93, 8.03, 7.96, 7.86, 7.9, 8.05, 8.14, 8.19, 8.15, 8.16, 8.26, 8.34, 8.73, 8.6, 8.86, 8.98, 9.19, 9.24, 9.57, 9.27, 9.49, 9.1, 8.99, 8.95, 8.91, 8.6, 8.69, 8.7, 8.79, 8.8, 8.74, 8.71, 8.76, 8.79, 8.94, 9.06, 9.03, 9.18, 9.1, 8.88, 8.78, 8.95, 8.9, 8.83, 8.86, 9.01, 9.01, 9.01, 9.07, 9.16, 9.11, 9.1, 9.06, 9.14, 9.11, 9.05, 9.1, 9.11, 9.23, 9.35, 9.24, 9.31, 9.32, 9.31, 9.51, 9.64, 9.64, 9.57, 9.65, 9.56, 9.36, 9.3, 9.5, 9.58, 9.52, 9.51, 9.59, 9.78, 9.79, 9.92, 9.87, 9.86, 10.01, 10.08, 10.38, 10.34, 10.62, 10.92, 10.93, 11.28, 11.9, 11.01, 9.91, 10.42, 10.87, 10.52, 10.36, 10.72, 10.67, 10.76, 10.72, 10.58, 10.95, 10.96, 10.91, 10.93, 11.42, 11.26, 10.98, 10.96, 10.87, 10.87, 10.96, 10.97, 10.94, 10.8, 10.66, 10.64, 10.61, 10.13, 9.9, 8.94, 9.3, 9.64, 9.45, 9.49, 9.66, 9.7, 10.02, 9.74, 9.83, 9.84, 10.11, 9.91, 9.97, 9.92, 10.01, 10.06, 10.1, 10.03, 10.04, 10.01, 10.0, 9.9, 9.83, 9.9, 9.73, 9.64, 9.68, 9.79, 9.91, 9.88, 9.77, 9.81, 9.8, 9.8, 9.55, 9.51, 9.52, 9.37, 9.45, 9.46, 9.51, 9.45, 9.35, 9.13, 9.4, 9.34, 9.41, 9.28, 9.29, 9.25, 8.95, 9.01, 8.74, 8.51, 8.66, 8.93, 8.95, 8.96, 8.91, 8.72, 8.54, 8.52, 8.29, 8.39, 8.45, 8.38, 8.27, 8.48, 8.67, 8.63, 8.6, 8.59, 8.54, 8.54, 8.42, 8.37, 8.37, 8.36, 8.31, 8.32, 8.47, 8.56, 8.56, 8.39, 8.5, 8.4, 8.39, 8.36, 8.43, 8.42, 8.41, 8.64, 8.8, 8.89, 9.01, 9.01, 9.1, 9.04, 8.946], "ma60": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 8.111, 8.132, 8.153, 8.175, 8.199, 8.226, 8.253, 8.283, 8.311, 8.335, 8.358, 8.384, 8.41, 8.434, 8.458, 8.485, 8.511, 8.537, 8.563, 8.591, 8.615, 8.639, 8.661, 8.684, 8.706, 8.726, 8.745, 8.764, 8.786, 8.809, 8.831, 8.853, 8.875, 8.899, 8.926, 8.953, 8.978, 9.001, 9.026, 9.049, 9.067, 9.083, 9.096, 9.113, 9.124, 9.132, 9.139, 9.148, 9.152, 9.162, 9.169, 9.181, 9.198, 9.217, 9.242, 9.271, 9.303, 9.34, 9.376, 9.417, 9.47, 9.508, 9.527, 9.554, 9.586, 9.611, 9.633, 9.659, 9.685, 9.716, 9.748, 9.776, 9.81, 9.845, 9.879, 9.911, 9.952, 9.989, 10.021, 10.051, 10.08, 10.11, 10.141, 10.172, 10.202, 10.232, 10.258, 10.283, 10.306, 10.319, 10.33, 10.324, 10.324, 10.329, 10.328, 10.326, 10.326, 10.328, 10.334, 10.337, 10.345, 10.354, 10.364, 10.37, 10.377, 10.384, 10.391, 10.396, 10.401, 10.403, 10.406, 10.408, 10.408, 10.405, 10.396, 10.388, 10.374, 10.352, 10.331, 10.307, 10.273, 10.255, 10.252, 10.242, 10.224, 10.212, 10.199, 10.179, 10.159, 10.136, 10.115, 10.096, 10.072, 10.047, 10.021, 9.991, 9.958, 9.926, 9.899, 9.871, 9.845, 9.818, 9.785, 9.752, 9.715, 9.677, 9.644, 9.615, 9.588, 9.568, 9.552, 9.548, 9.535, 9.517, 9.497, 9.479, 9.459, 9.437, 9.408, 9.387, 9.367, 9.347, 9.322, 9.3, 9.276, 9.253, 9.227, 9.198, 9.17, 9.142, 9.113, 9.085, 9.059, 9.037, 9.016, 8.991, 8.97, 8.949, 8.928, 8.904, 8.879, 8.855, 8.832, 8.813, 8.796, 8.781, 8.772, 8.764, 8.757, 8.751, 8.743], "ma120": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 8.79, 8.82, 8.84, 8.865, 8.893, 8.918, 8.943, 8.971, 8.998, 9.026, 9.053, 9.08, 9.11, 9.139, 9.169, 9.198, 9.231, 9.263, 9.292, 9.321, 9.348, 9.374, 9.401, 9.428, 9.454, 9.479, 9.501, 9.524, 9.546, 9.564, 9.581, 9.588, 9.599, 9.614, 9.627, 9.639, 9.652, 9.664, 9.68, 9.693, 9.706, 9.719, 9.73, 9.741, 9.75, 9.758, 9.765, 9.772, 9.776, 9.783, 9.787, 9.795, 9.803, 9.811, 9.819, 9.83, 9.838, 9.846, 9.854, 9.862, 9.872, 9.881, 9.89, 9.898, 9.905, 9.912, 9.916, 9.919, 9.922, 9.926, 9.932, 9.936, 9.941, 9.946, 9.95, 9.951, 9.955, 9.957, 9.96, 9.961, 9.963, 9.964, 9.963, 9.962, 9.959, 9.954, 9.951, 9.949, 9.947, 9.944, 9.941, 9.936, 9.93, 9.923, 9.913, 9.902, 9.892, 9.883, 9.871, 9.862, 9.856, 9.851, 9.843, 9.835, 9.827, 9.819, 9.809, 9.797, 9.785, 9.772, 9.759, 9.747, 9.734, 9.721, 9.706, 9.69, 9.672, 9.651, 9.63, 9.605, 9.577, 9.555, 9.542, 9.528, 9.51, 9.497, 9.486, 9.471, 9.458, 9.444, 9.429]};
+var chart = echarts.init(document.getElementById('chart'));
+var dates = data.dates.map(function(d){return d.slice(5);});
+chart.setOption({
+  tooltip:{trigger:'axis'},
+  grid:{left:40,right:20,top:20,bottom:30},
+  xAxis:{type:'category',data:dates,axisLabel:{interval:39}},
+  yAxis:{type:'value',scale:true},
+  series:[
+    {name:'收盘',type:'line',data:data.closes,showSymbol:false,lineStyle:{width:1.5,color:'#2c3e50'}},
+    {name:'MA60',type:'line',data:data.ma60,showSymbol:false,lineStyle:{width:1,color:'#c0392b'}},
+    {name:'MA120',type:'line',data:data.ma120,showSymbol:false,lineStyle:{width:1,color:'#27ae60'}}
+  ]
+});
+window.addEventListener('resize',function(){chart.resize();});
+</script>
+</body></html>

@@ -66,7 +66,7 @@ CAN_ADD = {"T2", "T3a", "T3b", "T4"}
 # Per-state action_reason prefix
 STATE_LABEL = {
     "T0": "长期下降", "T1": "下降减速", "T2": "底部构建",
-    "T3a": "反转初步确认(MA60仍向下)", "T3b": "反转初步确认(MA60转上)",
+    "T3": "反转初步确认", "T3a": "反转初步确认(MA60仍向下)", "T3b": "反转初步确认(MA60转上)",
     "T4": "中期上升确认", "T5": "上升加速", "T6": "高位整理",
     "T7": "趋势衰竭", "T8": "结构破坏",
 }
@@ -261,6 +261,10 @@ def decide(state_code, sub_state=None, role="core", config=None, code=None,
 
     # 有效状态 (sub-state T3a/T3b maps to its own code for action rules)
     eff_state = state_code
+    # trend_analysis 返回 code="T3" + sub_state=T3a/T3b；归一化为子态以命中硬约束矩阵
+    if state_code == "T3" and sub_state in ("T3a", "T3b"):
+        state_code = sub_state
+        sub_state = None
 
     # Proposed base action from state, refined by role
     proposed = BASE_ACTION.get(state_code, "HOLD")
@@ -457,6 +461,7 @@ def base_reason(state_code, role):
         "T0": "周线向下+空头排列+低点降低，中期趋势向下",
         "T1": "周线仍向下但日线减速/反弹，未确认反转",
         "T2": "近低位+低点抬高，筑底中",
+        "T3": "价格结构转强，MA60方向决定 T3a/T3b",
         "T3a": "价格结构转强但MA60仍下行，反转初步确认",
         "T3b": "MA60走平/转上，反转确认可分批加仓",
         "T4": "多头排列+MA60/120向上+HH/HL，中期上升确认",

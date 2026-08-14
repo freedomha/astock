@@ -1,7 +1,7 @@
 {
   "sh518880": {
-    "state": "T1",
-    "sub_state": null,
+    "state": "T3",
+    "sub_state": "T3a",
     "consecutive_weeks": 1,
     "last_update": "2026-08-14"
   },
