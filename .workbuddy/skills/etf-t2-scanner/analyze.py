@@ -24,9 +24,6 @@ KLINE_DAYS = 250
 MAX_WORKERS = 8
 CHECK_DAYS = 5
 
-
-# ─── Shared numeric utilities (from trend_analysis.py:41-98) ───────────────
-
 # ─── Shared numeric utilities (self-contained) ─────────────────────────────
 
 def lin_slope(arr, win):
