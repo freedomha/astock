@@ -7,13 +7,6 @@
     "totalMV": 1169.95
   },
   {
-    "code": "sh511880",
-    "name": "银华日利ETF",
-    "type": "ETF",
-    "size": 94198745831.06,
-    "totalMV": 927.94
-  },
-  {
     "code": "sh518880",
     "name": "黄金ETF华安",
     "type": "ETF",
@@ -28,27 +21,6 @@
     "totalMV": 828.59
   },
   {
-    "code": "sh511360",
-    "name": "短融ETF海富通",
-    "type": "ETF",
-    "size": 86823616078.56,
-    "totalMV": 854.13
-  },
-  {
-    "code": "sh511990",
-    "name": "华宝添益ETF",
-    "type": "ETF",
-    "size": 83583450000,
-    "totalMV": 829.59
-  },
-  {
-    "code": "sh511380",
-    "name": "可转债ETF博时",
-    "type": "ETF",
-    "size": 64475892827.34,
-    "totalMV": 638.74
-  },
-  {
     "code": "sh512880",
     "name": "证券ETF国泰",
     "type": "ETF",
@@ -61,13 +33,6 @@
     "type": "ETF",
     "size": 61352250211.6656,
     "totalMV": 638.68
-  },
-  {
-    "code": "sh511220",
-    "name": "城投债ETF海富通",
-    "type": "ETF",
-    "size": 54927653691.12,
-    "totalMV": 549.13
   },
   {
     "code": "sh588200",
@@ -91,25 +56,11 @@
     "totalMV": 404.72
   },
   {
-    "code": "sh511520",
-    "name": "政金债ETF富国",
-    "type": "ETF",
-    "size": 43179472685.95,
-    "totalMV": 434.03
-  },
-  {
     "code": "sz159516",
     "name": "半导体设备ETF国泰",
     "type": "ETF",
     "size": 42157640682.5408,
     "totalMV": 378.93
-  },
-  {
-    "code": "sh511030",
-    "name": "公司债ETF平安",
-    "type": "ETF",
-    "size": 41952861427.05,
-    "totalMV": 419.45
   },
   {
     "code": "sz159792",
@@ -145,13 +96,6 @@
     "type": "ETF",
     "size": 34620006859,
     "totalMV": 350.97
-  },
-  {
-    "code": "sh511090",
-    "name": "30年国债ETF鹏扬",
-    "type": "ETF",
-    "size": 32753857642.52,
-    "totalMV": 331.99
   },
   {
     "code": "sz159995",
@@ -224,25 +168,11 @@
     "totalMV": 205.17
   },
   {
-    "code": "sh511200",
-    "name": "信用债ETF华夏",
-    "type": "ETF",
-    "size": 21915572786.25,
-    "totalMV": 219.79
-  },
-  {
     "code": "sh512480",
     "name": "半导体ETF国联安",
     "type": "ETF",
     "size": 20975424476.96,
     "totalMV": 187.34
-  },
-  {
-    "code": "sh511260",
-    "name": "十年国债ETF国泰",
-    "type": "ETF",
-    "size": 19942851201,
-    "totalMV": 199.48
   },
   {
     "code": "sh515450",
@@ -392,20 +322,6 @@
     "totalMV": 121.22
   },
   {
-    "code": "sh511100",
-    "name": "国债ETF华夏",
-    "type": "ETF",
-    "size": 11977514301.6,
-    "totalMV": 120.34
-  },
-  {
-    "code": "sh511120",
-    "name": "科创债ETF广发",
-    "type": "ETF",
-    "size": 11609368958.64,
-    "totalMV": 119.56
-  },
-  {
     "code": "sh512800",
     "name": "银行ETF华宝",
     "type": "ETF",
@@ -418,13 +334,6 @@
     "type": "ETF",
     "size": 11004178182.87,
     "totalMV": 110.26
-  },
-  {
-    "code": "sh511270",
-    "name": "10年地方债ETF海富通",
-    "type": "ETF",
-    "size": 10008511708,
-    "totalMV": 100.03
   },
   {
     "code": "sh588710",
@@ -455,25 +364,11 @@
     "totalMV": 88.14
   },
   {
-    "code": "sh511580",
-    "name": "国债政金债ETF招商",
-    "type": "ETF",
-    "size": 8172009007.8,
-    "totalMV": 78.98
-  },
-  {
     "code": "sz159852",
     "name": "软件ETF嘉实",
     "type": "ETF",
     "size": 7929294375.0363,
     "totalMV": 79.41
-  },
-  {
-    "code": "sh511660",
-    "name": "货币ETF建信",
-    "type": "ETF",
-    "size": 7454160000,
-    "totalMV": 74.53
   },
   {
     "code": "sz159363",
@@ -852,13 +747,6 @@
     "type": "ETF",
     "size": 2050674110.9,
     "totalMV": 18.5
-  },
-  {
-    "code": "sh511060",
-    "name": "5年地方债ETF海富通",
-    "type": "ETF",
-    "size": 2028785156.21,
-    "totalMV": 20.51
   },
   {
     "code": "sh561360",
@@ -1253,13 +1141,6 @@
     "totalMV": 6.02
   },
   {
-    "code": "sh511690",
-    "name": "交易货币ETF大成",
-    "type": "ETF",
-    "size": 599240000,
-    "totalMV": 6.02
-  },
-  {
     "code": "sh563900",
     "name": "300自由现金流ETF摩根",
     "type": "ETF",
@@ -1617,13 +1498,6 @@
     "totalMV": 1.93
   },
   {
-    "code": "sz159003",
-    "name": "招商快线ETF",
-    "type": "ETF",
-    "size": 196404000,
-    "totalMV": 1.92
-  },
-  {
     "code": "sh563320",
     "name": "通用航空ETF华泰柏瑞",
     "type": "ETF",
@@ -1657,13 +1531,6 @@
     "type": "ETF",
     "size": 186363892.4,
     "totalMV": 1.64
-  },
-  {
-    "code": "sh511900",
-    "name": "富国货币ETF",
-    "type": "ETF",
-    "size": 185610000,
-    "totalMV": 1.86
   },
   {
     "code": "sh517080",
@@ -1713,13 +1580,6 @@
     "type": "ETF",
     "size": 162664496.36,
     "totalMV": 1.63
-  },
-  {
-    "code": "sh511800",
-    "name": "易方达货币ETF",
-    "type": "ETF",
-    "size": 161000000,
-    "totalMV": 1.61
   },
   {
     "code": "sh516620",
@@ -2226,13 +2086,6 @@
     "totalMV": 0.43
   },
   {
-    "code": "sh511970",
-    "name": "国寿货币ETF",
-    "type": "ETF",
-    "size": 41580000,
-    "totalMV": 0.42
-  },
-  {
     "code": "sh562580",
     "name": "可选消费ETF华夏",
     "type": "ETF",
@@ -2254,13 +2107,6 @@
     "totalMV": 0.41
   },
   {
-    "code": "sh511770",
-    "name": "金鹰增益货币ETF",
-    "type": "ETF",
-    "size": 40350000,
-    "totalMV": 0.4
-  },
-  {
     "code": "sh517880",
     "name": "品牌消费ETF华泰柏瑞",
     "type": "ETF",
@@ -2280,13 +2126,6 @@
     "type": "ETF",
     "size": 33944310.72,
     "totalMV": 0.34
-  },
-  {
-    "code": "sh511950",
-    "name": "添利货币ETF广发",
-    "type": "ETF",
-    "size": 32960000,
-    "totalMV": 0.33
   },
   {
     "code": "sh561780",
@@ -2420,13 +2259,6 @@
     "type": "ETF",
     "size": 8453746,
     "totalMV": 8000000
-  },
-  {
-    "code": "sh511910",
-    "name": "融通货币ETF",
-    "type": "ETF",
-    "size": 8330000,
-    "totalMV": 0.08
   },
   {
     "code": "sh512830",
