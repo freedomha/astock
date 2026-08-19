@@ -1,5 +1,5 @@
 {
-  "_note": "进取偏好、中长期投资。portfolio_value 为总资产（本金30000）；max_portfolio_drawdown_pct=15 对应进取回撤容忍。黄金为避险核心，军工/粮食为长期核心仓——当前 T0（下降趋势），引擎对核心仓给出 REDUCE（降低）而非 EXIT（退出）；target 为长期目标，趋势转好（T3+）后再分批加仓。costs 为交易成本参数（官方口径：ETF 免印花税；佣金万2.5 最低5元/笔；单边价差0.05%；最小交易单位 1手=100份），引擎增仓须通过成本门（单边成本占比≤1%、成本占预期收益≤15%、成本调整后 RR≥2），30000 本金下千元级订单常被最低佣金拦截而自动降级为持有。",
+  "_note": "进取偏好、中长期投资。portfolio_value 为总资产（本金30000）；max_portfolio_drawdown_pct=15 对应进取回撤容忍。三只持仓均为战术仓（tactical_*）——引擎对战术仓在 T0/T8 给出 EXIT、在 T3b/T4 允许回踩 ADD，不再有核心仓的长期持有语义；target 为长期目标，趋势转好（T3b+）后再分批加仓。costs 为交易成本参数（官方口径：ETF 免印花税；佣金万2.5 最低5元/笔；单边价差0.05%；最小交易单位 1手=100份），引擎增仓须通过成本门（单边成本占比≤1%、成本占预期收益≤15%、成本调整后 RR≥2），30000 本金下千元级订单常被最低佣金拦截而自动降级为持有。",
   "portfolio_value": 30000,
   "max_portfolio_drawdown_pct": 15,
   "costs": {
@@ -13,19 +13,19 @@
   },
   "positions": {
     "sh518880": {
-      "role": "core_hedge",
+      "role": "tactical_hedge",
       "target_weight_pct": 20,
       "max_weight_pct": 25,
       "risk_budget_pct": 2.0
     },
     "sh512710": {
-      "role": "core_growth",
+      "role": "tactical_growth",
       "target_weight_pct": 20,
       "max_weight_pct": 25,
       "risk_budget_pct": 2.0
     },
     "sz159698": {
-      "role": "core_value",
+      "role": "tactical_value",
       "target_weight_pct": 20,
       "max_weight_pct": 25,
       "risk_budget_pct": 2.0
