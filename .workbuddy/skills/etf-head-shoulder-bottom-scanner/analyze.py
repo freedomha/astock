@@ -692,11 +692,11 @@ def update_kline_data(kline_data, etfs, kline_file, refresh_today=False):
 
 
 def main():
-    refresh_today = "--refresh" in sys.argv
+    refresh_today = "--no-refresh" not in sys.argv
     print("=" * 60)
     print("A股ETF头肩底形态分析 (v2)")
     if refresh_today:
-        print("🔄 盘中刷新模式: 同日期数据将用最新数据替换")
+        print("🔄 盘中刷新模式: 同日期数据将用最新数据替换 (默认开启, --no-refresh 关闭)")
     print("=" * 60)
     
     # Step 1: Load ETFs

@@ -1,6 +1,6 @@
 ---
 name: etf-t2-scanner
-description: Use when scanning A-share ETFs for the T2 trend state (底部构建) — classify all ETFs with the T0-T8 trend-state machine (weekly-primary, used by etf-operation-plan), score T2 candidates on a 5-dimension confidence engine (approaching T3 upgrade), and output an HTML report. Input is etf_kline_data.json (250-day klines), no network fetch required unless --refresh. Chinese stock market convention: red=up, green=down.
+description: Use when scanning A-share ETFs for the T2 trend state (底部构建) — classify all ETFs with the T0-T8 trend-state machine (weekly-primary, used by etf-operation-plan), score T2 candidates on a 5-dimension confidence engine (approaching T3 upgrade), and output an HTML report. Input is etf_kline_data.json (250-day klines); same-date bars are force-refreshed by default (--no-refresh to skip). Chinese stock market convention: red=up, green=down.
 ---
 
 # ETF T2区间扫描器 (ETF T2底部构建扫描) v1
@@ -25,7 +25,7 @@ description: Use when scanning A-share ETFs for the T2 trend state (底部构建
 ```
 1. 确保 etf_kline_data.json 与 all_etfs_larggest.json 存在于项目根目录
 2. 运行 analyze.py → 判定状态 + T2置信度打分 → etf_t2_results.json
-   - 追加 --refresh 可强制刷新当日盘中数据为收盘数据（15:00后使用）
+   - 刷新默认开启：当日bar自动用最新数据替换（15:00后用收盘数据；--no-refresh 跳过）
 3. 运行 generate_report.py → reports/etf/etf_t2_report.html
 4. present_files 展示 HTML 报告
 ```
@@ -38,13 +38,13 @@ description: Use when scanning A-share ETFs for the T2 trend state (底部构建
 PYTHON="/Users/aldiadmin/.workbuddy/binaries/python/versions/3.13.12/bin/python3"
 $PYTHON .workbuddy/skills/etf-t2-scanner/analyze.py
 
-# 收盘后刷新盘中数据:
-$PYTHON .workbuddy/skills/etf-t2-scanner/analyze.py --refresh
+# 刷新默认开启，跳过刷新用 --no-refresh:
+$PYTHON .workbuddy/skills/etf-t2-scanner/analyze.py --no-refresh
 ```
 
 `analyze.py` 流程：
 - 加载 `all_etfs_larggest.json`（ETF名称）+ `etf_kline_data.json`（K线）
-- （可选）检查数据新鲜度，联网追加最新K线；`--refresh` 替换当日盘中bar
+- 默认联网刷新当日bar（`--no-refresh` 跳过）
 - 对每只 ETF 计算：周线特征（完整周重采样）、MA特征（60/120/250）、结构（高低点）、波动率
 - 运行 `classify_trend_state` 判定 T0-T8（含 T3a/T3b）
 - T2 标的追加 5 维置信度打分 → 排序输出

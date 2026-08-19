@@ -25,7 +25,7 @@ Uses `westock-data` to fetch ETF K-line data, then runs an enhanced multi-dimens
 ```
 1. Ensure all_etfs_larggest.json exists in project root
 2. Run analyze.py → fetches K-line + scores + saves etf_bowl_results.json & etf_kline_data.json
-   - Add --refresh to force-refresh today's intraday data to post-close (run after 15:00)
+   - 刷新默认开启: same-date bars are force-refreshed with the latest data (use --no-refresh to skip)
 3. Run generate_report.py → reports/etf/etf_bowl_report.html
 4. present_files the HTML report
 ```
@@ -41,9 +41,8 @@ Uses `westock-data` to fetch ETF K-line data, then runs an enhanced multi-dimens
 ```bash
 PYTHON="/Users/aldiadmin/.workbuddy/binaries/python/versions/3.13.12/bin/python3"
 $PYTHON .codebuddy/skills/etf-bowl-bottom-scanner/analyze.py
-
-# After market close (post-15:00), refresh intraday data with:
-$PYTHON .codebuddy/skills/etf-bowl-bottom-scanner/analyze.py --refresh
+# 刷新默认开启: 同日期数据(盘中K线)会用最新数据替换; 跳过刷新用 --no-refresh
+$PYTHON .codebuddy/skills/etf-bowl-bottom-scanner/analyze.py --no-refresh
 ```
 
 `analyze.py` does everything in one run:
@@ -52,7 +51,7 @@ $PYTHON .codebuddy/skills/etf-bowl-bottom-scanner/analyze.py --refresh
 - Scores each ETF with the enhanced engine → `etf_bowl_results.json`
 - Prints summary with bowl-bottom labels
 
-**`--refresh` flag**: Without `--refresh`, the update logic compares dates only — if today's bar already exists in cache (even if fetched during market hours at 10:30), it won't be refreshed. With `--refresh`, all ETFs whose latest bar matches today's date are re-fetched and replaced with the latest data from the source. Use this after 15:00 to convert intraday bars to post-close bars.
+**刷新默认开启**: Without `--no-refresh`, the update logic force-refreshes all ETFs whose latest bar matches today's date — replacing intraday bars (e.g. fetched at 10:30) with the latest post-close data. Use `--no-refresh` to skip when cached same-date bars are already considered current.
 
 ### Step 3: Generate HTML Report
 
@@ -122,4 +121,4 @@ A **true bowl-bottom** requires THREE conditions simultaneously:
 - ETF bowl-bottom ≠ underlying index bottom (tracking error possible).
 - Data sourced from 腾讯自选股 via westock-data skill; may have delay, trust exchange official data.
 - Re-run regularly (e.g., weekly) to track bowl-bottom progression: 减速筑底 → 确认中 → 确认碗底.
-- When re-running on the same day as a prior scan, use `--refresh` after 15:00 to replace intraday bars with post-close data.
+- Refresh is on by default — same-date bars are always re-fetched with the latest data (post-close after 15:00).
