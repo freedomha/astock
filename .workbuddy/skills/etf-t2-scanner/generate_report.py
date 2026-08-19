@@ -30,6 +30,9 @@ def build_report(out, klines, output_path):
         "T6": "#95a5a6", "T7": "#8e44ad", "T8": "#c0392b",
     }
 
+    def fmt_ma60(v):
+        return '-' if v is None else v
+
     # ---- State distribution bar chart data ----
     state_keys = sorted(dist, key=lambda x: (int(x[1]) if x[1][:1].isdigit() else 9, x))
     dist_labels = json.dumps(state_keys, ensure_ascii=False)
@@ -51,7 +54,7 @@ def build_report(out, klines, output_path):
           <td class="low">{b.get('pos250', '-')}%</td>
           <td class="{'pos' if b.get('hl_pct', 0) > 0 else 'neg'}">{b.get('hl_pct', 0):+}%</td>
           <td class="{wk_cls}">{b.get('wk_dir', '-')} ({b.get('wk_slope', 0):+.1f}%)</td>
-          <td class="{'neg' if (b.get('d_ma60') or 0) < 0 else 'pos'}">{b.get('d_ma60', '-')}%</td>
+          <td class="{'neg' if (b.get('d_ma60') or 0) < 0 else 'pos'}">{fmt_ma60(b.get('d_ma60'))}%</td>
           <td>{b.get('vol_ratio', '-')}</td>
           <td>{b.get('atr_ratio', '-')}</td>
         </tr>""")
@@ -94,7 +97,7 @@ def build_report(out, klines, output_path):
             <div class="metric"><span class="ml">低点抬高</span><span class="mv {'pos' if b.get('hl_pct', 0) > 0 else 'neg'}">{b.get('hl_pct', 0):+}%</span></div>
             <div class="metric"><span class="ml">周线方向</span><span class="mv">{b.get('wk_dir', '-')}</span></div>
             <div class="metric"><span class="ml">周线斜率10w</span><span class="mv">{b.get('wk_slope', 0):+.1f}%</span></div>
-            <div class="metric"><span class="ml">距MA60</span><span class="mv {'neg' if (b.get('d_ma60') or 0) < 0 else 'pos'}">{b.get('d_ma60', '-')}%</span></div>
+            <div class="metric"><span class="ml">距MA60</span><span class="mv {'neg' if (b.get('d_ma60') or 0) < 0 else 'pos'}">{fmt_ma60(b.get('d_ma60'))}%</span></div>
             <div class="metric"><span class="ml">周量比</span><span class="mv">{b.get('vol_ratio', '-')}</span></div>
             <div class="metric"><span class="ml">ATR比(20/60)</span><span class="mv">{b.get('atr_ratio', '-')}</span></div>
             <div class="metric"><span class="ml">近20日动量</span><span class="mv {'neg' if (b.get('t20') or 0) < 0 else 'pos'}">{b.get('t20', 0):+.1f}%</span></div>
