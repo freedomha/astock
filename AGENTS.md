@@ -8,7 +8,7 @@ A-share quantitative analysis workspace producing sector and ETF research report
 
 Two categories of skills exist:
 - **Sector scanners** (1 skill): bowl-bottom pattern scanning on 861 industry/concept sectors
-- **ETF scanners** (5 skills): bowl-bottom, box-consolidation, W-bottom, head-shoulder-bottom, 2B-bottom pattern scanning on 352 largest A-share ETFs
+- **ETF scanners** (6 skills): bowl-bottom, box-consolidation, W-bottom, head-shoulder-bottom, 2B-bottom pattern scanning + T2区间 state-machine scanning on 352 largest A-share ETFs
 - **Deep analysis** (2 skills): sell-side quality research reports for individual sectors or ETFs
 
 ## Environment & Prerequisites
@@ -231,13 +231,14 @@ The 7-layer analysis framework: core logic → trading position → catalyst int
 | `etf-head-shoulder-bottom-scanner/etf_hs_bottom_results.json` | 178 KB | ETF HS bottom scan results |
 | `etf-head-shoulder-bottom-scanner/hs_bottom_backtest_results.json` | 3 KB | HS bottom backtest results |
 | `etf-2b-bottom-scanner/etf_2b_bottom_results.json` | 5 KB | ETF 2B bottom scan results |
+| `etf-t2-scanner/etf_t2_results.json` | 411 KB | ETF T2区间(T0-T8状态机) scan results |
 
 ### Report Output
 
 | Directory | Contents |
 |-----------|----------|
 | `reports/sectors/` | Sector bowl report + deep analysis reports |
-| `reports/etf/` | 5 × scanner reports (`etf_*_report.html`) + ETF deep analysis reports |
+| `reports/etf/` | 6 × scanner reports (`etf_*_report.html`) + ETF deep analysis reports |
 
 ### Trade Records
 
