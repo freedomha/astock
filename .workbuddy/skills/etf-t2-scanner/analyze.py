@@ -700,7 +700,7 @@ def load_etfs():
 def update_kline_data(kline_data, etfs, kline_file, refresh_today=False):
     """
     Check cached kline data and append latest records if any are missing.
-    (逐字符复制自 etf-bowl-bottom-scanner/analyze.py 的 update_kline_data)
+    (函数体逐字符复制自 etf-bowl-bottom-scanner/analyze.py 的 update_kline_data)
     """
     if not etfs:
         return 0
@@ -853,7 +853,7 @@ def main():
     for i, r in enumerate(t2_list[:20]):
         b = r.get("t2_breakdown", {})
         print(f"{i+1:<4}{r['name']:<18}{r.get('t2_score', 0):<6}{b.get('pos250', '-'):<8}"
-              f"{b.get('hl_pct', 0):+<8}{b.get('wk_dir', '-'):<8}{b.get('d_ma60', '-'):<8}")
+              f"{b.get('hl_pct', 0): <+8.1f}{b.get('wk_dir', '-'):<8}{b.get('d_ma60', '-'):<8}")
 
     out = {
         "meta": {
