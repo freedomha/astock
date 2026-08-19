@@ -62,6 +62,10 @@ $PYTHON .workbuddy/skills/etf-2b-bottom-scanner/generate_report.py
 $PYTHON .workbuddy/skills/etf-2b-bottom-scanner/backtest.py
 $PYTHON .workbuddy/skills/etf-2b-bottom-scanner/backtest_500.py
 
+# ETF T2区间 — analyze + generate report (T0-T8状态机, 筛出T2底部构建)
+$PYTHON .workbuddy/skills/etf-t2-scanner/analyze.py
+$PYTHON .workbuddy/skills/etf-t2-scanner/generate_report.py
+
 # ETF Operation Plan — 趋势状态机回测（状态信号统计 + 硬约束策略模拟，含交易成本）
 $PYTHON .workbuddy/skills/etf-operation-plan/backtest.py
 $PYTHON .workbuddy/skills/etf-operation-plan/backtest.py --use-confirmed  # 暴露上调需连续2周确认
@@ -116,6 +120,7 @@ westock-data CLI (Node.js) → raw JSON → Python scripts → processed JSON �
 | ETF W-Bottom | `etf-w-bottom-scanner/` | analyze.py (597L), generate_report.py (264L), backtest.py (178L) | 352 ETFs | etf_w_bottom_results.json |
 | ETF HS Bottom | `etf-head-shoulder-bottom-scanner/` | analyze.py (821L), generate_report.py (415L), backtest.py (232L) | 352 ETFs | etf_hs_bottom_results.json |
 | ETF 2B Bottom | `etf-2b-bottom-scanner/` | analyze.py (807L), generate_report.py (295L), backtest.py (516L), backtest_500.py (471L) | 352 ETFs | etf_2b_bottom_results.json |
+| ETF T2区间 | `etf-t2-scanner/` | analyze.py (T0-T8状态机+5维置信度), generate_report.py | 352 ETFs | etf_t2_results.json |
 | ETF Operation Plan | `etf-operation-plan/` | trend_analysis.py (844L), score_patterns.py (2056L), operation_engine.py (363L), backtest.py (577L) | 1 held ETF | reports/etf/operation/*-操作建议.html + backtest_trend_state_results.json |
 | Sector Deep Analysis | `sector-deep-analysis/` | AI-driven, no scripts | 1 sector | reports/sectors/<name>.html |
 | ETF Deep Analysis | `etf-deep-analysis/` | AI-driven, no scripts | 1 ETF | reports/etf/<name>.html |
