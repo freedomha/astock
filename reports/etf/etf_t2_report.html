@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A股ETF T2底部构建扫描报告 · 2026-08-19</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif; background:#f5f6fa; color:#2c3e50; line-height:1.6; }
+.container { max-width:1280px; margin:0 auto; padding:20px; }
+.header { background:linear-gradient(135deg,#0f3d1e 0%,#14532d 50%,#1a6b3a 100%); color:#fff; padding:36px 30px; border-radius:12px; margin-bottom:24px; box-shadow:0 4px 20px rgba(0,0,0,0.15); }
+.header h1 { font-size:26px; margin-bottom:8px; }
+.header .subtitle { opacity:0.85; font-size:14px; }
+.header .meta { margin-top:14px; display:flex; gap:24px; font-size:13px; opacity:0.75; flex-wrap:wrap; }
+.summary-cards { display:grid; grid-template-columns:repeat(6,1fr); gap:14px; margin-bottom:28px; }
+.summary-card { background:#fff; border-radius:10px; padding:18px; text-align:center; box-shadow:0 2px 10px rgba(0,0,0,0.06); }
+.summary-card .number { font-size:30px; font-weight:700; }
+.summary-card .label { font-size:12px; color:#7f8c8d; margin-top:4px; }
+.c-green .number { color:#27ae60; } .c-orange .number { color:#e67e22; } .c-red .number { color:#e74c3c; }
+.c-blue .number { color:#2980b9; } .c-gray .number { color:#7f8c8d; } .c-purple .number { color:#8e44ad; }
+.section-title { font-size:19px; font-weight:600; margin:28px 0 14px; padding-bottom:10px; border-bottom:2px solid #ecf0f1; display:flex; align-items:center; gap:8px; }
+.section-title .count { font-size:13px; color:#7f8c8d; font-weight:400; }
+.table-wrapper { background:#fff; border-radius:10px; overflow:hidden; box-shadow:0 2px 10px rgba(0,0,0,0.06); margin-bottom:28px; overflow-x:auto; }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+th { background:#f8f9fa; padding:11px 9px; text-align:left; font-weight:600; color:#5a6473; white-space:nowrap; border-bottom:2px solid #e8eaed; }
+td { padding:10px 9px; border-bottom:1px solid #f0f2f5; white-space:nowrap; }
+tr:hover td { background:#fafbfc; }
+.muted { color:#95a5a6; font-size:12px; }
+.pos { color:#e74c3c; font-weight:600; }
+.neg { color:#16a085; font-weight:600; }
+.low { color:#e67e22; font-weight:600; }
+.warn { color:#e67e22; font-weight:600; }
+.score-badge { padding:3px 10px; border-radius:12px; font-size:12px; font-weight:600; }
+.score-badge.pos { background:#e8f8f0; color:#27ae60; }
+.score-badge.warn { background:#fef5e7; color:#e67e22; }
+.score-badge.muted { background:#f0f2f5; color:#7f8c8d; }
+.dist-chart-box { height:280px; background:#fff; border-radius:10px; padding:16px; box-shadow:0 2px 10px rgba(0,0,0,0.06); margin-bottom:28px; }
+.charts-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-bottom:28px; }
+.chart-card { background:#fff; border-radius:10px; padding:16px; box-shadow:0 2px 10px rgba(0,0,0,0.06); }
+.chart-card h4 { font-size:15px; margin-bottom:4px; display:flex; align-items:center; gap:8px; }
+.chart-card .sub { font-size:12px; color:#7f8c8d; margin-bottom:10px; }
+.chart-box { height:150px; position:relative; }
+.detail-card { background:#fff; border-radius:10px; padding:20px; margin-bottom:18px; box-shadow:0 2px 10px rgba(0,0,0,0.06); border-left:4px solid #27ae60; }
+.detail-head { display:flex; align-items:center; gap:12px; margin-bottom:14px; flex-wrap:wrap; }
+.detail-head .rank { color:#fff; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px; }
+.detail-head h3 { font-size:18px; }
+.detail-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:14px; }
+.metric { background:#f8f9fa; padding:9px 12px; border-radius:6px; }
+.metric .ml { font-size:12px; color:#7f8c8d; display:block; }
+.metric .mv { font-size:15px; font-weight:600; }
+.reasons { background:#f8f9fa; padding:12px 16px; border-radius:6px; }
+.reasons ul { list-style:none; margin-top:6px; }
+.reasons li { padding:2px 0; font-size:13px; }
+.note { background:#eaf7ef; border-left:4px solid #27ae60; padding:14px 18px; border-radius:6px; margin:20px 0; font-size:13px; }
+.disclaimer { background:#fdecea; border-radius:8px; padding:16px 20px; margin-top:28px; font-size:12px; color:#c0392b; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+  <h1>🏗️ A股ETF T2底部构建扫描报告</h1>
+  <div class="subtitle">T0-T8趋势状态机扫描 · T2区间(底部构建)候选 · 置信度=接近T3升级概率</div>
+  <div class="meta">
+    <span>📅 数据日期: 2026-08-19</span>
+    <span>📊 样本: 344 只ETF</span>
+    <span>📈 K线周期: 日线 250 天</span>
+    <span>🔍 算法: T0-T8状态机 + 5维置信度打分</span>
+  </div>
+</div>
+
+<div class="summary-cards">
+  <div class="summary-card c-green"><div class="number">8</div><div class="label">🏗️ T2 底部构建</div></div>
+  <div class="summary-card c-green"><div class="number">73.8</div><div class="label">T2平均置信度</div></div>
+  <div class="summary-card c-orange"><div class="number">164</div><div class="label">T1 下降减速</div></div>
+  <div class="summary-card c-green"><div class="number">109</div><div class="label">T3 反转确认中</div></div>
+  <div class="summary-card c-red"><div class="number">10</div><div class="label">T0 长期下降</div></div>
+  <div class="summary-card c-gray"><div class="number">53</div><div class="label">其他状态</div></div>
+</div>
+
+<div class="note">
+  <b>📌 T2 判定逻辑:</b> ① 250日区间位置 ≤ 35% + ② 低点抬高（近20日低点 > 前20日低点）+ ③ 周线非向下（且未落入T0/T1/T6/T7/T8）。
+  置信度打分 5 维: 低点抬高幅度(30) + 距250日低点(25) + 周线斜率回升(20) + 距MA60(15) + 量能/波幅(10)。
+  高分(≥70) = 最接近 T3 反转确认，可按操作计划 T2 档（小额试仓，约25%）观察。
+</div>
+
+<div class="section-title">📊 趋势状态分布 <span class="count">(全部ETF, 判断大盘筑底广度)</span></div>
+<div class="dist-chart-box"><canvas id="distChart"></canvas></div>
+
+<div class="section-title">🏆 T2 置信度排名 (TOP 25) <span class="count">颜色: 涨红跌绿 (A股惯例)</span></div>
+<div class="table-wrapper">
+<table>
+<thead><tr>
+<th>#</th><th>ETF名称</th><th>置信度</th><th>250日位</th><th>抬底%</th><th>周线方向</th><th>距MA60</th><th>周量比</th><th>ATR比</th>
+</tr></thead>
+<tbody>
+
+        <tr>
+          <td><b>1</b></td>
+          <td><b>港股通消费ETF易方达</b><br><span class="muted">sh513070</span></td>
+          <td><span class="score-badge pos">85</span></td>
+          <td class="low">16.3%</td>
+          <td class="pos">+6.8%</td>
+          <td class="pos">up (+3.2%)</td>
+          <td class="neg">-0.17%</td>
+          <td>1.64</td>
+          <td>0.79</td>
+        </tr>
+        <tr>
+          <td><b>2</b></td>
+          <td><b>港股通互联网ETF富国</b><br><span class="muted">sz159792</span></td>
+          <td><span class="score-badge pos">83</span></td>
+          <td class="low">13.0%</td>
+          <td class="pos">+11.76%</td>
+          <td class="pos">up (+9.5%)</td>
+          <td class="neg">-1.43%</td>
+          <td>1.2</td>
+          <td>0.92</td>
+        </tr>
+        <tr>
+          <td><b>3</b></td>
+          <td><b>港股互联网ETF华宝</b><br><span class="muted">sh513770</span></td>
+          <td><span class="score-badge pos">83</span></td>
+          <td class="low">13.7%</td>
+          <td class="pos">+12.9%</td>
+          <td class="pos">up (+7.6%)</td>
+          <td class="neg">-1.5%</td>
+          <td>1.15</td>
+          <td>0.86</td>
+        </tr>
+        <tr>
+          <td><b>4</b></td>
+          <td><b>港股通非银ETF广发</b><br><span class="muted">sh513750</span></td>
+          <td><span class="score-badge pos">78</span></td>
+          <td class="low">15.6%</td>
+          <td class="pos">+5.76%</td>
+          <td class="pos">up (+4.7%)</td>
+          <td class="neg">-1.84%</td>
+          <td>0.83</td>
+          <td>0.74</td>
+        </tr>
+        <tr>
+          <td><b>5</b></td>
+          <td><b>招商财富宝ETF</b><br><span class="muted">sh511850</span></td>
+          <td><span class="score-badge warn">68</span></td>
+          <td class="low">9.1%</td>
+          <td class="pos">+0.1%</td>
+          <td class="warn">flat (-0.0%)</td>
+          <td class="neg">-0.01%</td>
+          <td>0.66</td>
+          <td>0.65</td>
+        </tr>
+        <tr>
+          <td><b>6</b></td>
+          <td><b>富国货币ETF</b><br><span class="muted">sh511900</span></td>
+          <td><span class="score-badge warn">68</span></td>
+          <td class="low">5.8%</td>
+          <td class="pos">+0.02%</td>
+          <td class="warn">flat (-0.0%)</td>
+          <td class="pos">-0.0%</td>
+          <td>0.74</td>
+          <td>0.18</td>
+        </tr>
+        <tr>
+          <td><b>7</b></td>
+          <td><b>证券保险ETF易方达</b><br><span class="muted">sh512070</span></td>
+          <td><span class="score-badge warn">67</span></td>
+          <td class="low">15.4%</td>
+          <td class="pos">+1.04%</td>
+          <td class="pos">up (+3.8%)</td>
+          <td class="neg">-1.05%</td>
+          <td>1.05</td>
+          <td>0.57</td>
+        </tr>
+        <tr>
+          <td><b>8</b></td>
+          <td><b>国债政金债ETF招商</b><br><span class="muted">sh511580</span></td>
+          <td><span class="score-badge warn">58</span></td>
+          <td class="low">17.0%</td>
+          <td class="pos">+0.08%</td>
+          <td class="warn">flat (+0.3%)</td>
+          <td class="pos">0.18%</td>
+          <td>1.57</td>
+          <td>0.73</td>
+        </tr>
+</tbody></table>
+</div>
+
+<div class="section-title">📈 T2 高分ETF — K线缩略图 <span class="count">(前9名 120日走势)</span></div>
+<div class="charts-grid" id="chartsGrid"></div>
+
+<div class="section-title">📝 T2 详细分析</div>
+
+        <div class="detail-card" style="border-left-color:#27ae60">
+          <div class="detail-head">
+            <span class="rank" style="background:#27ae60">#1</span>
+            <h3>港股通消费ETF易方达</h3>
+            <span class="muted">sh513070</span>
+            <span class="score-badge">置信度 85/100</span>
+          </div>
+          <div class="detail-grid">
+            <div class="metric"><span class="ml">当前价格</span><span class="mv">1.105</span></div>
+            <div class="metric"><span class="ml">250日区间位</span><span class="mv low">16.3%</span></div>
+            <div class="metric"><span class="ml">250日回撤</span><span class="mv neg">-25.8%</span></div>
+            <div class="metric"><span class="ml">低点抬高</span><span class="mv pos">+6.8%</span></div>
+            <div class="metric"><span class="ml">周线方向</span><span class="mv">up</span></div>
+            <div class="metric"><span class="ml">周线斜率10w</span><span class="mv">+3.2%</span></div>
+            <div class="metric"><span class="ml">距MA60</span><span class="mv neg">-0.17%</span></div>
+            <div class="metric"><span class="ml">周量比</span><span class="mv">1.64</span></div>
+            <div class="metric"><span class="ml">ATR比(20/60)</span><span class="mv">0.79</span></div>
+            <div class="metric"><span class="ml">近20日动量</span><span class="mv neg">-1.6%</span></div>
+            <div class="metric"><span class="ml">均线排列</span><span class="mv muted">price < ma60 < ma120 < ma250</span></div>
+            <div class="metric"><span class="ml">周线数据</span><span class="mv muted">53周</span></div>
+          </div>
+          <div class="reasons"><b>状态机判定依据 (T2):</b><ul><li>价格处于250日低位(16%)</li><li>低点开始抬高，正在筑底</li><li>周线方向 up(slope +3.2%)</li></ul></div>
+          <div class="reasons" style="margin-top:8px"><b>置信度分项:</b><ul><li>低点抬高幅度 +6.8% (得30/30)</li><li>250日区间位置 16% (得20/25)</li><li>周线方向 up, slope10w +3.2% (得20/20)</li><li>距MA60 -0.17% (得10/15)</li><li>周量比 1.64, ATR比 0.79 (得5/10)</li></ul></div>
+        </div>
+        <div class="detail-card" style="border-left-color:#27ae60">
+          <div class="detail-head">
+            <span class="rank" style="background:#27ae60">#2</span>
+            <h3>港股通互联网ETF富国</h3>
+            <span class="muted">sz159792</span>
+            <span class="score-badge">置信度 83/100</span>
+          </div>
+          <div class="detail-grid">
+            <div class="metric"><span class="ml">当前价格</span><span class="mv">0.584</span></div>
+            <div class="metric"><span class="ml">250日区间位</span><span class="mv low">13.0%</span></div>
+            <div class="metric"><span class="ml">250日回撤</span><span class="mv neg">-45.9%</span></div>
+            <div class="metric"><span class="ml">低点抬高</span><span class="mv pos">+11.76%</span></div>
+            <div class="metric"><span class="ml">周线方向</span><span class="mv">up</span></div>
+            <div class="metric"><span class="ml">周线斜率10w</span><span class="mv">+9.5%</span></div>
+            <div class="metric"><span class="ml">距MA60</span><span class="mv neg">-1.43%</span></div>
+            <div class="metric"><span class="ml">周量比</span><span class="mv">1.2</span></div>
+            <div class="metric"><span class="ml">ATR比(20/60)</span><span class="mv">0.92</span></div>
+            <div class="metric"><span class="ml">近20日动量</span><span class="mv pos">+2.2%</span></div>
+            <div class="metric"><span class="ml">均线排列</span><span class="mv muted">price < ma60 < ma120 < ma250</span></div>
+            <div class="metric"><span class="ml">周线数据</span><span class="mv muted">53周</span></div>
+          </div>
+          <div class="reasons"><b>状态机判定依据 (T2):</b><ul><li>价格处于250日低位(13%)</li><li>低点开始抬高，正在筑底</li><li>周线方向 up(slope +9.5%)</li></ul></div>
+          <div class="reasons" style="margin-top:8px"><b>置信度分项:</b><ul><li>低点抬高幅度 +11.8% (得30/30)</li><li>250日区间位置 13% (得20/25)</li><li>周线方向 up, slope10w +9.5% (得20/20)</li><li>距MA60 -1.43% (得10/15)</li><li>周量比 1.20, ATR比 0.92 (得3/10)</li></ul></div>
+        </div>
+        <div class="detail-card" style="border-left-color:#27ae60">
+          <div class="detail-head">
+            <span class="rank" style="background:#27ae60">#3</span>
+            <h3>港股互联网ETF华宝</h3>
+            <span class="muted">sh513770</span>
+            <span class="score-badge">置信度 83/100</span>
+          </div>
+          <div class="detail-grid">
+            <div class="metric"><span class="ml">当前价格</span><span class="mv">0.358</span></div>
+            <div class="metric"><span class="ml">250日区间位</span><span class="mv low">13.7%</span></div>
+            <div class="metric"><span class="ml">250日回撤</span><span class="mv neg">-45.8%</span></div>
+            <div class="metric"><span class="ml">低点抬高</span><span class="mv pos">+12.9%</span></div>
+            <div class="metric"><span class="ml">周线方向</span><span class="mv">up</span></div>
+            <div class="metric"><span class="ml">周线斜率10w</span><span class="mv">+7.6%</span></div>
+            <div class="metric"><span class="ml">距MA60</span><span class="mv neg">-1.5%</span></div>
+            <div class="metric"><span class="ml">周量比</span><span class="mv">1.15</span></div>
+            <div class="metric"><span class="ml">ATR比(20/60)</span><span class="mv">0.86</span></div>
+            <div class="metric"><span class="ml">近20日动量</span><span class="mv pos">+2.1%</span></div>
+            <div class="metric"><span class="ml">均线排列</span><span class="mv muted">price < ma60 < ma120 < ma250</span></div>
+            <div class="metric"><span class="ml">周线数据</span><span class="mv muted">53周</span></div>
+          </div>
+          <div class="reasons"><b>状态机判定依据 (T2):</b><ul><li>价格处于250日低位(14%)</li><li>低点开始抬高，正在筑底</li><li>周线方向 up(slope +7.6%)</li></ul></div>
+          <div class="reasons" style="margin-top:8px"><b>置信度分项:</b><ul><li>低点抬高幅度 +12.9% (得30/30)</li><li>250日区间位置 14% (得20/25)</li><li>周线方向 up, slope10w +7.6% (得20/20)</li><li>距MA60 -1.5% (得10/15)</li><li>周量比 1.15, ATR比 0.86 (得3/10)</li></ul></div>
+        </div>
+        <div class="detail-card" style="border-left-color:#27ae60">
+          <div class="detail-head">
+            <span class="rank" style="background:#27ae60">#4</span>
+            <h3>港股通非银ETF广发</h3>
+            <span class="muted">sh513750</span>
+            <span class="score-badge">置信度 78/100</span>
+          </div>
+          <div class="detail-grid">
+            <div class="metric"><span class="ml">当前价格</span><span class="mv">1.471</span></div>
+            <div class="metric"><span class="ml">250日区间位</span><span class="mv low">15.6%</span></div>
+            <div class="metric"><span class="ml">250日回撤</span><span class="mv neg">-23.0%</span></div>
+            <div class="metric"><span class="ml">低点抬高</span><span class="mv pos">+5.76%</span></div>
+            <div class="metric"><span class="ml">周线方向</span><span class="mv">up</span></div>
+            <div class="metric"><span class="ml">周线斜率10w</span><span class="mv">+4.7%</span></div>
+            <div class="metric"><span class="ml">距MA60</span><span class="mv neg">-1.84%</span></div>
+            <div class="metric"><span class="ml">周量比</span><span class="mv">0.83</span></div>
+            <div class="metric"><span class="ml">ATR比(20/60)</span><span class="mv">0.74</span></div>
+            <div class="metric"><span class="ml">近20日动量</span><span class="mv neg">-5.8%</span></div>
+            <div class="metric"><span class="ml">均线排列</span><span class="mv muted">price < ma60 < ma120 < ma250</span></div>
+            <div class="metric"><span class="ml">周线数据</span><span class="mv muted">53周</span></div>
+          </div>
+          <div class="reasons"><b>状态机判定依据 (T2):</b><ul><li>价格处于250日低位(16%)</li><li>低点开始抬高，正在筑底</li><li>周线方向 up(slope +4.7%)</li></ul></div>
+          <div class="reasons" style="margin-top:8px"><b>置信度分项:</b><ul><li>低点抬高幅度 +5.8% (得30/30)</li><li>250日区间位置 16% (得20/25)</li><li>周线方向 up, slope10w +4.7% (得20/20)</li><li>距MA60 -1.84% (得10/15)</li><li>周量比 0.83, ATR比 0.74 (得8/10)</li><li>惩罚: 近20日动量 -5.8% < -4% (-10分)</li></ul></div>
+        </div>
+        <div class="detail-card" style="border-left-color:#f39c12">
+          <div class="detail-head">
+            <span class="rank" style="background:#f39c12">#5</span>
+            <h3>招商财富宝ETF</h3>
+            <span class="muted">sh511850</span>
+            <span class="score-badge">置信度 68/100</span>
+          </div>
+          <div class="detail-grid">
+            <div class="metric"><span class="ml">当前价格</span><span class="mv">100.0</span></div>
+            <div class="metric"><span class="ml">250日区间位</span><span class="mv low">9.1%</span></div>
+            <div class="metric"><span class="ml">250日回撤</span><span class="mv neg">-1.0%</span></div>
+            <div class="metric"><span class="ml">低点抬高</span><span class="mv pos">+0.1%</span></div>
+            <div class="metric"><span class="ml">周线方向</span><span class="mv">flat</span></div>
+            <div class="metric"><span class="ml">周线斜率10w</span><span class="mv">-0.0%</span></div>
+            <div class="metric"><span class="ml">距MA60</span><span class="mv neg">-0.01%</span></div>
+            <div class="metric"><span class="ml">周量比</span><span class="mv">0.66</span></div>
+            <div class="metric"><span class="ml">ATR比(20/60)</span><span class="mv">0.65</span></div>
+            <div class="metric"><span class="ml">近20日动量</span><span class="mv neg">-0.0%</span></div>
+            <div class="metric"><span class="ml">均线排列</span><span class="mv muted">price < ma60 < ma120 < ma250</span></div>
+            <div class="metric"><span class="ml">周线数据</span><span class="mv muted">53周</span></div>
+          </div>
+          <div class="reasons"><b>状态机判定依据 (T2):</b><ul><li>价格处于250日低位(9%)</li><li>低点开始抬高，正在筑底</li><li>周线方向 flat(slope -0.0%)</li></ul></div>
+          <div class="reasons" style="margin-top:8px"><b>置信度分项:</b><ul><li>低点抬高幅度 +0.1% (得8/30)</li><li>250日区间位置 9% (得25/25)</li><li>周线方向 flat, slope10w -0.0% (得15/20)</li><li>距MA60 -0.01% (得10/15)</li><li>周量比 0.66, ATR比 0.65 (得10/10)</li></ul></div>
+        </div>
+        <div class="detail-card" style="border-left-color:#f39c12">
+          <div class="detail-head">
+            <span class="rank" style="background:#f39c12">#6</span>
+            <h3>富国货币ETF</h3>
+            <span class="muted">sh511900</span>
+            <span class="score-badge">置信度 68/100</span>
+          </div>
+          <div class="detail-grid">
+            <div class="metric"><span class="ml">当前价格</span><span class="mv">99.999</span></div>
+            <div class="metric"><span class="ml">250日区间位</span><span class="mv low">5.8%</span></div>
+            <div class="metric"><span class="ml">250日回撤</span><span class="mv neg">-1.6%</span></div>
+            <div class="metric"><span class="ml">低点抬高</span><span class="mv pos">+0.02%</span></div>
+            <div class="metric"><span class="ml">周线方向</span><span class="mv">flat</span></div>
+            <div class="metric"><span class="ml">周线斜率10w</span><span class="mv">-0.0%</span></div>
+            <div class="metric"><span class="ml">距MA60</span><span class="mv pos">-0.0%</span></div>
+            <div class="metric"><span class="ml">周量比</span><span class="mv">0.74</span></div>
+            <div class="metric"><span class="ml">ATR比(20/60)</span><span class="mv">0.18</span></div>
+            <div class="metric"><span class="ml">近20日动量</span><span class="mv pos">-0.0%</span></div>
+            <div class="metric"><span class="ml">均线排列</span><span class="mv muted">price < ma60 < ma120 > ma250</span></div>
+            <div class="metric"><span class="ml">周线数据</span><span class="mv muted">53周</span></div>
+          </div>
+          <div class="reasons"><b>状态机判定依据 (T2):</b><ul><li>价格处于250日低位(6%)</li><li>低点开始抬高，正在筑底</li><li>周线方向 flat(slope -0.0%)</li></ul></div>
+          <div class="reasons" style="margin-top:8px"><b>置信度分项:</b><ul><li>低点抬高幅度 +0.0% (得8/30)</li><li>250日区间位置 6% (得25/25)</li><li>周线方向 flat, slope10w -0.0% (得15/20)</li><li>距MA60 -0.0% (得10/15)</li><li>周量比 0.74, ATR比 0.18 (得10/10)</li></ul></div>
+        </div>
+        <div class="detail-card" style="border-left-color:#f39c12">
+          <div class="detail-head">
+            <span class="rank" style="background:#f39c12">#7</span>
+            <h3>证券保险ETF易方达</h3>
+            <span class="muted">sh512070</span>
+            <span class="score-badge">置信度 67/100</span>
+          </div>
+          <div class="detail-grid">
+            <div class="metric"><span class="ml">当前价格</span><span class="mv">0.78</span></div>
+            <div class="metric"><span class="ml">250日区间位</span><span class="mv low">15.4%</span></div>
+            <div class="metric"><span class="ml">250日回撤</span><span class="mv neg">-22.0%</span></div>
+            <div class="metric"><span class="ml">低点抬高</span><span class="mv pos">+1.04%</span></div>
+            <div class="metric"><span class="ml">周线方向</span><span class="mv">up</span></div>
+            <div class="metric"><span class="ml">周线斜率10w</span><span class="mv">+3.8%</span></div>
+            <div class="metric"><span class="ml">距MA60</span><span class="mv neg">-1.05%</span></div>
+            <div class="metric"><span class="ml">周量比</span><span class="mv">1.05</span></div>
+            <div class="metric"><span class="ml">ATR比(20/60)</span><span class="mv">0.57</span></div>
+            <div class="metric"><span class="ml">近20日动量</span><span class="mv neg">-4.7%</span></div>
+            <div class="metric"><span class="ml">均线排列</span><span class="mv muted">price < ma60 < ma120 < ma250</span></div>
+            <div class="metric"><span class="ml">周线数据</span><span class="mv muted">53周</span></div>
+          </div>
+          <div class="reasons"><b>状态机判定依据 (T2):</b><ul><li>价格处于250日低位(15%)</li><li>低点开始抬高，正在筑底</li><li>周线方向 up(slope +3.8%)</li></ul></div>
+          <div class="reasons" style="margin-top:8px"><b>置信度分项:</b><ul><li>低点抬高幅度 +1.0% (得22/30)</li><li>250日区间位置 15% (得20/25)</li><li>周线方向 up, slope10w +3.8% (得20/20)</li><li>距MA60 -1.05% (得10/15)</li><li>周量比 1.05, ATR比 0.57 (得5/10)</li><li>惩罚: 近20日动量 -4.7% < -4% (-10分)</li></ul></div>
+        </div>
+        <div class="detail-card" style="border-left-color:#f39c12">
+          <div class="detail-head">
+            <span class="rank" style="background:#f39c12">#8</span>
+            <h3>国债政金债ETF招商</h3>
+            <span class="muted">sh511580</span>
+            <span class="score-badge">置信度 58/100</span>
+          </div>
+          <div class="detail-grid">
+            <div class="metric"><span class="ml">当前价格</span><span class="mv">109.645</span></div>
+            <div class="metric"><span class="ml">250日区间位</span><span class="mv low">17.0%</span></div>
+            <div class="metric"><span class="ml">250日回撤</span><span class="mv neg">-7.2%</span></div>
+            <div class="metric"><span class="ml">低点抬高</span><span class="mv pos">+0.08%</span></div>
+            <div class="metric"><span class="ml">周线方向</span><span class="mv">flat</span></div>
+            <div class="metric"><span class="ml">周线斜率10w</span><span class="mv">+0.3%</span></div>
+            <div class="metric"><span class="ml">距MA60</span><span class="mv pos">0.18%</span></div>
+            <div class="metric"><span class="ml">周量比</span><span class="mv">1.57</span></div>
+            <div class="metric"><span class="ml">ATR比(20/60)</span><span class="mv">0.73</span></div>
+            <div class="metric"><span class="ml">近20日动量</span><span class="mv pos">+0.1%</span></div>
+            <div class="metric"><span class="ml">均线排列</span><span class="mv muted">price > ma60 > ma120 > ma250</span></div>
+            <div class="metric"><span class="ml">周线数据</span><span class="mv muted">53周</span></div>
+          </div>
+          <div class="reasons"><b>状态机判定依据 (T2):</b><ul><li>价格处于250日低位(17%)</li><li>低点开始抬高，正在筑底</li><li>周线方向 flat(slope +0.3%)</li></ul></div>
+          <div class="reasons" style="margin-top:8px"><b>置信度分项:</b><ul><li>低点抬高幅度 +0.1% (得8/30)</li><li>250日区间位置 17% (得20/25)</li><li>周线方向 flat, slope10w +0.3% (得15/20)</li><li>距MA60 0.18% (得10/15)</li><li>周量比 1.57, ATR比 0.73 (得5/10)</li></ul></div>
+        </div>
+
+<div class="disclaimer">
+  ⚠️ <b>风险提示:</b> 本报告仅基于历史价格形态的客观量化分析，不构成任何投资建议。T2为底部构建状态，
+  存在继续下跌 (跌回T1/T0) 的可能；T2→T3升级需周线转上+站上MA60确认。投资有风险，决策需谨慎。
+  请结合基本面、资金面、宏观环境综合判断。数据来源: 腾讯自选股行情接口，可能存在延迟，以交易所官方数据为准。
+</div>
+
+</div>
+
+<script>
+const distLabels = ["T0", "T1", "T2", "T3(T3a)", "T3(T3b)", "T4", "T6", "T7"];
+const distValues = [10, 164, 8, 90, 19, 4, 29, 20];
+const distColors = ["#e74c3c", "#e67e22", "#27ae60", "#2ecc71", "#2ecc71", "#3498db", "#95a5a6", "#8e44ad"];
+new Chart(document.getElementById('distChart'), {
+  type: 'bar',
+  data: {
+    labels: distLabels,
+    datasets: [{ data: distValues, backgroundColor: distColors, borderRadius: 4, barPercentage: 0.7 }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: (i) => i.parsed.y + ' 只' } }
+    },
+    scales: {
+      x: { ticks: { font: { size: 12 }, color: '#5a6473' }, grid: { display: false } },
+      y: { ticks: { precision: 0, color: '#95a5a6' }, grid: { color: '#f0f2f5' } }
+    }
+  }
+});
+
+const chartData = [{"name": "港股通消费ETF易方达", "code": "sh513070", "score": 85, "closes": [1.4, 1.37, 1.37, 1.35, 1.31, 1.29, 1.29, 1.32, 1.3, 1.31, 1.3, 1.29, 1.28, 1.3, 1.31, 1.31, 1.28, 1.27, 1.22, 1.27, 1.24, 1.21, 1.22, 1.2, 1.2, 1.22, 1.21, 1.21, 1.21, 1.24, 1.23, 1.24, 1.22, 1.23, 1.22, 1.23, 1.21, 1.24, 1.25, 1.23, 1.21, 1.21, 1.21, 1.2, 1.21, 1.21, 1.19, 1.21, 1.2, 1.2, 1.19, 1.19, 1.18, 1.17, 1.15, 1.15, 1.15, 1.14, 1.13, 1.13, 1.13, 1.11, 1.11, 1.14, 1.16, 1.17, 1.15, 1.14, 1.14, 1.12, 1.12, 1.13, 1.13, 1.15, 1.14, 1.12, 1.1, 1.07, 1.06, 1.04, 1.05, 1.04, 1.04, 1.06, 1.03, 1.03, 1.06, 1.08, 1.08, 1.07, 1.08, 1.06, 1.07, 1.07, 1.09, 1.1, 1.12, 1.1, 1.13, 1.12, 1.11, 1.13, 1.1, 1.12, 1.12, 1.16, 1.17, 1.15, 1.14, 1.13, 1.13, 1.12, 1.11, 1.14, 1.12, 1.11, 1.11, 1.11, 1.12, 1.1], "dates": ["2026-02-25", "2026-02-26", "2026-02-27", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02", "2026-04-03", "2026-04-07", "2026-04-08", "2026-04-09", "2026-04-10", "2026-04-13", "2026-04-14", "2026-04-15", "2026-04-16", "2026-04-17", "2026-04-20", "2026-04-21", "2026-04-22", "2026-04-23", "2026-04-24", "2026-04-27", "2026-04-28", "2026-04-29", "2026-04-30", "2026-05-06", "2026-05-07", "2026-05-08", "2026-05-11", "2026-05-12", "2026-05-13", "2026-05-14", "2026-05-15", "2026-05-18", "2026-05-19", "2026-05-20", "2026-05-21", "2026-05-22", "2026-05-25", "2026-05-26", "2026-05-27", "2026-05-28", "2026-05-29", "2026-06-01", "2026-06-02", "2026-06-03", "2026-06-04", "2026-06-05", "2026-06-08", "2026-06-09", "2026-06-10", "2026-06-11", "2026-06-12", "2026-06-15", "2026-06-16", "2026-06-17", "2026-06-18", "2026-06-22", "2026-06-23", "2026-06-24", "2026-06-25", "2026-06-26", "2026-06-29", "2026-06-30", "2026-07-01", "2026-07-02", "2026-07-03", "2026-07-06", "2026-07-07", "2026-07-08", "2026-07-09", "2026-07-10", "2026-07-13", "2026-07-14", "2026-07-15", "2026-07-16", "2026-07-17", "2026-07-20", "2026-07-21", "2026-07-22", "2026-07-23", "2026-07-24", "2026-07-27", "2026-07-28", "2026-07-29", "2026-07-30", "2026-07-31", "2026-08-03", "2026-08-04", "2026-08-05", "2026-08-06", "2026-08-07", "2026-08-10", "2026-08-11", "2026-08-12", "2026-08-13", "2026-08-14", "2026-08-17", "2026-08-18"], "pos250": 16.3, "hl": 6.8, "wk": "up"}, {"name": "港股通互联网ETF富国", "code": "sz159792", "score": 83, "closes": [0.79, 0.77, 0.78, 0.74, 0.73, 0.72, 0.72, 0.74, 0.73, 0.75, 0.75, 0.74, 0.74, 0.75, 0.76, 0.76, 0.74, 0.71, 0.68, 0.7, 0.71, 0.7, 0.7, 0.69, 0.68, 0.69, 0.67, 0.67, 0.67, 0.72, 0.7, 0.7, 0.69, 0.69, 0.7, 0.72, 0.72, 0.73, 0.72, 0.7, 0.69, 0.69, 0.68, 0.67, 0.68, 0.67, 0.69, 0.7, 0.71, 0.7, 0.69, 0.69, 0.7, 0.67, 0.66, 0.67, 0.66, 0.64, 0.64, 0.63, 0.63, 0.62, 0.6, 0.61, 0.63, 0.66, 0.64, 0.62, 0.62, 0.6, 0.61, 0.6, 0.59, 0.6, 0.6, 0.58, 0.58, 0.56, 0.56, 0.54, 0.54, 0.52, 0.51, 0.53, 0.53, 0.53, 0.54, 0.55, 0.56, 0.56, 0.6, 0.59, 0.6, 0.58, 0.58, 0.6, 0.62, 0.59, 0.61, 0.61, 0.58, 0.59, 0.57, 0.59, 0.59, 0.62, 0.62, 0.62, 0.63, 0.63, 0.64, 0.62, 0.62, 0.63, 0.62, 0.61, 0.6, 0.59, 0.6, 0.58], "dates": ["2026-02-25", "2026-02-26", "2026-02-27", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02", "2026-04-03", "2026-04-07", "2026-04-08", "2026-04-09", "2026-04-10", "2026-04-13", "2026-04-14", "2026-04-15", "2026-04-16", "2026-04-17", "2026-04-20", "2026-04-21", "2026-04-22", "2026-04-23", "2026-04-24", "2026-04-27", "2026-04-28", "2026-04-29", "2026-04-30", "2026-05-06", "2026-05-07", "2026-05-08", "2026-05-11", "2026-05-12", "2026-05-13", "2026-05-14", "2026-05-15", "2026-05-18", "2026-05-19", "2026-05-20", "2026-05-21", "2026-05-22", "2026-05-25", "2026-05-26", "2026-05-27", "2026-05-28", "2026-05-29", "2026-06-01", "2026-06-02", "2026-06-03", "2026-06-04", "2026-06-05", "2026-06-08", "2026-06-09", "2026-06-10", "2026-06-11", "2026-06-12", "2026-06-15", "2026-06-16", "2026-06-17", "2026-06-18", "2026-06-22", "2026-06-23", "2026-06-24", "2026-06-25", "2026-06-26", "2026-06-29", "2026-06-30", "2026-07-01", "2026-07-02", "2026-07-03", "2026-07-06", "2026-07-07", "2026-07-08", "2026-07-09", "2026-07-10", "2026-07-13", "2026-07-14", "2026-07-15", "2026-07-16", "2026-07-17", "2026-07-20", "2026-07-21", "2026-07-22", "2026-07-23", "2026-07-24", "2026-07-27", "2026-07-28", "2026-07-29", "2026-07-30", "2026-07-31", "2026-08-03", "2026-08-04", "2026-08-05", "2026-08-06", "2026-08-07", "2026-08-10", "2026-08-11", "2026-08-12", "2026-08-13", "2026-08-14", "2026-08-17", "2026-08-18"], "pos250": 13.0, "hl": 11.76, "wk": "up"}, {"name": "港股互联网ETF华宝", "code": "sh513770", "score": 83, "closes": [0.49, 0.48, 0.48, 0.46, 0.45, 0.44, 0.44, 0.45, 0.45, 0.46, 0.46, 0.45, 0.45, 0.46, 0.46, 0.47, 0.45, 0.44, 0.42, 0.43, 0.44, 0.43, 0.43, 0.42, 0.42, 0.43, 0.41, 0.41, 0.41, 0.44, 0.43, 0.43, 0.42, 0.42, 0.43, 0.44, 0.44, 0.44, 0.44, 0.43, 0.43, 0.42, 0.42, 0.41, 0.42, 0.41, 0.42, 0.43, 0.44, 0.43, 0.42, 0.42, 0.43, 0.41, 0.41, 0.41, 0.4, 0.39, 0.39, 0.39, 0.39, 0.38, 0.37, 0.37, 0.38, 0.4, 0.39, 0.38, 0.38, 0.37, 0.37, 0.37, 0.36, 0.37, 0.37, 0.36, 0.36, 0.35, 0.34, 0.33, 0.33, 0.32, 0.32, 0.33, 0.32, 0.32, 0.33, 0.34, 0.34, 0.34, 0.36, 0.36, 0.37, 0.36, 0.36, 0.36, 0.38, 0.36, 0.38, 0.38, 0.36, 0.36, 0.35, 0.36, 0.36, 0.38, 0.38, 0.38, 0.39, 0.39, 0.39, 0.38, 0.38, 0.39, 0.38, 0.37, 0.37, 0.36, 0.37, 0.36], "dates": ["2026-02-25", "2026-02-26", "2026-02-27", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02", "2026-04-03", "2026-04-07", "2026-04-08", "2026-04-09", "2026-04-10", "2026-04-13", "2026-04-14", "2026-04-15", "2026-04-16", "2026-04-17", "2026-04-20", "2026-04-21", "2026-04-22", "2026-04-23", "2026-04-24", "2026-04-27", "2026-04-28", "2026-04-29", "2026-04-30", "2026-05-06", "2026-05-07", "2026-05-08", "2026-05-11", "2026-05-12", "2026-05-13", "2026-05-14", "2026-05-15", "2026-05-18", "2026-05-19", "2026-05-20", "2026-05-21", "2026-05-22", "2026-05-25", "2026-05-26", "2026-05-27", "2026-05-28", "2026-05-29", "2026-06-01", "2026-06-02", "2026-06-03", "2026-06-04", "2026-06-05", "2026-06-08", "2026-06-09", "2026-06-10", "2026-06-11", "2026-06-12", "2026-06-15", "2026-06-16", "2026-06-17", "2026-06-18", "2026-06-22", "2026-06-23", "2026-06-24", "2026-06-25", "2026-06-26", "2026-06-29", "2026-06-30", "2026-07-01", "2026-07-02", "2026-07-03", "2026-07-06", "2026-07-07", "2026-07-08", "2026-07-09", "2026-07-10", "2026-07-13", "2026-07-14", "2026-07-15", "2026-07-16", "2026-07-17", "2026-07-20", "2026-07-21", "2026-07-22", "2026-07-23", "2026-07-24", "2026-07-27", "2026-07-28", "2026-07-29", "2026-07-30", "2026-07-31", "2026-08-03", "2026-08-04", "2026-08-05", "2026-08-06", "2026-08-07", "2026-08-10", "2026-08-11", "2026-08-12", "2026-08-13", "2026-08-14", "2026-08-17", "2026-08-18"], "pos250": 13.7, "hl": 12.9, "wk": "up"}, {"name": "港股通非银ETF广发", "code": "sh513750", "score": 78, "closes": [1.75, 1.72, 1.72, 1.67, 1.67, 1.61, 1.64, 1.65, 1.6, 1.64, 1.64, 1.62, 1.61, 1.62, 1.64, 1.65, 1.6, 1.6, 1.5, 1.56, 1.58, 1.54, 1.54, 1.52, 1.52, 1.56, 1.54, 1.53, 1.53, 1.6, 1.58, 1.6, 1.58, 1.6, 1.58, 1.59, 1.57, 1.58, 1.58, 1.58, 1.55, 1.56, 1.55, 1.54, 1.59, 1.6, 1.62, 1.66, 1.65, 1.65, 1.64, 1.62, 1.61, 1.59, 1.57, 1.58, 1.56, 1.56, 1.56, 1.55, 1.56, 1.54, 1.51, 1.53, 1.53, 1.54, 1.52, 1.5, 1.48, 1.46, 1.47, 1.48, 1.47, 1.52, 1.55, 1.52, 1.52, 1.46, 1.51, 1.47, 1.45, 1.44, 1.39, 1.42, 1.41, 1.45, 1.43, 1.46, 1.49, 1.45, 1.48, 1.47, 1.46, 1.44, 1.47, 1.51, 1.5, 1.47, 1.51, 1.53, 1.54, 1.57, 1.54, 1.54, 1.54, 1.55, 1.57, 1.56, 1.55, 1.54, 1.56, 1.52, 1.53, 1.52, 1.49, 1.49, 1.49, 1.47, 1.5, 1.47], "dates": ["2026-02-25", "2026-02-26", "2026-02-27", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02", "2026-04-03", "2026-04-07", "2026-04-08", "2026-04-09", "2026-04-10", "2026-04-13", "2026-04-14", "2026-04-15", "2026-04-16", "2026-04-17", "2026-04-20", "2026-04-21", "2026-04-22", "2026-04-23", "2026-04-24", "2026-04-27", "2026-04-28", "2026-04-29", "2026-04-30", "2026-05-06", "2026-05-07", "2026-05-08", "2026-05-11", "2026-05-12", "2026-05-13", "2026-05-14", "2026-05-15", "2026-05-18", "2026-05-19", "2026-05-20", "2026-05-21", "2026-05-22", "2026-05-25", "2026-05-26", "2026-05-27", "2026-05-28", "2026-05-29", "2026-06-01", "2026-06-02", "2026-06-03", "2026-06-04", "2026-06-05", "2026-06-08", "2026-06-09", "2026-06-10", "2026-06-11", "2026-06-12", "2026-06-15", "2026-06-16", "2026-06-17", "2026-06-18", "2026-06-22", "2026-06-23", "2026-06-24", "2026-06-25", "2026-06-26", "2026-06-29", "2026-06-30", "2026-07-01", "2026-07-02", "2026-07-03", "2026-07-06", "2026-07-07", "2026-07-08", "2026-07-09", "2026-07-10", "2026-07-13", "2026-07-14", "2026-07-15", "2026-07-16", "2026-07-17", "2026-07-20", "2026-07-21", "2026-07-22", "2026-07-23", "2026-07-24", "2026-07-27", "2026-07-28", "2026-07-29", "2026-07-30", "2026-07-31", "2026-08-03", "2026-08-04", "2026-08-05", "2026-08-06", "2026-08-07", "2026-08-10", "2026-08-11", "2026-08-12", "2026-08-13", "2026-08-14", "2026-08-17", "2026-08-18"], "pos250": 15.6, "hl": 5.76, "wk": "up"}, {"name": "招商财富宝ETF", "code": "sh511850", "score": 68, "closes": [100.01, 100.0, 100.01, 100.01, 100.02, 100.02, 100.01, 100.01, 100.0, 100.0, 100.0, 100.01, 100.02, 100.01, 100.0, 100.0, 100.01, 100.01, 100.0, 100.0, 100.0, 100.01, 100.01, 100.0, 100.0, 100.0, 100.01, 100.01, 100.01, 100.0, 100.0, 100.01, 100.0, 100.0, 100.0, 100.0, 100.01, 100.0, 100.0, 100.0, 100.0, 100.01, 100.0, 100.01, 100.02, 100.02, 100.0, 100.0, 100.01, 100.01, 100.01, 100.0, 100.01, 100.01, 100.0, 100.0, 100.0, 100.0, 100.01, 100.0, 100.0, 100.0, 100.0, 100.01, 100.0, 100.0, 100.0, 100.01, 100.02, 100.02, 100.0, 100.02, 100.01, 100.01, 100.0, 100.0, 100.0, 100.01, 100.0, 100.0, 100.0, 100.0, 100.01, 100.0, 100.0, 100.0, 100.01, 100.01, 100.0, 100.01, 100.0, 100.0, 100.01, 100.01, 100.01, 100.0, 100.01, 100.01, 100.0, 100.0, 100.0, 100.01, 100.01, 100.0, 100.01, 100.01, 100.01, 100.01, 100.01, 100.0, 100.0, 100.01, 100.01, 100.0, 100.0, 100.0, 100.0, 100.01, 100.0, 100.0], "dates": ["2026-02-25", "2026-02-26", "2026-02-27", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02", "2026-04-03", "2026-04-07", "2026-04-08", "2026-04-09", "2026-04-10", "2026-04-13", "2026-04-14", "2026-04-15", "2026-04-16", "2026-04-17", "2026-04-20", "2026-04-21", "2026-04-22", "2026-04-23", "2026-04-24", "2026-04-27", "2026-04-28", "2026-04-29", "2026-04-30", "2026-05-06", "2026-05-07", "2026-05-08", "2026-05-11", "2026-05-12", "2026-05-13", "2026-05-14", "2026-05-15", "2026-05-18", "2026-05-19", "2026-05-20", "2026-05-21", "2026-05-22", "2026-05-25", "2026-05-26", "2026-05-27", "2026-05-28", "2026-05-29", "2026-06-01", "2026-06-02", "2026-06-03", "2026-06-04", "2026-06-05", "2026-06-08", "2026-06-09", "2026-06-10", "2026-06-11", "2026-06-12", "2026-06-15", "2026-06-16", "2026-06-17", "2026-06-18", "2026-06-22", "2026-06-23", "2026-06-24", "2026-06-25", "2026-06-26", "2026-06-29", "2026-06-30", "2026-07-01", "2026-07-02", "2026-07-03", "2026-07-06", "2026-07-07", "2026-07-08", "2026-07-09", "2026-07-10", "2026-07-13", "2026-07-14", "2026-07-15", "2026-07-16", "2026-07-17", "2026-07-20", "2026-07-21", "2026-07-22", "2026-07-23", "2026-07-24", "2026-07-27", "2026-07-28", "2026-07-29", "2026-07-30", "2026-07-31", "2026-08-03", "2026-08-04", "2026-08-05", "2026-08-06", "2026-08-07", "2026-08-10", "2026-08-11", "2026-08-12", "2026-08-13", "2026-08-14", "2026-08-17", "2026-08-18"], "pos250": 9.1, "hl": 0.1, "wk": "flat"}, {"name": "富国货币ETF", "code": "sh511900", "score": 68, "closes": [100.0, 100.0, 100.0, 100.0, 100.0, 100.01, 100.0, 100.01, 100.0, 100.0, 100.0, 100.0, 100.01, 100.0, 100.0, 100.0, 100.0, 100.01, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.01, 100.0, 100.01, 100.02, 100.0, 100.0, 100.01, 100.01, 100.0, 100.69, 100.01, 100.01, 100.01, 100.0, 100.0, 100.01, 100.01, 100.01, 100.0, 100.0, 100.01, 100.02, 100.0, 100.02, 100.01, 100.01, 100.02, 100.01, 100.01, 100.02, 100.01, 100.01, 100.01, 100.01, 100.02, 100.01, 100.01, 100.01, 100.01, 100.01, 100.0, 100.0, 100.0, 100.0, 100.01, 100.01, 100.0, 100.0, 100.01, 100.01, 100.0, 100.0, 100.0, 100.01, 100.0, 100.0, 100.0, 100.0, 100.01, 100.0, 100.0, 100.0, 100.0, 100.01, 100.0, 100.0, 100.0, 100.0, 100.01, 100.0, 100.0, 100.0, 100.0, 100.01, 100.0, 100.0, 100.0, 100.0, 100.01, 100.0, 100.0, 100.0, 100.0, 100.01, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.01, 100.0, 100.0], "dates": ["2026-02-25", "2026-02-26", "2026-02-27", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02", "2026-04-03", "2026-04-07", "2026-04-08", "2026-04-09", "2026-04-10", "2026-04-13", "2026-04-14", "2026-04-15", "2026-04-16", "2026-04-17", "2026-04-20", "2026-04-21", "2026-04-22", "2026-04-23", "2026-04-24", "2026-04-27", "2026-04-28", "2026-04-29", "2026-04-30", "2026-05-06", "2026-05-07", "2026-05-08", "2026-05-11", "2026-05-12", "2026-05-13", "2026-05-14", "2026-05-15", "2026-05-18", "2026-05-19", "2026-05-20", "2026-05-21", "2026-05-22", "2026-05-25", "2026-05-26", "2026-05-27", "2026-05-28", "2026-05-29", "2026-06-01", "2026-06-02", "2026-06-03", "2026-06-04", "2026-06-05", "2026-06-08", "2026-06-09", "2026-06-10", "2026-06-11", "2026-06-12", "2026-06-15", "2026-06-16", "2026-06-17", "2026-06-18", "2026-06-22", "2026-06-23", "2026-06-24", "2026-06-25", "2026-06-26", "2026-06-29", "2026-06-30", "2026-07-01", "2026-07-02", "2026-07-03", "2026-07-06", "2026-07-07", "2026-07-08", "2026-07-09", "2026-07-10", "2026-07-13", "2026-07-14", "2026-07-15", "2026-07-16", "2026-07-17", "2026-07-20", "2026-07-21", "2026-07-22", "2026-07-23", "2026-07-24", "2026-07-27", "2026-07-28", "2026-07-29", "2026-07-30", "2026-07-31", "2026-08-03", "2026-08-04", "2026-08-05", "2026-08-06", "2026-08-07", "2026-08-10", "2026-08-11", "2026-08-12", "2026-08-13", "2026-08-14", "2026-08-17", "2026-08-18"], "pos250": 5.8, "hl": 0.02, "wk": "flat"}, {"name": "证券保险ETF易方达", "code": "sh512070", "score": 67, "closes": [0.89, 0.88, 0.88, 0.87, 0.86, 0.84, 0.85, 0.85, 0.84, 0.85, 0.85, 0.84, 0.84, 0.83, 0.85, 0.85, 0.83, 0.82, 0.79, 0.79, 0.8, 0.78, 0.78, 0.78, 0.77, 0.79, 0.78, 0.77, 0.77, 0.8, 0.78, 0.8, 0.8, 0.81, 0.8, 0.81, 0.8, 0.8, 0.8, 0.8, 0.8, 0.79, 0.79, 0.8, 0.81, 0.81, 0.82, 0.82, 0.81, 0.82, 0.82, 0.81, 0.79, 0.77, 0.77, 0.77, 0.77, 0.77, 0.76, 0.76, 0.77, 0.76, 0.74, 0.76, 0.76, 0.76, 0.76, 0.75, 0.75, 0.74, 0.75, 0.76, 0.75, 0.78, 0.79, 0.79, 0.79, 0.76, 0.81, 0.8, 0.78, 0.8, 0.77, 0.79, 0.78, 0.82, 0.8, 0.81, 0.82, 0.79, 0.79, 0.8, 0.79, 0.78, 0.79, 0.81, 0.8, 0.79, 0.81, 0.81, 0.82, 0.82, 0.81, 0.81, 0.8, 0.81, 0.82, 0.81, 0.81, 0.8, 0.81, 0.8, 0.8, 0.8, 0.79, 0.79, 0.79, 0.78, 0.79, 0.78], "dates": ["2026-02-25", "2026-02-26", "2026-02-27", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02", "2026-04-03", "2026-04-07", "2026-04-08", "2026-04-09", "2026-04-10", "2026-04-13", "2026-04-14", "2026-04-15", "2026-04-16", "2026-04-17", "2026-04-20", "2026-04-21", "2026-04-22", "2026-04-23", "2026-04-24", "2026-04-27", "2026-04-28", "2026-04-29", "2026-04-30", "2026-05-06", "2026-05-07", "2026-05-08", "2026-05-11", "2026-05-12", "2026-05-13", "2026-05-14", "2026-05-15", "2026-05-18", "2026-05-19", "2026-05-20", "2026-05-21", "2026-05-22", "2026-05-25", "2026-05-26", "2026-05-27", "2026-05-28", "2026-05-29", "2026-06-01", "2026-06-02", "2026-06-03", "2026-06-04", "2026-06-05", "2026-06-08", "2026-06-09", "2026-06-10", "2026-06-11", "2026-06-12", "2026-06-15", "2026-06-16", "2026-06-17", "2026-06-18", "2026-06-22", "2026-06-23", "2026-06-24", "2026-06-25", "2026-06-26", "2026-06-29", "2026-06-30", "2026-07-01", "2026-07-02", "2026-07-03", "2026-07-06", "2026-07-07", "2026-07-08", "2026-07-09", "2026-07-10", "2026-07-13", "2026-07-14", "2026-07-15", "2026-07-16", "2026-07-17", "2026-07-20", "2026-07-21", "2026-07-22", "2026-07-23", "2026-07-24", "2026-07-27", "2026-07-28", "2026-07-29", "2026-07-30", "2026-07-31", "2026-08-03", "2026-08-04", "2026-08-05", "2026-08-06", "2026-08-07", "2026-08-10", "2026-08-11", "2026-08-12", "2026-08-13", "2026-08-14", "2026-08-17", "2026-08-18"], "pos250": 15.4, "hl": 1.04, "wk": "up"}, {"name": "国债政金债ETF招商", "code": "sh511580", "score": 58, "closes": [108.73, 108.7, 108.73, 108.77, 108.78, 108.8, 108.79, 108.8, 108.78, 108.79, 108.79, 108.79, 108.82, 108.8, 108.81, 108.84, 108.89, 108.88, 108.85, 108.86, 108.9, 108.91, 108.93, 108.94, 108.99, 108.97, 108.95, 108.97, 108.96, 108.94, 108.95, 108.96, 108.96, 108.96, 108.97, 109.02, 109.04, 109.07, 109.09, 109.11, 109.15, 109.17, 109.12, 109.12, 109.17, 109.2, 109.11, 109.13, 109.16, 109.15, 109.17, 109.17, 109.18, 109.19, 109.21, 109.23, 109.26, 109.26, 109.28, 109.28, 109.28, 109.29, 109.33, 109.35, 109.35, 109.37, 109.36, 109.35, 109.37, 109.36, 109.34, 109.33, 109.3, 109.29, 109.29, 109.3, 109.3, 109.34, 109.36, 109.37, 109.4, 109.42, 109.43, 109.45, 109.44, 109.39, 109.39, 109.41, 109.42, 109.44, 109.44, 109.45, 109.48, 109.47, 109.47, 109.47, 109.46, 109.48, 109.47, 109.47, 109.47, 109.49, 109.5, 109.5, 109.53, 109.54, 109.53, 109.57, 109.56, 109.56, 109.57, 109.57, 109.6, 109.58, 109.59, 109.6, 109.6, 109.64, 109.64, 109.64], "dates": ["2026-02-25", "2026-02-26", "2026-02-27", "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-09", "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-16", "2026-03-17", "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-23", "2026-03-24", "2026-03-25", "2026-03-26", "2026-03-27", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02", "2026-04-03", "2026-04-07", "2026-04-08", "2026-04-09", "2026-04-10", "2026-04-13", "2026-04-14", "2026-04-15", "2026-04-16", "2026-04-17", "2026-04-20", "2026-04-21", "2026-04-22", "2026-04-23", "2026-04-24", "2026-04-27", "2026-04-28", "2026-04-29", "2026-04-30", "2026-05-06", "2026-05-07", "2026-05-08", "2026-05-11", "2026-05-12", "2026-05-13", "2026-05-14", "2026-05-15", "2026-05-18", "2026-05-19", "2026-05-20", "2026-05-21", "2026-05-22", "2026-05-25", "2026-05-26", "2026-05-27", "2026-05-28", "2026-05-29", "2026-06-01", "2026-06-02", "2026-06-03", "2026-06-04", "2026-06-05", "2026-06-08", "2026-06-09", "2026-06-10", "2026-06-11", "2026-06-12", "2026-06-15", "2026-06-16", "2026-06-17", "2026-06-18", "2026-06-22", "2026-06-23", "2026-06-24", "2026-06-25", "2026-06-26", "2026-06-29", "2026-06-30", "2026-07-01", "2026-07-02", "2026-07-03", "2026-07-06", "2026-07-07", "2026-07-08", "2026-07-09", "2026-07-10", "2026-07-13", "2026-07-14", "2026-07-15", "2026-07-16", "2026-07-17", "2026-07-20", "2026-07-21", "2026-07-22", "2026-07-23", "2026-07-24", "2026-07-27", "2026-07-28", "2026-07-29", "2026-07-30", "2026-07-31", "2026-08-03", "2026-08-04", "2026-08-05", "2026-08-06", "2026-08-07", "2026-08-10", "2026-08-11", "2026-08-12", "2026-08-13", "2026-08-14", "2026-08-17", "2026-08-18"], "pos250": 17.0, "hl": 0.08, "wk": "flat"}];
+const colors = ['#e74c3c','#2980b9','#9b59b6','#16a085','#e67e22','#34495e','#1abc9c','#d35400','#8e44ad'];
+const grid = document.getElementById('chartsGrid');
+chartData.forEach((c, idx) => {
+  const card = document.createElement('div');
+  card.className = 'chart-card';
+  card.innerHTML = `
+    <h4><span style="color:${colors[idx%colors.length]}">●</span> ${c.name}</h4>
+    <div class="sub">置信度${c.score} · 250日位${c.pos250}% · 抬底${c.hl}% · 周线${c.wk}</div>
+    <div class="chart-box"><canvas></canvas></div>
+  `;
+  grid.appendChild(card);
+  const ctx = card.querySelector('canvas');
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: c.dates,
+      datasets: [{ data: c.closes, borderColor: colors[idx%colors.length], backgroundColor: colors[idx%colors.length]+'15', borderWidth: 1.8, pointRadius:0, fill:true, tension:0.35 }]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins: { legend:{display:false}, tooltip:{ callbacks:{ title:(i)=>c.dates[i[0].dataIndex], label:(i)=>'价格 '+i.parsed.y }}},
+      scales: { x: { display:false }, y: { display:true, position:'right', ticks:{ font:{size:9}, color:'#95a5a6' }, grid:{ color:'#f0f2f5' } } }
+    }
+  });
+});
+</script>
+</body>
+</html>
