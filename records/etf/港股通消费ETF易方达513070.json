@@ -1,0 +1,13 @@
+{
+  "name": "港股通消费ETF易方达",
+  "code": "sh513070",
+  "trades": [
+    {
+      "date": "2026-08-20",
+      "action": "buy",
+      "price": 1.119,
+      "shares": 2000,
+      "amount": 2238.0
+    }
+  ]
+}
