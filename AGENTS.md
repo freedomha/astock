@@ -8,7 +8,7 @@ A-share quantitative analysis workspace producing sector and ETF research report
 
 Two categories of skills exist:
 - **Sector scanners** (1 skill): bowl-bottom pattern scanning on 861 industry/concept sectors
-- **ETF scanners** (6 skills): bowl-bottom, box-consolidation, W-bottom, head-shoulder-bottom, 2B-bottom pattern scanning + T2区间 state-machine scanning on 352 largest A-share ETFs
+- **ETF scanners** (7 skills): bowl-bottom, box-consolidation, W-bottom, head-shoulder-bottom, 2B-bottom pattern scanning + T2区间 state-machine scanning + T2/T3a低吸 scanning on 352 largest A-share ETFs
 - **Deep analysis** (2 skills): sell-side quality research reports for individual sectors or ETFs
 
 ## Environment & Prerequisites
@@ -66,6 +66,10 @@ $PYTHON .workbuddy/skills/etf-2b-bottom-scanner/backtest_500.py
 $PYTHON .workbuddy/skills/etf-t2-scanner/analyze.py
 $PYTHON .workbuddy/skills/etf-t2-scanner/generate_report.py
 
+# ETF 低吸(T2+T3a) — analyze + generate report (T0-T8状态机, 行业ETF选股算法-SOP)
+$PYTHON .workbuddy/skills/etf-lowdip-scanner/analyze.py
+$PYTHON .workbuddy/skills/etf-lowdip-scanner/generate_report.py
+
 # ETF Operation Plan — 趋势状态机回测（状态信号统计 + 硬约束策略模拟，含交易成本）
 $PYTHON .workbuddy/skills/etf-operation-plan/backtest.py
 $PYTHON .workbuddy/skills/etf-operation-plan/backtest.py --use-confirmed  # 暴露上调需连续2周确认
@@ -122,6 +126,7 @@ westock-data CLI (Node.js) → raw JSON → Python scripts → processed JSON �
 | ETF HS Bottom | `etf-head-shoulder-bottom-scanner/` | analyze.py (821L), generate_report.py (415L), backtest.py (232L) | 352 ETFs | etf_hs_bottom_results.json |
 | ETF 2B Bottom | `etf-2b-bottom-scanner/` | analyze.py (807L), generate_report.py (295L), backtest.py (516L), backtest_500.py (471L) | 352 ETFs | etf_2b_bottom_results.json |
 | ETF T2区间 | `etf-t2-scanner/` | analyze.py (T0-T8状态机+5维置信度), generate_report.py | 352 ETFs | etf_t2_results.json |
+| ETF 低吸(T2+T3a) | `etf-lowdip-scanner/` | analyze.py (T0-T8状态机+6维低吸置信度), generate_report.py | 352 ETFs | etf_lowdip_results.json |
 | ETF Operation Plan | `etf-operation-plan/` | trend_analysis.py (844L), score_patterns.py (2056L), operation_engine.py (363L), backtest.py (577L) | 1 held ETF | reports/etf/operation/*-操作建议.html + backtest_trend_state_results.json |
 | Sector Deep Analysis | `sector-deep-analysis/` | AI-driven, no scripts | 1 sector | reports/sectors/<name>.html |
 | ETF Deep Analysis | `etf-deep-analysis/` | AI-driven, no scripts | 1 ETF | reports/etf/<name>.html |
@@ -233,13 +238,25 @@ The 7-layer analysis framework: core logic → trading position → catalyst int
 | `etf-head-shoulder-bottom-scanner/hs_bottom_backtest_results.json` | 3 KB | HS bottom backtest results |
 | `etf-2b-bottom-scanner/etf_2b_bottom_results.json` | 5 KB | ETF 2B bottom scan results |
 | `etf-t2-scanner/etf_t2_results.json` | 411 KB | ETF T2区间(T0-T8状态机) scan results |
+| `etf-lowdip-scanner/etf_lowdip_results.json` | dynamic | ETF 低吸(T2+T3a, 6维低吸置信度) scan results |
 
 ### Report Output
 
 | Directory | Contents |
 |-----------|----------|
 | `reports/sectors/` | Sector bowl report + deep analysis reports |
-| `reports/etf/` | 6 × scanner reports (`etf_*_report.html`) + ETF deep analysis reports |
+| `reports/etf/` | 7 × scanner reports (`etf_*_report.html`) + ETF deep analysis reports |
+
+### 9. ETF 低吸(T2+T3a) Scanner (`etf-lowdip-scanner/`)
+
+依据《行业ETF选股算法-SOP》寻找 **T2(底部构建) + T3a(反转初步确认, MA60仍下行) 小额低吸机会**。
+
+- **`SKILL.md`** — Skill definition: T0-T8 状态机 (周线为主), 低吸vs建仓硬约束 (T0/T1 禁抄底; T2=小额试仓; T3a=小额等待回踩, MA60 未走平不加码; 完整建仓仅限 T3b/T4 白名单), 6维低吸置信度打分
+- **`analyze.py`** (915 lines) — Main engine: AUM≥5亿硬门槛, 排除货币基金/债券近平价标的 (sh511850 招商财富宝), 复用 etf-t2-scanner 的 T0-T8 分类 (parse_kline/lin_slope/atr/ma_series/compute_ma_features/compute_structure/compute_volatility/compute_weekly_features/classify_trend_state), 新增 `_slope_r2()`(对数价格斜率×R²动量=SOP量价动量因子) + `score_lowdip()`(6维: 250日位置25/低点抬高20/动量20/周线15/MA60修复10/量能波幅10, 满分100), 仅对T2/T3a打分, 输出 etf_lowdip_results.json
+- **`generate_report.py`** (342 lines) — Reads JSON, builds HTML with T3a/T2 各 TOP25 榜单 + 高分K线缩略图 + 详细卡片 → `reports/etf/etf_lowdip_report.html`
+- 输出分组: `etf_lowdip_results.json` 含 `t3a_count`/`t2_count`/`state_distribution`/`results` (每标的 `group`="T3a"或"T2", `lowdip_score`, `lowdip_breakdown`)
+
+低吸置信度语义 = 「左侧低吸性价比 + 接近T3b升级概率」。高分(≥65) = 估值低 + 结构转强 + 动量转正, 最接近 T3b 升级; 但仍属小额低吸候选, 非建仓信号。下单须通过 etf-operation-plan 四道程序校验。
 
 ### Trade Records
 
