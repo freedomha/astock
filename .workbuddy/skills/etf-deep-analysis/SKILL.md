@@ -45,7 +45,7 @@ If NOT found in the JSON, use WebSearch: `<ETF名称> ETF代码` to find the cod
 Use westock-data to get the ETF's price and K-line history.
 
 ```bash
-WD="/Applications/WorkBuddy.app/Contents/Resources/app.asar.unpacked/resources/builtin-skills/westock-data"
+WD="/Users/aldiadmin/.workbuddy/westock-data"
 NODE="/Users/aldiadmin/.workbuddy/binaries/node/versions/22.22.2/bin/node"
 
 # (a) ETF current quote

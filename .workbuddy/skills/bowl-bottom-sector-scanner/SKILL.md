@@ -38,7 +38,7 @@ Uses `westock-data` to fetch sector lists and K-line data, then runs an enhanced
 申万一级行业（`sw1_sectors.json`）默认优先读取 skill 目录本地文件，缺失时回退到 `/tmp/sw1_sectors.json`。如需重新生成：
 
 ```bash
-WESTOCK="/Applications/WorkBuddy.app/Contents/Resources/app.asar.unpacked/resources/builtin-skills/westock-data/scripts/index.js"
+WESTOCK="/Users/aldiadmin/.workbuddy/westock-data/scripts/index.js"
 NODE="/Users/aldiadmin/.workbuddy/binaries/node/versions/22.22.2/bin/node"
 SKILL_DIR="$(dirname "$0")/.workbuddy/skills/bowl-bottom-sector-scanner"
 

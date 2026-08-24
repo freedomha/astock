@@ -7,7 +7,7 @@ Critical patterns for extracting data from westock-data `--raw` JSON output. Get
 westock-data is a Node.js script, not a system binary:
 
 ```bash
-WD="/Applications/WorkBuddy.app/Contents/Resources/app.asar.unpacked/resources/builtin-skills/westock-data"
+WD="/Users/aldiadmin/.workbuddy/westock-data"
 NODE="/Users/aldiadmin/.workbuddy/binaries/node/versions/22.22.2/bin/node"
 $NODE $WD/scripts/index.js <command> [params] --raw
 ```

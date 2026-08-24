@@ -4,7 +4,7 @@
 - **必须加 `dangerouslyDisableSandbox: true`**：沙箱会屏蔽网络，所有 westock-data 命令（quote/kline/finance/consensus/rating/report/macro）不加此参数会返回"数据为空"或 `[]`。
 - **数据源高概率瞬时失败**：quote 批量常整批 `SKILL_004 未找到匹配数据`；kline/consensus/finance 偶发 `[]` 或 `null`（注意 `null` 不是空数组，需单独拒绝）。务必用重试循环（参考 /tmp/fetch_westock.py：最多10次，拒绝 `success:false`、空数组、`^null$`）。
 - **概念板块代码不可直接取 K 线**（如 pt02GN2324 电信运营返回 `[]`），改用其成分股 K 线自建等权/市值加权指数；申万行业代码（如 pt01801770 通信）可正常取 K 线。
-- 重试时 `WD` / `NODE` 环境变量不跨 Bash 调用持久，须用绝对路径：`WD=/Applications/WorkBuddy.app/Contents/Resources/app.asar.unpacked/resources/builtin-skills/westock-data`，`NODE=/Users/aldiadmin/.workbuddy/binaries/node/versions/22.22.2/bin/node`。
+- 重试时 `WD` / `NODE` 环境变量不跨 Bash 调用持久，须用绝对路径：`WD=/Users/aldiadmin/.workbuddy/westock-data`，`NODE=/Users/aldiadmin/.workbuddy/binaries/node/versions/22.22.2/bin/node`。
 
 ## 板块深度分析（sector-deep-analysis）产出规律
 - 报告命名：`<板块名>板块深度分析-YYYYMMDD.html`，存项目根目录。

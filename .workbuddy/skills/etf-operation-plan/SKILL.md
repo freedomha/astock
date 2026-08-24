@@ -400,12 +400,14 @@ validate_cost(shares, trade_price, commission_rate, min_commission, half_spread,
 ### Step 2: Fetch Real-Time Data
 
 ```bash
-WD="/Applications/WorkBuddy.app/Contents/Resources/app.asar.unpacked/resources/builtin-skills/westock-data"
+WD="/Users/aldiadmin/.workbuddy/westock-data"
 NODE="/Users/aldiadmin/.workbuddy/binaries/node/versions/22.22.2/bin/node"
 $NODE $WD/scripts/index.js quote <code> --raw > /tmp/op_quote.json
 $NODE $WD/scripts/index.js kline <code> --period day --limit 250 --raw > /tmp/op_kline.json
 ```
 （westock-data 必须 `dangerouslyDisableSandbox: true`）
+
+> **路径说明**：当前 WorkBuddy.app 不再内置 westock-data，`--raw` JSON 版 CLI 已复制到 `~/.workbuddy/westock-data`（自包含单文件，无 node_modules）。若该目录缺失，可从 `~/Library/Caches/com.workbuddy.workbuddy.BundleMigration/backups/WorkBuddy-5.3.14.36279234-1787212259474.backup.app/Contents/Resources/app.asar.unpacked/resources/builtin-skills/westock-data` 复制恢复。新版 `npx -y westock-data-skillhub@1.0.5` 输出 Markdown、无 `--raw` JSON 模式，与 Python 管线不兼容。
 
 ### Step 3: Trend-State Machine（PRIMARY，含周线完整性）
 

@@ -13,7 +13,7 @@ import sys
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-WESTOCK_BIN = "/Applications/WorkBuddy.app/Contents/Resources/app.asar.unpacked/resources/builtin-skills/westock-data/scripts/index.js"
+WESTOCK_BIN = "/Users/aldiadmin/.workbuddy/westock-data/scripts/index.js"
 NODE_BIN = "/Users/aldiadmin/.workbuddy/binaries/node/versions/22.22.2/bin/node"
 OUT_DIR = "/Users/aldiadmin/Documents/vscodeworkspace/astock"
 KLINE_DAYS = 250

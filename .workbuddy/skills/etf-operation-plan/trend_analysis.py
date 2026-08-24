@@ -37,6 +37,12 @@ import os
 import argparse
 import datetime as dt
 
+try:
+    import fcntl  # POSIX file locking (macOS/Linux) — guards shared state file writes
+    _HAVE_FLOCK = True
+except ImportError:
+    _HAVE_FLOCK = False
+
 
 # ─── Shared numeric utilities (self-contained) ─────────────────────────────
 
@@ -663,6 +669,46 @@ def migrate(prev, raw_code, raw_sub):
     return raw_code, raw_sub, "degradation", "pending", "降级，需连续2个完整周线确认"
 
 
+def _persist_state(code, eff_code, eff_sub, consecutive, state_file):
+    """Merge-update a single code's entry into the shared state file.
+
+    Safe for concurrent invocations: the whole read-merge-write is guarded by an
+    exclusive advisory lock (fcntl.flock) and the file is replaced atomically
+    (os.replace). Without this, parallel runs (e.g. multi-ETF operation plans)
+    each write back the entire store from a stale snapshot and the last writer
+    clobbers every other code's history. See feedback_state_save_race memory.
+    """
+    lock_path = state_file + ".lock"
+    try:
+        os.makedirs(os.path.dirname(state_file), exist_ok=True)
+    except OSError:
+        pass
+    with open(lock_path, "w") as lk:
+        if _HAVE_FLOCK:
+            fcntl.flock(lk, fcntl.LOCK_EX)
+        try:
+            store = {}
+            if os.path.exists(state_file):
+                try:
+                    with open(state_file) as f:
+                        store = json.load(f)
+                except Exception:
+                    store = {}
+            store[code] = {
+                "state": eff_code,
+                "sub_state": eff_sub,
+                "consecutive_weeks": consecutive,
+                "last_update": dt.date.today().isoformat(),
+            }
+            tmp = state_file + ".tmp"
+            with open(tmp, "w") as f:
+                json.dump(store, f, ensure_ascii=False, indent=2)
+            os.replace(tmp, state_file)  # atomic: readers never see partial file
+        finally:
+            if _HAVE_FLOCK:
+                fcntl.flock(lk, fcntl.LOCK_UN)
+
+
 def apply_state_machine(code, raw_trend, state_file, save_state):
     """Load previous state, apply migration rules, persist, return machine block."""
     prev = None
@@ -710,24 +756,7 @@ def apply_state_machine(code, raw_trend, state_file, save_state):
     }
 
     if save_state and state_file:
-        store = {}
-        if os.path.exists(state_file):
-            try:
-                with open(state_file) as f:
-                    store = json.load(f)
-            except Exception:
-                store = {}
-        store[code] = {
-            "state": eff_code,
-            "sub_state": eff_sub,
-            "consecutive_weeks": consecutive,
-            "last_update": dt.date.today().isoformat(),
-        }
-        try:
-            with open(state_file, "w") as f:
-                json.dump(store, f, ensure_ascii=False, indent=2)
-        except Exception:
-            pass
+        _persist_state(code, eff_code, eff_sub, consecutive, state_file)
 
     return machine
 
