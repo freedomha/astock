@@ -334,7 +334,7 @@ tr:hover td {{ background:#fafbfc; }}
 <div class="note">
   <b>📌 四道程序校验 (SOP §七) 结果:</b> {fail_gate_html or '<span class="muted">无候选</span>'}
   每个 T2/T3a 候选都跑操作引擎 <b>decide(trial=True)</b> 的四个校验 — 动作合法性 / 成本调整后 RR / 仓位数量 / 交易成本。
-  小额试仓(T2/T3a, ≤10%仓)用<b>更低 RR 下限(≥1.2)</b>，用极小仓位换更宽 RR；完整建仓仍须 RR≥2。
+  小额试仓(T2/T3a, ≤25%目标仓, 默认注入 25% 目标仓)用<b>更低 RR 下限(≥1.2)</b>，用极小仓位换更宽 RR；完整建仓仍须 RR≥2。
   任一失败自动降级 HOLD。所有金额/权重/成本参数来自 <b>records/portfolio_config.json</b>（不硬编码）。
 </div>
 

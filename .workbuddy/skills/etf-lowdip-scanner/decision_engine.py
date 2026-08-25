@@ -210,7 +210,8 @@ def decide(state_code, sub_state=None, role="core", config=None, code=None,
            first_observation=None, atr20=None, ma60_dir="flat",
            commission_rate=None, min_commission=None, half_spread=None,
            impact_pct=None, lot_size=None, max_cost_pct_of_trade=None,
-           max_cost_pct_of_reward=None, trial=False, trial_rr_floor=1.2):
+           max_cost_pct_of_reward=None, trial=False, trial_rr_floor=1.2,
+           trial_add_pct=None):
     costs_cfg = (config or {}).get("costs") or {}
     commission_rate = commission_rate if commission_rate is not None else costs_cfg.get("commission_rate", 0.00025)
     min_commission = min_commission if min_commission is not None else costs_cfg.get("min_commission", 5.0)
@@ -222,6 +223,8 @@ def decide(state_code, sub_state=None, role="core", config=None, code=None,
 
     # 小额试仓(T2/T3a)用更低 RR 门槛放行极小仓位; 完整建仓保持 rr>=2(=rr_floor 默认)
     trial_rr_floor = trial_rr_floor if trial_rr_floor is not None else 1.2
+    # 试仓比例(占目标仓): 可单次调用覆盖, 默认 TRIAL_ADD_PCT(10%)
+    trial_add_pct = trial_add_pct if trial_add_pct is not None else TRIAL_ADD_PCT
 
     # trend_analysis 返回 code="T3" + sub_state=T3a/T3b；归一化为子态以命中硬约束矩阵
     if state_code == "T3" and sub_state in ("T3a", "T3b"):
@@ -283,7 +286,7 @@ def decide(state_code, sub_state=None, role="core", config=None, code=None,
         gap = target_value - current_value
         current_weight = current_value / portfolio_value * 100 if portfolio_value else 0.0
 
-        single_add_cap = max(gap, 0.0) * (TRIAL_ADD_PCT / 100.0 if trial_mode else (FULL_ADD_PCT / 100.0))
+        single_add_cap = max(gap, 0.0) * (trial_add_pct / 100.0 if trial_mode else (FULL_ADD_PCT / 100.0))
         risk_budget = portfolio_value * risk_budget_pct / 100.0
 
         if proposed == "ADD":
@@ -318,7 +321,7 @@ def decide(state_code, sub_state=None, role="core", config=None, code=None,
             else:
                 cost_reasons = ["不适用（已降级/非加仓/价格不可用）"]
 
-            add_pct = TRIAL_ADD_PCT if trial_mode else FULL_ADD_PCT
+            add_pct = trial_add_pct if trial_mode else FULL_ADD_PCT
             if proposed == "ADD" and cost_pass and cost_info:
                 order_size = {
                     "pct_of_target": add_pct,

@@ -50,9 +50,14 @@ STRUCT_INVALIDATION_MULT = 0.5
 DISASTER_MULT = 1.0
 
 # 小额试仓放行门槛: 低吸分 + rr_net 双阈值
-# 完整建仓(操作计划)维持 rr>=2; 小额试仓(T2/T3a, ≤10%仓)用更低 TRIAL_RR_FLOOR, 用极小仓位换更宽 RR
+# 完整建仓(操作计划)维持 rr>=2; 小额试仓(T2/T3a, ≤25%目标仓)用更低 TRIAL_RR_FLOOR, 用极小仓位换更宽 RR
 TRIAL_SCORE_FLOOR = 50
 TRIAL_RR_FLOOR = 1.2
+TRIAL_ADD_PCT = 25            # 试仓金额 = 目标仓的 25%（用户规则：低吸分+RR达标时以默认25%目标仓试仓）
+DEFAULT_TARGET_WEIGHT_PCT = 25   # 未在 portfolio_config 定义的候选: 默认 25% 目标仓（=四只战术仓口径）
+DEFAULT_MAX_WEIGHT_PCT = 25      # 默认最大权重（与原四只持仓同口径）
+DEFAULT_RISK_BUDGET_PCT = 2.0    # 默认单标的风险预算 %（与原四只持仓同口径）
+DEFAULT_ROLE = "tactical_value"  # 默认角色
 
 # 第一观察区 / 计划买入价: 低吸计划设定为「回踩再买」——买在回踩支撑、目标看第一阻力
 OBSERVATION_MULT = 1.0       # 第一观察区 = 第一阻力（近20日高），突破/触及后兑现或加仓
@@ -102,12 +107,33 @@ def _load_decision_engine():
 
 
 def _three_validations(dengine, config, code, shares, price, decide_kwargs):
-    """Run decide() with the four program validations; returns the verdict dict."""
-    pos_cfg = (config.get("positions") or {}).get(code) or {}
-    role = pos_cfg.get("role", "tactical_value")
+    """Run decide() with the four program validations; returns the verdict dict.
+
+    未在 portfolio_config positions 中定义的候选(如扫描新发现标的):
+    若其低吸分/RR 达标(由 _run_program_check 分数门槛 + decide 内部 RR 判定),
+    注入默认 25% 目标仓(与原四只战术仓同口径), 试仓金额=目标仓的 25%,
+    使订单份额/交易成本得以计算, 而非因无目标权重算出 0 手被成本门误拦。
+    """
+    cfg = config
+    positions = config.get("positions") or {}
+    if code not in positions:
+        # 浅拷贝注入默认仓位, 不改动磁盘上的 portfolio_config.json
+        cfg = dict(config)
+        cfg["positions"] = dict(positions)
+        cfg["positions"][code] = {
+            "role": DEFAULT_ROLE,
+            "target_weight_pct": DEFAULT_TARGET_WEIGHT_PCT,
+            "max_weight_pct": DEFAULT_MAX_WEIGHT_PCT,
+            "risk_budget_pct": DEFAULT_RISK_BUDGET_PCT,
+        }
+        pos_cfg = cfg["positions"][code]
+    else:
+        pos_cfg = positions[code]
+    role = pos_cfg.get("role", DEFAULT_ROLE)
     res = dengine.decide(
-        role=role, config=config, code=code, shares=shares, price=price,
-        **decide_kwargs, trial=True, trial_rr_floor=TRIAL_RR_FLOOR)
+        role=role, config=cfg, code=code, shares=shares, price=price,
+        **decide_kwargs, trial=True, trial_rr_floor=TRIAL_RR_FLOOR,
+        trial_add_pct=TRIAL_ADD_PCT)
     v = res["validations"]
     verdict = "PASS" if (res["current_action"] == "ADD" and res.get("trial")
                          and v["action_legal"]["pass"] and v["risk_reward"]["pass"]
