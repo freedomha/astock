@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>黄金ETF华安 操作建议 20260909</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+<style>
+body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:#f7f9fa;color:#222;margin:0;padding:24px;line-height:1.75;font-size:14px}
+.wrap{max-width:1080px;margin:0 auto}
+h1{font-size:22px;color:#fff;margin:0}
+.header{border-radius:12px;padding:22px 28px;color:#fff;margin-bottom:18px}
+.header .meta{opacity:.85;font-size:12px;margin-top:6px}
+.card{background:#fff;border-radius:12px;padding:22px 26px;margin-bottom:16px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.opcard{background:linear-gradient(135deg,#fdfefe,#eaf2f8);border:2px solid #1a5276;border-radius:12px;padding:22px 26px;margin-bottom:18px}
+.opcard h2{margin-top:0;color:#154360;border:none;font-size:18px}
+table{width:100%;border-collapse:collapse;margin:10px 0;font-size:13px}
+th{background:#eaf2f8;color:#154360;text-align:left;padding:8px 10px;border:1px solid #d6eaf8}
+td{padding:7px 10px;border:1px solid #e8eef4;vertical-align:top}
+.up{color:#c0392b;font-weight:600}.down{color:#27ae60;font-weight:600}.flat{color:#7f8c8d}
+.tag{display:inline-block;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:600;margin-right:6px}
+.tag.hold{background:#fef9e7;color:#b7950b;border:1px solid #f4d03f}
+.tag.add{background:#d5f5e3;color:#1e8449;border:1px solid #58d68d}
+.tag.wait{background:#edbb99;border-color:#ca6f1e;color:#7e5109}
+.tag.forbid{background:#fadbd8;color:#c0392b;border:1px solid #ec7063}
+.tag.ok{background:#d5f5e3;color:#1e8449;border:1px solid #58d68d}
+.tag.bad{background:#fadbd8;color:#c0392b;border:1px solid #ec7063}
+h2.sec{color:#154360;border-left:5px solid #1a5276;padding-left:10px;font-size:17px;margin-top:0}
+.trig{background:#fbfcfc;border-left:3px solid #1a5276;padding:10px 14px;margin:8px 0;font-size:13px}
+.muted{color:#7f8c8d;font-size:12px}
+.warnbox{background:#fdedec;border-left:4px solid #c0392b;padding:10px 14px;margin:10px 0;font-size:13px}
+.goodbox{background:#eafaf1;border-left:4px solid #1e8449;padding:10px 14px;margin:10px 0;font-size:13px}
+.infobox{background:#fbfcfc;border-left:4px solid #5dade2;padding:10px 14px;margin:10px 0;font-size:13px}
+.chart{width:100%;height:380px}
+ul{margin:6px 0;padding-left:22px}li{margin:3px 0}
+.ev{font-size:12px;color:#5d6d7e;border-top:1px dashed #dfe6ec;padding-top:6px;margin-top:6px}
+</style>
+</head>
+<body><div class="wrap">
+<div class="header" style="background:linear-gradient(135deg,#7d6608,#b7950b)">
+<h1>黄金ETF华安（SH518880）操作建议</h1>
+<div class="meta">评估时点 2026-09-09 09:12（<b>开盘前</b>，价格基准 2026-09-08 收盘）｜ 数据来源：腾讯自选股（westock-data）＋趋势状态机 ＋ 操作引擎四道程序校验 ｜ 仅供研究参考，不构成投资建议</div>
+</div>
+
+<div class="opcard">
+<h2>⚡ 今日操作卡</h2>
+<table>
+<tr><th style="width:130px">当前状态</th><td><b>反转初步确认（T3（T3a））</b>，effective <b>T3（T3a）</b>，持续 5 个完整周（same 迁移，confirmed；状态保持不变，需连续2个完整周线确认）</td></tr>
+<tr><th>当前动作</th><td><span class="tag hold">HOLD</span>　持有，不新增（等待 T3b 与回踩）<div class="muted" style="margin-top:4px">T3a 反转初步确认(MA60仍向下)：价格结构转强但MA60仍下行，反转初步确认</div></td></tr>
+<tr><th>已有仓位</th><td>300 份，当前市值 2,714.10 元，占目标仓位（20% = 6,000.00 元）的 <b>45.2%</b>（组合权重 9.05%）　<span class="muted">避险型战术仓（tactical_hedge）</span></td></tr>
+<tr><th>禁止动作</th><td><span class="tag forbid">⛔ CHASE</span></td></tr>
+<tr><th>程序校验摘要</th><td>动作合法性 <span class="tag ok">✓ 通过</span>　风险收益 <span class="tag hold">— 不适用</span>　仓位数量 <span class="tag ok">✓ 通过</span>　交易成本 <span class="tag ok">✓ 通过</span>
+<div class="muted" style="margin-top:4px">不适用（当前非加仓动作）　｜　不适用（当前非加仓动作或价格不可用，未计算金额级交易成本）</div></td></tr>
+<tr><th>交易成本测算</th><td>本期非加仓动作，未生成订单。上表为触发后的预测算：按缺口 20% ≈ 657 元、8.90 元/份 → 700 份（7 手）= 623 元，单笔成本 5.31 元（占 0.85%，阈值 1%），成本占预期收益 1.5%（阈值 15%）→ 成本门可过。</td></tr>
+<tr><th>下次复评</th><td>周五收盘后（完整周线形成后重新计算），或提前触及上述任意触发位</td></tr>
+</table>
+<div class="trig"><b style="color:#1a5276">▎增加触发</b>（首次增加战术仓目标仓位 20%（第二周继续确认且未明显扩张，再增加 20%））<br>完整周线状态迁移为 T3b 且 MA60 斜率走平或转正 且 日线回踩 MA20/MA60 附近后收盘重新站回 且 reward/risk（9.4−8.9 vs 8.9−8.69）>= 2（成本调整后） 且 通过交易成本门（单边成本占比/成本占预期收益/最小1手）</div><div class="trig"><b style="color:#b7950b">▎降低触发</b>（降低战术仓 50%）<br>连续 2 日收盘低于结构失效位（8.69）</div><div class="trig"><b style="color:#c0392b">▎退出触发</b>（退出剩余战术仓（核心仓位是否退出由组合用途决定））<br>完整周线进入 T8，或单日收盘跌破灾难保护位（8.534，超 1 ATR）</div>
+<div class="warnbox"><b>失效条件：</b>当前逻辑基于 T3a（反转初步确认(MA60仍向下)）；收盘连续跌破结构失效位 8.69 即失效</div>
+<div class="infobox"><b>五层门控结论：</b>数据门 <span class="tag ok">通过</span>　趋势门 <span class="tag ok">通过</span>（T3a 硬约束已执行）　资产逻辑门 <span class="tag bad">不通过</span>　风险收益门 <span class="tag bad">不通过（现价 RR 0.99）</span>　组合门 <span class="tag ok">通过（单标的模式）</span></div>
+</div>
+
+<h2 class="sec">一、数据状态</h2>
+<div class="card">
+<ul>
+<li>最后交易日：<b>2026-09-08</b>（daily_bar_status = <b>complete</b> —— 已收盘，当日 K 线定稿；报告生成于 2026-09-09 09:12 开盘前，<b>不含盘中数据</b>）</li>
+<li>weekly_bar_status = <b>incomplete_current_week</b>：本周已有 2 根日线（9/7–9/8），仅作预览（provisional close 9.047，区间 9.01–9.123），<b>不参与</b> T3/T4/T7/T8 的最终迁移判断</li>
+<li>最后一个<b>完整</b>自然交易周：2026-08-31 ~ 09-04，周线收盘 9.16；趋势判断（周线斜率 / 10·20·40 周均线 / 突破与失效 / T0–T8 分类）全部基于该完整周</li>
+<li>K 线数量：250 个自然日（2025-08-28 起）｜ 周线样本 53 周，sufficient = True｜ 检测到大跳空 1 处</li>
+<li>收盘价 9.047，昨收 9.02，当日涨跌 <span class="up">+0.30%</span></li>
+<li class="muted">数据门结论：K 线 250 日充足、周线样本 53 周充分、日线已收盘，且状态<b>未在本周切换</b>（T3/T3a，same/confirmed）→ <b>通过</b>。周线当周仅 2 根日线（9/7–9/8）仍不完整，趋势判断维持「最后一个完整自然交易周（8/31–9/4）」口径。</li>
+</ul>
+</div>
+
+<h2 class="sec">二、持仓状态</h2>
+<div class="card">
+<table>
+<tr><th>剩余份额</th><td>300 份</td><th>账面持仓均价</th><td>8.6370</td></tr>
+<tr><th>资金回本价</th><td>8.63700</td><th>当前价（2026-09-08 收）</th><td>9.047</td></tr>
+<tr><th>已实现盈亏</th><td class="flat">+0.00 元</td><th>未实现盈亏</th><td class="up">+123.00 元（<span class="up">+4.75%</span>）</td></tr>
+<tr><th>总盈亏</th><td class="up">+123.00 元</td><th>目标仓位 / 缺口</th><td>6,000.00 元 / 3,285.90 元（已建 45.2%）</td></tr>
+</table>
+<p class="muted">避险型战术仓（tactical_hedge）：target 20% / max 25% / 单标的风险预算 2.0%（= 600.00 元）。组合总资产 30,000 元，四只持仓合计市值 7,239.80 元（占本金 24.1%）。</p>
+</div>
+
+<h2 class="sec">三、ETF 属性和核心驱动</h2>
+<div class="card">
+<p><b>资产类型：</b>商品现货 ETF（commodity_futures_etf，黄金现货）　<b>跟踪标的：</b>上海黄金交易所 Au99.99 现货合约（人民币计价）</p>
+<p><b>暴露映射：</b><span class="muted">asset_class=commodity_futures_etf ｜ direct_commodity_exposure=<b>direct（直接）</b> ｜ 传导通道：国际金价 · 人民币汇率 · 实际利率 · 避险需求</span></p>
+<p><b>驱动逻辑：</b>黄金 ETF 直接持有实物/现货合约，价格 ≈ 人民币金价，<b>与实际利率负相关、与避险需求正相关</b>。中长期核心变量为：美元实际利率路径、美联储政策、美元指数、人民币汇率、央行购金与地缘避险。</p>
+<p><b>核心风险变量：</b>① 美联储 9 月议息（9/15–16）加息落地的概率与幅度；② 强非农后实际利率预期上修；③ 人民币汇率波动对人民币金价的额外损益；④ 前期跌幅已深（距 250 日高 -24.5%），反弹与二次探底皆有可能。</p>
+<h3 style="font-size:14px;color:#154360;margin-bottom:4px">催化剂证据（每条外部事实均须可追溯）</h3>
+<table>
+<tr><th style="width:73%">事实主张（claim）</th><th>来源与证据属性</th></tr>
+<tr><td>美国 8 月非农新增就业 16.2 万人，远高于市场预期的 5.6–8 万人，7 月仅 2.1 万；失业率 4.1% 持平历史低位，数据大超预期直接改写短期货币政策定价</td><td style="width:27%"><b>海外市场周报｜非农大超预期，美联储9月加息预期再度回升</b><br><span class="muted">百家号（Wind 数据）｜2026-09-06</span><br><a href="https://baijiahao.baidu.com/s?id=1875578408396539241" target="_blank" style="font-size:11px;word-break:break-all">https://baijiahao.baidu.com/s?id=1875578408396539241</a><br><span class="muted">类型 hard_data｜资产关联 direct｜新鲜度 3 天｜交叉验证 是</span></td></tr><tr><td>9/7 国际黄金亚盘小幅走弱，金价交投于 4400 美元附近，延续非农落地后的回调节奏；非农公布后金价一度跳水超 100 美元后跌幅收窄</td><td style="width:27%"><b>新浪贵金属热点小时报丨2026年09月07日19时</b><br><span class="muted">新浪财经｜2026-09-07</span><br><a href="https://k.sina.com.cn/article_7857201856_1d45362c001908mj24.html" target="_blank" style="font-size:11px;word-break:break-all">https://k.sina.com.cn/article_7857201856_1d45362c001908mj24.html</a><br><span class="muted">类型 hard_data｜资产关联 direct｜新鲜度 2 天｜交叉验证 是</span></td></tr><tr><td>据 CME「美联储观察」，9/8 美联储 9 月加息概率为 60.4%；与议息挂钩的掉期已计入约 16 个基点加息幅度</td><td style="width:27%"><b>美联储动态（财联社）</b><br><span class="muted">财联社｜2026-09-08</span><br><a href="https://www.cls.cn/subject/3140" target="_blank" style="font-size:11px;word-break:break-all">https://www.cls.cn/subject/3140</a><br><span class="muted">类型 hard_data｜资产关联 direct｜新鲜度 1 天｜交叉验证 否</span></td></tr><tr><td>沃勒等官员把「核心 CPI 环比 0.2% vs 0.3%」作为维持或加息的直接阈值，本周四 PPI、周五 CPI 成为全周最核心的交易开关；9/15–16 美联储议息为本月终极事件</td><td style="width:27%"><b>非农直接三倍打脸加上加息板上钉钉 黄金4400还能撑几天?</b><br><span class="muted">同花顺财经｜2026-09-07</span><br><a href="https://stock.10jqka.com.cn/20260907/c679650759.shtml" target="_blank" style="font-size:11px;word-break:break-all">https://stock.10jqka.com.cn/20260907/c679650759.shtml</a><br><span class="muted">类型 soft_opinion｜资产关联 direct｜新鲜度 2 天｜交叉验证 否</span></td></tr>
+</table>
+<h3 style="font-size:14px;color:#154360;margin-bottom:4px">资产逻辑门（Gate 3）判定</h3>
+<div class="warnbox"><b>不通过（不构成新增理由）。</b>驱动方向由 9/3 的「边际改善」转回「承压」：8 月非农 16.2 万大超预期 → 加息预期上修（9/8 CME 60.4%）→ 实际利率预期上行压制无息资产。金价自非农后回落至 4400 美元附近，本 ETF 从 9/4 收 9.16 回落至 9.047（-1.2%）。<b>驱动与技术趋势不一致</b>（周线仍 up，但基本面转负），且 9/15–16 FOMC 前 CPI/PPI 为二元事件，不满足「底层驱动仍成立 + 与技术趋势一致」两条。</div>
+<p class="muted">口径约束：新闻不作为交易触发器，仅用于趋势解释、风险提醒与复评触发；无结构化来源时降级输出「当前未取得足够可验证的宏观驱动数据，操作判断以价格趋势为主」。</p>
+</div>
+
+<h2 class="sec">四、中长期趋势状态（主决策层）</h2>
+<div class="card">
+<table>
+<tr><th style="width:150px">趋势状态</th><td><b>反转初步确认（T3（T3a））</b>　父状态持续 5 个完整周</td></tr>
+<tr><th>判定依据</th><td>· 周线转上(slope +12.7%)<br>· 价格站上MA60(+3.3%)<br>· 低点抬高，但MA60仍向下（T3a，反转初步确认，需等待MA60走平/转上）<br><span class="muted">置信度：medium</span></td></tr>
+<tr><th>周线（完整周）</th><td>10 周斜率 <b><span class="up">+12.73%</span></b>（方向 up）｜20 周斜率 <span class="down">-9.11%</span><br>MA10w 8.821 ｜ MA20w 9.061 ｜ MA40w 9.519 ｜ 周 ATR 0.37 ｜ 量比 1.83<br>周线突破确认 False ｜ 周线失效确认 False</td></tr>
+<tr><th>均线排列</th><td>price > ma60 < ma120 < ma250　多头排列 False ｜ 空头排列 False<br>MA20 9.1933 ｜ MA60 8.761（<span class="up">+3.26%</span>，斜率 <span class="up">+0.16%</span>，flat）｜ MA120 9.188（<span class="down">-1.54%</span>，斜率 <span class="down">-3.04%</span>，down）｜ MA250 9.291（斜率 <span class="flat">+0.00%</span>，flat）</td></tr>
+<tr><th>高低点结构</th><td>higher_high_higher_low（higher_high True / higher_low True）｜ 近期高低 9.62 / 8.83 ｜ 前值 9.16 / 8.26</td></tr>
+<tr><th>位置与延伸</th><td>250 日分位 <b>35.1%</b>（区间 7.46–11.98）｜ 距 250 日高 <span class="down">-24.48%</span>（deep）<br>距 MA60 <b>1.83 ATR</b>，状态 <b>not_extended</b></td></tr>
+<tr><th>波动率</th><td>ATR20 0.1561 ｜ ATR60 0.1371 ｜ ATR 比 1.14（normal）</td></tr>
+<tr><th>自身动量</th><td>improving（无基准，仅称「自身动量」不称「相对强弱」）｜ 60 日 <span class="up">+1.31%</span> ｜ 120 日 <span class="down">-14.97%</span></td></tr>
+<tr><th>状态机迁移</th><td>上次状态 T3（T3a） → 原始 T3（T3a） → <b>生效 T3（T3a）</b><br>迁移类型 <b>same</b>｜确认状态 <b>confirmed</b>｜状态保持不变，需连续2个完整周线确认</td></tr>
+</table>
+<div class="goodbox"><b>本期最重要的边际变化：MA60 斜率由 down 转 flat。</b>MA60 = 8.761，20 日斜率 +0.16%（上期为 -0.39%），方向已由「向下」转为「走平」，但尚未转正（T3b 要求 ma60_dir == up）。价格 9.047 位于 MA60 上方 +3.26%、MA120（9.188）下方 -1.54%。这意味着黄金是四只中<b>最接近 T3b 升级</b>的标的——只需 MA60 斜率转正即可；但在正式迁移前，硬约束仍按 T3a 执行（维持为主、禁止积极加仓、禁止追高）。</div>
+<div class="chart" id="mainchart"></div>
+</div>
+
+<h2 class="sec">五、技术结构和形态（辅助层）</h2>
+<div class="card">
+<table>
+<tr><th style="width:150px">关键价位</th><td></td></tr>
+<tr><th>S1 / S2（60·120 日低）</th><td>8.22 / 8.22</td></tr><tr><th>R1（60 日高）</th><td>9.62</td></tr><tr><th>R2（120 日高）</th><td>10.64</td></tr><tr><th>MA60 / MA120 / MA250</th><td>8.761 / 9.188 / 9.291</td></tr><tr><th>成本锚（账面均价）</th><td>8.637（现价 +4.75%）</td></tr><tr><th>结构支撑（higher-low）</th><td>8.83（9/2 低点）</td></tr><tr><th><b>结构失效位</b></th><td><b>8.69</b>　= 结构支撑 8.83 − 0.9×ATR20(0.1561)</td></tr><tr><th><b>灾难保护位</b></th><td><b>8.53</b>　= 结构失效位 8.69 − 1.0×ATR20</td></tr><tr><th>趋势观察位</th><td>9.00 / 9.188（MA120）</td></tr>
+</table>
+<h3 style="font-size:14px;color:#154360;margin-bottom:4px">五形态辅助评分（<b>不可覆盖趋势状态动作</b>）</h3>
+<table>
+<tr><th style="width:34%">形态</th><th style="width:14%">评分</th><th>标签</th></tr>
+<tr><td>碗底</td><td style="text-align:right"><b>18</b></td><td>⚪ 观望</td></tr><tr><td>箱体</td><td style="text-align:right"><b>40</b></td><td>⚪ 趋势行情</td></tr><tr><td>W 底</td><td style="text-align:right"><b>0</b></td><td>非W底</td></tr><tr><td>头肩底</td><td style="text-align:right"><b>0</b></td><td>⚪ 非头肩底</td></tr><tr><td>2B 底</td><td style="text-align:right"><b>0</b></td><td>无2B信号</td></tr>
+</table>
+<div class="infobox">五形态中<b>无任何一项给出底部或突破信号</b>（碗底 18 / 箱体 40 / W 底 0 / 头肩底 0 / 2B 0）。形态层不提供任何额外证据，也不改变 T3a 的硬约束动作——这正是「趋势状态为主决策层」的体现：即便形态分很低，只要状态未升级，动作仍是 HOLD。</div>
+</div>
+
+<h2 class="sec">六、未来 1–3 个月情景</h2>
+<div class="card">
+<table>
+<tr><th style="width:11%">情景</th><th style="width:26%">触发条件</th><th style="width:24%">仓位后果</th><th style="width:19%">确认条件</th><th style="width:10%">证据强度</th><th style="width:10%">数据完整度</th></tr>
+<tr><td><b>主场景<br>（延续 T3a）</b></td><td>MA60 由 flat 转 up，价格守住 8.83–9.00 区间并重新站上 MA120（9.188）</td><td>维持现有 300 份不动；待完整周线迁至 T3b 且回踩 8.90 不破，再按 20% 缺口首次增加</td><td>完整周线 T3a→T3b 且 MA60 斜率转正；日线收盘站上 MA120</td><td>中</td><td>高</td></tr><tr><td><b>备选场景<br>（回踩后升级）</b></td><td>先回踩 MA60（8.76）甚至结构低点 8.83 附近，随后周线仍维持 up</td><td>回踩不破 8.69 即视为健康回踩；若同时 MA60 转正，则触发首次增加（回踩买点优于追高）</td><td>回踩过程中 250 日分位不跌破 30%、周线 10 周斜率维持 > 0</td><td>中</td><td>中</td></tr><tr><td><b>失效场景</b></td><td>连续 2 日收盘跌破 8.69，或完整周线进入 T8</td><td>降低战术仓 50%；跌破 8.53 退出剩余战术仓</td><td>收盘确认（非盘中瞬时跌破）＋持续 2 日</td><td>高</td><td>高</td></tr>
+</table>
+<p class="muted">不输出未经回测校准的百分比概率。情景用于框定应对方式，而非预测。</p>
+</div>
+
+<h2 class="sec">七、操作计划</h2>
+<div class="card">
+<h3 style="font-size:14px;color:#154360;margin-bottom:4px">战术仓位动作（避险型战术仓）</h3>
+<p>T3a 的硬约束为「维持为主 + 小额等待回踩 + 禁止积极加仓 + 禁止追高」。当前持仓 300 份、占目标 45.2%，<b>维持不动</b>。目标缺口 3,285.90 元不主动补足，等待状态升级与回踩同时满足。</p>
+
+<div class="trig"><b>分批计划（仅在触发后执行，非立即执行）：</b><br>
+① 首次：完整周线迁移为 T3b、MA60 斜率转正、日线回踩至 8.90 附近后收盘重新站回 8.95 以上、RR≥2、通过成本门 → 按缺口 20%（≈657 元）挂单。<br>
+② 第二次：第二周继续确认且未明显扩张 → 再增加 20%。<br>
+③ 任一批次若单笔金额低于 1 手（100 份）或单边成本占比 > 1%，自动降级为持有。</div>
+<div class="warnbox"><b>不应采取的动作：</b>T3a 下<b>禁止追高</b>（现价 9.047 的 RR 仅 0.99，风险收益门直接否决）；禁止积极加仓；禁止因「CPI 可能走弱」等新闻预期提前建仓；禁止使用 MA60（8.761）作为回踩锚——MA60 已低于结构低点 8.83，按 MA60 计算的 RR 分母失真不可采信，统一使用 <b>8.90</b>。</div>
+<p><b>最大可接受风险：</b>单标的风险预算 600.00 元。按计划买入价 8.90、结构失效位 8.69 计算，单份风险 0.21 元，理论最大可买 2,857 份；但受缺口 20% 上限约束，实际下单远小于此，风险敞口可控。最大可接受回撤为组合的 15%。</p>
+</div>
+
+<h2 class="sec">八、未来 3–6 个月观察区间</h2>
+<div class="card">
+<table>
+<tr><th style="width:150px">第一观察区</th><td><b>9.40 – 9.62</b>　（距现价 +3.9% ~ +6.3%）<div class="muted">计算方法：60 日高点 9.62（前期密集区上沿）与 9.40（8/28 前平台）构成的压力带；同时为 MA120(9.188) 上方的第一个量度目标</div></td></tr>
+<tr><th>第二观察区</th><td><b>9.62 – 10.64</b><div class="muted">计算方法：120 日高点 10.64；突破 9.62 后按 8.22–9.62 区间的箱体量度空间外推</div></td></tr>
+<tr><th>趋势跟随退出</th><td>完整周线进入 T7/T8，或价格站上 9.62 后周线 10 周斜率重新转负 → 由「跟随」转为「保护收益」，降低战术仓 50%</td></tr>
+</table>
+<div class="infobox"><b>风险收益门（Gate 4）复算：</b>现价 9.047 追高：RR = (9.40−9.047)/(9.047−8.69) = <b>0.99</b> <span class='down'>✗ 不通过（<2）</span>。<br>回踩 8.90 买入：RR = (9.40−8.90)/(8.90−8.69) = <b>2.38</b> <span class='up'>✓ 通过</span>（成本调整后约 2.32，仍 ≥2）。<br>参考成本：按缺口 20% ≈ 657 元、8.90 元/份 → 700 份（7 手）= 623 元，单笔成本 max(5, 623×0.00025)=5.00 + 0.31 = <b>5.31 元（占 0.85%）</b>，成本占预期收益 5.31/700/0.50 = <b>1.5%</b>，成本门可通过。<br><b>结论：追高被 Gate 4 否决，回踩 8.90 可行——但本期因状态未升级（仍 T3a）+ 回踩未发生，动作仍为 HOLD。</b></div>
+</div>
+
+<h2 class="sec">九、下次复评条件</h2>
+<div class="card">
+<ul>
+<li><b>定期：</b>2026-09-11（周五）收盘后 —— 完整自然交易周形成，重新计算 T0–T8 状态与迁移</li>
+<li><b>价格：</b>触及 8.83（结构低点）/ 8.69（结构失效位）/ 9.188（MA120）/ 9.62（60 日高）任一位置；回踩至 8.90 加仓区</li>
+<li><b>需特别确认：</b>MA60 斜率是否由 flat 转正（T3a→T3b 的唯一剩余条件）</li>
+<li><b>趋势：</b>完整周线状态发生迁移（尤其是升/降至 T3b、T4、T7、T8）；MA120 方向由 down 转 flat/up；周线突破或失效确认翻转</li>
+<li><b>事件：</b>9/10 美国 PPI、9/11 美国 CPI（沃勒阈值核心 CPI 环比 0.2% vs 0.3%）；9/15–16 美联储议息；人民币汇率大幅波动；地缘冲突升级或缓和</li>
+</ul>
+</div>
+
+<h2 class="sec">十、风险和限制</h2>
+<div class="card">
+<ul>
+<li><b>数据限制：</b>本报告基于 2026-09-08 收盘定稿数据，生成于 2026-09-09 开盘前；当日盘中如有重大变化需重新计算。周线口径采用最后一个完整自然交易周（2026-08-31 ~ 09-04），当前周仅作预览，不触发最终迁移。</li>
+<li><b>模型限制：</b>趋势状态机依赖周线斜率、均线与高低点结构的阈值划分，存在边界抖动；形态评分为辅助证据，不可覆盖趋势状态动作；情景分析不含未经校准的概率。</li>
+<li><b>未校准指标：</b>观察区间为价位区间而非收益预测；ATR 缓冲基于近 20 日波幅，波幅扩张时会低估风险；距 250 日高回撤与分位为描述性指标。</li>
+<li><b>组合配置提醒：</b>组合总资产 30,000 元、单标的目标 20%（6,000 元）、风险预算 2%（600 元）。ETF 免印花税，但佣金万 2.5 单笔最低 5 元 + 单边价差 0.05% + 最小交易单位 1 手（100 份），千元级订单单边成本易超 0.5%，小资金分批加仓须逐笔通过成本门。</li>
+<li><b>免责：</b>本报告仅供研究参考，不构成投资建议。市场有风险，决策请自行判断。</li>
+</ul>
+</div>
+
+</div>
+<script>
+(function(){
+  var c = document.getElementById('mainchart');
+  if(!c || typeof echarts === 'undefined') return;
+  var ch = echarts.init(c);
+  var dates = ["2026-04-30", "2026-05-06", "2026-05-07", "2026-05-08", "2026-05-11", "2026-05-12", "2026-05-13", "2026-05-14", "2026-05-15", "2026-05-18", "2026-05-19", "2026-05-20", "2026-05-21", "2026-05-22", "2026-05-25", "2026-05-26", "2026-05-27", "2026-05-28", "2026-05-29", "2026-06-01", "2026-06-02", "2026-06-03", "2026-06-04", "2026-06-05", "2026-06-08", "2026-06-09", "2026-06-10", "2026-06-11", "2026-06-12", "2026-06-15", "2026-06-16", "2026-06-17", "2026-06-18", "2026-06-22", "2026-06-23", "2026-06-24", "2026-06-25", "2026-06-26", "2026-06-29", "2026-06-30", "2026-07-01", "2026-07-02", "2026-07-03", "2026-07-06", "2026-07-07", "2026-07-08", "2026-07-09", "2026-07-10", "2026-07-13", "2026-07-14", "2026-07-15", "2026-07-16", "2026-07-17", "2026-07-20", "2026-07-21", "2026-07-22", "2026-07-23", "2026-07-24", "2026-07-27", "2026-07-28", "2026-07-29", "2026-07-30", "2026-07-31", "2026-08-03", "2026-08-04", "2026-08-05", "2026-08-06", "2026-08-07", "2026-08-10", "2026-08-11", "2026-08-12", "2026-08-13", "2026-08-14", "2026-08-17", "2026-08-18", "2026-08-19", "2026-08-20", "2026-08-21", "2026-08-24", "2026-08-25", "2026-08-26", "2026-08-27", "2026-08-28", "2026-08-31", "2026-09-01", "2026-09-02", "2026-09-03", "2026-09-04", "2026-09-07", "2026-09-08"];
+  var close = [9.68, 9.79, 9.91, 9.88, 9.77, 9.81, 9.8, 9.8, 9.55, 9.51, 9.52, 9.37, 9.45, 9.46, 9.51, 9.45, 9.35, 9.13, 9.4, 9.34, 9.41, 9.28, 9.29, 9.25, 8.95, 9.01, 8.74, 8.51, 8.66, 8.93, 8.95, 8.96, 8.91, 8.72, 8.54, 8.52, 8.29, 8.39, 8.45, 8.38, 8.27, 8.48, 8.67, 8.63, 8.6, 8.59, 8.54, 8.54, 8.42, 8.37, 8.37, 8.36, 8.31, 8.32, 8.47, 8.56, 8.56, 8.39, 8.5, 8.4, 8.39, 8.36, 8.43, 8.42, 8.41, 8.64, 8.8, 8.89, 9.01, 9.01, 9.1, 9.04, 8.95, 9.07, 9.08, 8.97, 9.23, 9.39, 9.56, 9.53, 9.52, 9.45, 9.48, 9.14, 9.12, 8.9, 9.11, 9.16, 9.02, 9.047];
+  var ma20 = [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 9.574, 9.5605, 9.535, 9.504, 9.4725, 9.4315, 9.3915, 9.3385, 9.274, 9.2295, 9.2005, 9.172, 9.1515, 9.1245, 9.0875, 9.039, 8.9925, 8.9395, 8.9025, 8.855, 8.807, 8.75, 8.71, 8.679, 8.648, 8.6305, 8.6095, 8.5995, 8.601, 8.589, 8.561, 8.532, 8.502, 8.472, 8.452, 8.4485, 8.4505, 8.464, 8.464, 8.4665, 8.4675, 8.4735, 8.4675, 8.4555, 8.445, 8.4355, 8.438, 8.451, 8.4685, 8.498, 8.53, 8.5665, 8.6005, 8.6325, 8.67, 8.7005, 8.721, 8.7545, 8.8045, 8.8575, 8.914, 8.9705, 9.025, 9.0775, 9.1135, 9.149, 9.162, 9.1775, 9.191, 9.1915, 9.1933];
+  var ma60 = [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 8.9495, 8.928, 8.9042, 8.8795, 8.8552, 8.8325, 8.813, 8.7963, 8.7812, 8.7722, 8.7638, 8.7568, 8.7513, 8.743, 8.7365, 8.7293, 8.7213, 8.7193, 8.7237, 8.7263, 8.7295, 8.7313, 8.7342, 8.7373, 8.7355, 8.7383, 8.7365, 8.7427, 8.7535, 8.7595, 8.7614];
+  ch.setOption({
+    animation:false,
+    tooltip:{trigger:'axis'},
+    legend:{data:['收盘','MA20','MA60'],top:0},
+    grid:{left:56,right:24,top:36,bottom:56},
+    xAxis:{type:'category',data:dates,axisLabel:{rotate:45,fontSize:10}},
+    yAxis:{type:'value',scale:true,axisLabel:{fontSize:10}},
+    series:[
+      {name:'收盘',type:'line',data:close,showSymbol:false,lineStyle:{width:2,color:'#1a5276'}},
+      {name:'MA20',type:'line',data:ma20,showSymbol:false,lineStyle:{width:1,color:'#e67e22'}},
+      {name:'MA60',type:'line',data:ma60,showSymbol:false,lineStyle:{width:1,color:'#7f8c8d'}},
+      {name:'结构失效位',type:'line',data:[8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69, 8.69],showSymbol:false,lineStyle:{width:1,type:'dashed',color:'#c0392b'}},
+      {name:'灾难保护位',type:'line',data:[8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534, 8.534],showSymbol:false,lineStyle:{width:1,type:'dotted',color:'#8e44ad'}},
+      {name:'第一观察区',type:'line',data:[9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4, 9.4],showSymbol:false,lineStyle:{width:1,type:'dashed',color:'#27ae60'}}
+    ]
+  });
+  window.addEventListener('resize',function(){ch.resize();});
+})();
+</script>
+</body></html>

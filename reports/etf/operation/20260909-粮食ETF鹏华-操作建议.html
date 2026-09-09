@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>粮食ETF鹏华 操作建议 20260909</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+<style>
+body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:#f7f9fa;color:#222;margin:0;padding:24px;line-height:1.75;font-size:14px}
+.wrap{max-width:1080px;margin:0 auto}
+h1{font-size:22px;color:#fff;margin:0}
+.header{border-radius:12px;padding:22px 28px;color:#fff;margin-bottom:18px}
+.header .meta{opacity:.85;font-size:12px;margin-top:6px}
+.card{background:#fff;border-radius:12px;padding:22px 26px;margin-bottom:16px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.opcard{background:linear-gradient(135deg,#fdfefe,#eaf2f8);border:2px solid #1a5276;border-radius:12px;padding:22px 26px;margin-bottom:18px}
+.opcard h2{margin-top:0;color:#154360;border:none;font-size:18px}
+table{width:100%;border-collapse:collapse;margin:10px 0;font-size:13px}
+th{background:#eaf2f8;color:#154360;text-align:left;padding:8px 10px;border:1px solid #d6eaf8}
+td{padding:7px 10px;border:1px solid #e8eef4;vertical-align:top}
+.up{color:#c0392b;font-weight:600}.down{color:#27ae60;font-weight:600}.flat{color:#7f8c8d}
+.tag{display:inline-block;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:600;margin-right:6px}
+.tag.hold{background:#fef9e7;color:#b7950b;border:1px solid #f4d03f}
+.tag.add{background:#d5f5e3;color:#1e8449;border:1px solid #58d68d}
+.tag.wait{background:#edbb99;border-color:#ca6f1e;color:#7e5109}
+.tag.forbid{background:#fadbd8;color:#c0392b;border:1px solid #ec7063}
+.tag.ok{background:#d5f5e3;color:#1e8449;border:1px solid #58d68d}
+.tag.bad{background:#fadbd8;color:#c0392b;border:1px solid #ec7063}
+h2.sec{color:#154360;border-left:5px solid #1a5276;padding-left:10px;font-size:17px;margin-top:0}
+.trig{background:#fbfcfc;border-left:3px solid #1a5276;padding:10px 14px;margin:8px 0;font-size:13px}
+.muted{color:#7f8c8d;font-size:12px}
+.warnbox{background:#fdedec;border-left:4px solid #c0392b;padding:10px 14px;margin:10px 0;font-size:13px}
+.goodbox{background:#eafaf1;border-left:4px solid #1e8449;padding:10px 14px;margin:10px 0;font-size:13px}
+.infobox{background:#fbfcfc;border-left:4px solid #5dade2;padding:10px 14px;margin:10px 0;font-size:13px}
+.chart{width:100%;height:380px}
+ul{margin:6px 0;padding-left:22px}li{margin:3px 0}
+.ev{font-size:12px;color:#5d6d7e;border-top:1px dashed #dfe6ec;padding-top:6px;margin-top:6px}
+</style>
+</head>
+<body><div class="wrap">
+<div class="header" style="background:linear-gradient(135deg,#145a32,#27ae60)">
+<h1>粮食ETF鹏华（SZ159698）操作建议</h1>
+<div class="meta">评估时点 2026-09-09 09:12（<b>开盘前</b>，价格基准 2026-09-08 收盘）｜ 数据来源：腾讯自选股（westock-data）＋趋势状态机 ＋ 操作引擎四道程序校验 ｜ 仅供研究参考，不构成投资建议</div>
+</div>
+
+<div class="opcard">
+<h2>⚡ 今日操作卡</h2>
+<table>
+<tr><th style="width:130px">当前状态</th><td><b>反转初步确认（T3（T3b））</b>，effective <b>T3（T3b）</b>，持续 3 个完整周（same 迁移，confirmed；状态保持不变，需连续2个完整周线确认）</td></tr>
+<tr><th>当前动作</th><td><span class="tag hold">HOLD</span>　<span class="muted">（引擎原始输出 <span class="tag add">ADD</span>，经 Gate 1 数据门降级为仅观察）</span>　持有，本期不生成新增仓位动作（仅观察）<div class="muted" style="margin-top:4px">T3b 反转初步确认(MA60转上)：MA60走平/转上，反转确认可分批加仓</div></td></tr>
+<tr><th>已有仓位</th><td>1200 份，当前市值 1,261.20 元，占目标仓位（20% = 6,000.00 元）的 <b>21.0%</b>（组合权重 4.20%）　<span class="muted">价值型战术仓（tactical_value）</span></td></tr>
+<tr><th>禁止动作</th><td><span class="tag forbid">⛔ CHASE</span></td></tr>
+<tr><th>程序校验摘要</th><td>动作合法性 <span class="tag ok">✓ 通过</span>　风险收益 <span class="tag ok">✓ 通过</span>　仓位数量 <span class="tag ok">✓ 通过</span>　交易成本 <span class="tag ok">✓ 通过</span>
+<div class="muted" style="margin-top:4px">RR = 2.5　｜　成本门全部通过</div></td></tr>
+<tr><th>交易成本测算</th><td>拟买入 <b>900 份</b>（9 手）@ 1.00，成交额 <b>900.00 元</b>；单笔成本 max(最低5元, 900.00×0.00025) + 价差 = <b>5.45 元</b>，单边成本占比 <b>0.606%</b>（阈值 1%）；成本占预期收益 <b>6.06%</b>（阈值 15%）；成本调整后 RR = <b>2.35</b>（阈值 2）。<br>引擎原始输出为 ADD，成本门测算：<b>900 份（9 手）@ 1.00 = 900.00 元</b>；单笔成本 = max(5.00, 900×0.00025) + 900×0.0005 = 5.00 + 0.45 = <b>5.45 元</b>，单边成本占比 <b>0.606%</b>（≤1% ✓）；每股成本 0.0061，成本占预期收益（0.10/份）<b>6.06%</b>（≤15% ✓）；成本调整后 RR = (0.10−0.0061)/0.04 = <b>2.35</b>（≥2 ✓）。<br><b>但 Gate 1 未过，本期不执行该订单</b>；待 9/11 完整周线复核 T3b 后自动恢复可执行。另需注意：若只买 1 手（100 份 = 105 元），单边成本 5.05 元占 4.8%，<b>远超 1% 阈值</b>——小资金必须一次买足 9 手才经济。</td></tr>
+<tr><th>下次复评</th><td>周五收盘后（完整周线形成后重新计算），或提前触及上述任意触发位</td></tr>
+</table>
+<div class="trig"><b style="color:#1a5276">▎增加触发</b>（首次增加战术仓目标仓位 20%（第二周继续确认且未明显扩张，再增加 20%））<br>MA60 斜率走平或转正 且 日线回踩 MA20/MA60 附近后收盘重新站回 且 reward/risk（1.1−1.0 vs 1.0−0.96）>= 2（成本调整后） 且 通过交易成本门（单边成本占比/成本占预期收益/最小1手）</div><div class="trig"><b style="color:#b7950b">▎降低触发</b>（降低战术仓 50%）<br>连续 2 日收盘低于结构失效位（0.96）</div><div class="trig"><b style="color:#c0392b">▎退出触发</b>（退出剩余战术仓（核心仓位是否退出由组合用途决定））<br>完整周线进入 T8，或单日收盘跌破灾难保护位（0.921，超 1 ATR）</div>
+<div class="warnbox"><b>失效条件：</b>当前逻辑基于 T3b（反转初步确认(MA60转上)）；收盘连续跌破结构失效位 0.96 即失效</div>
+<div class="infobox"><b>五层门控结论：</b>数据门 <span class="tag bad">不通过（当周未完成 + T3a→T3b 刚切换 → 禁止新增）</span>　趋势门 <span class="tag ok">通过</span>（T3b 硬约束已执行，CHASE 已拒绝）　资产逻辑门 <span class="tag hold">部分通过（驱动成立但已计入、传导非单向）</span>　风险收益门 <span class="tag ok">通过（回踩 1.00 的 RR_net 2.35；现价 0.54 不通过）</span>　组合门 <span class="tag ok">通过（单标的模式）</span></div>
+</div>
+
+<h2 class="sec">一、数据状态</h2>
+<div class="card">
+<ul>
+<li>最后交易日：<b>2026-09-08</b>（daily_bar_status = <b>complete</b> —— 已收盘，当日 K 线定稿；报告生成于 2026-09-09 09:12 开盘前，<b>不含盘中数据</b>）</li>
+<li>weekly_bar_status = <b>incomplete_current_week</b>：本周已有 2 根日线（9/7–9/8），仅作预览（provisional close 1.051，区间 0.98–1.066），<b>不参与</b> T3/T4/T7/T8 的最终迁移判断</li>
+<li>最后一个<b>完整</b>自然交易周：2026-08-31 ~ 09-04，周线收盘 0.98；趋势判断（周线斜率 / 10·20·40 周均线 / 突破与失效 / T0–T8 分类）全部基于该完整周</li>
+<li>K 线数量：250 个自然日（2025-08-28 起）｜ 周线样本 53 周，sufficient = True｜ 检测到大跳空 1 处</li>
+<li>收盘价 1.051，昨收 1.01，当日涨跌 <span class="up">+4.06%</span></li>
+<li class="muted">数据门结论：<b>不通过。</b>触发条件「当前周未完成且状态刚切换」：weekly_bar_status = incomplete_current_week（当周仅 9/7、9/8 两根日线）<b>且</b>子态由 T3a 刚切换为 T3b。按五层门控，<b>禁止新增仓位建议 → 输出「仅观察，不生成新增仓位动作」</b>。K 线 250 日充足、日线已收盘、无异常跳点，其余数据门检查项正常。</li>
+</ul>
+</div>
+
+<h2 class="sec">二、持仓状态</h2>
+<div class="card">
+<table>
+<tr><th>剩余份额</th><td>1200 份</td><th>账面持仓均价</th><td>0.8592</td></tr>
+<tr><th>资金回本价</th><td>0.86213</td><th>当前价（2026-09-08 收）</th><td>1.051</td></tr>
+<tr><th>已实现盈亏</th><td class="down">-3.52 元</td><th>未实现盈亏</th><td class="up">+230.16 元（<span class="up">+22.32%</span>）</td></tr>
+<tr><th>总盈亏</th><td class="up">+226.64 元</td><th>目标仓位 / 缺口</th><td>6,000.00 元 / 4,738.80 元（已建 21.0%）</td></tr>
+</table>
+<p class="muted">价值型战术仓（tactical_value）：target 20% / max 25% / 单标的风险预算 2.0%（= 600.00 元）。组合总资产 30,000 元，四只持仓合计市值 7,239.80 元（占本金 24.1%）。</p>
+</div>
+
+<h2 class="sec">三、ETF 属性和核心驱动</h2>
+<div class="card">
+<p><b>资产类型：</b>农业产业链股票 ETF（equity_sector_etf，agri chain）　<b>跟踪标的：</b>国证粮食产业指数（399365.SZ），成分为种业、种植、饲料、粮食加工与贸易等产业链公司</p>
+<p><b>暴露映射：</b><span class="muted">asset_class=equity_sector_etf ｜ theme=grain_industry ｜ direct_commodity_exposure=<b>low_or_indirect（间接）</b> ｜ 传导通道：input_cost（饲料/加工环节成本，<b>不利</b>）· product_price（种业/种植环节，<b>有利</b>）· inventory_gain_loss · policy</span></p>
+<p><b>驱动逻辑：</b><b>必须区分「粮价上涨」与「粮食股票」</b>：粮价上行对种业 / 种植环节是产品价利好，但对成分中的饲料、粮食加工环节是原料成本利空，二者在指数内部相互抵消。本 ETF 是<b>股票 ETF，不等同于「买粮价」</b>。全球食品价格指数、国内主产区利益补偿政策与猪周期去化是三条真实传导链。</p>
+<p><b>核心风险变量：</b>① <b>严重超买</b>：距 MA60 +4.28 ATR，250 日分位 3 个交易日内由约 9% 跳升至 56.0%；② 波幅扩张（ATR 比 1.43，四只中最高）使固定百分比止损失真；③ 粮价对成分不同环节反向传导；④ 板块资金抱团快进快出（9/1 涨停潮 → 9/2 跌停潮已演示过一次）；⑤ 天气/地缘题材可持续性存疑。</p>
+<h3 style="font-size:14px;color:#154360;margin-bottom:4px">催化剂证据（每条外部事实均须可追溯）</h3>
+<table>
+<tr><th style="width:73%">事实主张（claim）</th><th>来源与证据属性</th></tr>
+<tr><td>联合国粮农组织（FAO）9/4 发布数据：8 月全球食品价格指数平均 133.3 点，较 7 月上涨 1.9%、较去年同期上涨 2.5%，升至 2022 年 12 月以来最高水平；高盛、汇丰、美国银行、摩根士通等国际机构此前纷纷预警新一轮粮食涨价</td><td style="width:27%"><b>粮食ETF鹏华(159698)标的指数涨超4.5%，全球粮食价格上涨引爆板块行情</b><br><span class="muted">新浪财经｜2026-09-08</span><br><a href="https://finance.sina.com.cn/jjxw/2026-09-08/doc-inirayqw6005214.shtml" target="_blank" style="font-size:11px;word-break:break-all">https://finance.sina.com.cn/jjxw/2026-09-08/doc-inirayqw6005214.shtml</a><br><span class="muted">类型 hard_data｜资产关联 direct｜新鲜度 1 天｜交叉验证 是</span></td></tr><tr><td>9/8 国证粮食产业指数涨 4.10%，连涨 3 日；粮食ETF景顺、汇添富、博时、南方、国泰等 10 只粮食相关 ETF 涨超 4%；成分股中粮糖业、中粮科技涨停</td><td style="width:27%"><b>资金涌入 粮食ETF霸榜！超强厄尔尼诺之下 气候主题成新共识？</b><br><span class="muted">天天基金（东方财富）｜2026-09-08</span><br><a href="https://fund.eastmoney.com/a/202609083868319913.html" target="_blank" style="font-size:11px;word-break:break-all">https://fund.eastmoney.com/a/202609083868319913.html</a><br><span class="muted">类型 hard_data｜资产关联 direct｜新鲜度 1 天｜交叉验证 是</span></td></tr><tr><td>国内政策：六部门发文强调加大对粮食主产区的利益补偿力度，实施粮食产销区省际横向利益补偿，完善产粮大县奖励制度</td><td style="width:27%"><b>粮食ETF鹏华(159698)标的指数涨超4.5%，全球粮食价格上涨引爆板块行情</b><br><span class="muted">新浪财经｜2026-09-08</span><br><a href="https://finance.sina.com.cn/jjxw/2026-09-08/doc-inirayqw6005214.shtml" target="_blank" style="font-size:11px;word-break:break-all">https://finance.sina.com.cn/jjxw/2026-09-08/doc-inirayqw6005214.shtml</a><br><span class="muted">类型 hard_data｜资产关联 direct｜新鲜度 1 天｜交叉验证 否</span></td></tr><tr><td>本轮行情由极端气候（超强厄尔尼诺）预期点燃，并由猪周期去化等产业周期底部数据承接，资金沿粮食涨价预期与猪周期去化两条逻辑集中布局</td><td style="width:27%"><b>农业板块集体走强，粮食涨价预期与猪周期去化共振</b><br><span class="muted">腾讯新闻｜2026-09-01</span><br><a href="https://news.qq.com/rain/a/20260901A04CF800" target="_blank" style="font-size:11px;word-break:break-all">https://news.qq.com/rain/a/20260901A04CF800</a><br><span class="muted">类型 soft_opinion｜资产关联 indirect｜新鲜度 8 天｜交叉验证 是</span></td></tr>
+</table>
+<h3 style="font-size:14px;color:#154360;margin-bottom:4px">资产逻辑门（Gate 3）判定</h3>
+<div class="warnbox"><b>部分通过（驱动显著改善，但已被价格快速计入且传导非单向）。</b>① 底层驱动<b>成立且有硬数据</b>：FAO 8 月全球食品价格指数 133.3 点（环比 +1.9%、同比 +2.5%，2022 年 12 月以来最高），叠加六部门主产区利益补偿政策与猪周期去化；② 作用于成分<b>但方向不一</b>——种业/种植受益于产品价，饲料/加工受原料成本挤压，指数内部相互抵消；③ <b>已被价格计入</b>：连涨 3 日、10 只粮食 ETF 单日涨超 4%、分位由 9% 跳到 56%，拥挤度快速累积；④ 与趋势<b>一致</b>（周线 up + 突破确认 + T3b）。<br><b>结论：驱动支持持有，不支持追高。</b>9/1 涨停潮 → 9/2 跌停潮已在两周内演示过一次「追高的代价」，本期不以驱动为由新增。</div>
+<p class="muted">口径约束：新闻不作为交易触发器，仅用于趋势解释、风险提醒与复评触发；无结构化来源时降级输出「当前未取得足够可验证的宏观驱动数据，操作判断以价格趋势为主」。</p>
+</div>
+
+<h2 class="sec">四、中长期趋势状态（主决策层）</h2>
+<div class="card">
+<table>
+<tr><th style="width:150px">趋势状态</th><td><b>反转初步确认（T3（T3b））</b>　父状态持续 3 个完整周</td></tr>
+<tr><th>判定依据</th><td>· 周线转上(slope +18.6%)<br>· 价格站上MA60(+18.8%)<br>· MA60转上，反转确认（T3b，可分批增加战术仓）<br><span class="muted">置信度：high</span></td></tr>
+<tr><th>周线（完整周）</th><td>10 周斜率 <b><span class="up">+18.64%</span></b>（方向 up）｜20 周斜率 <span class="down">-17.77%</span><br>MA10w 0.881 ｜ MA20w 0.927 ｜ MA40w 1.005 ｜ 周 ATR 0.06 ｜ 量比 3.17<br>周线突破确认 True ｜ 周线失效确认 False</td></tr>
+<tr><th>均线排列</th><td>price > ma60 < ma120 < ma250　多头排列 False ｜ 空头排列 False<br>MA20 0.9431 ｜ MA60 0.885（<span class="up">+18.78%</span>，斜率 <span class="up">+0.34%</span>，up）｜ MA120 0.958（<span class="up">+9.74%</span>，斜率 <span class="down">-3.68%</span>，down）｜ MA250 1.0（斜率 <span class="flat">+0.00%</span>，flat）</td></tr>
+<tr><th>高低点结构</th><td>higher_high_higher_low（higher_high True / higher_low True）｜ 近期高低 1.066 / 0.85 ｜ 前值 0.9 / 0.81</td></tr>
+<tr><th>位置与延伸</th><td>250 日分位 <b>56.0%</b>（区间 0.81–1.24）｜ 距 250 日高 <span class="down">-15.24%</span>（recovering）<br>距 MA60 <b>4.28 ATR</b>，状态 <b>over_extended</b></td></tr>
+<tr><th>波动率</th><td>ATR20 0.0388 ｜ ATR60 0.0271 ｜ ATR 比 1.43（expanding）</td></tr>
+<tr><th>自身动量</th><td>improving（无基准，仅称「自身动量」不称「相对强弱」）｜ 60 日 <span class="up">+13.01%</span> ｜ 120 日 <span class="down">-9.40%</span></td></tr>
+<tr><th>状态机迁移</th><td>上次状态 T3（T3a） → 原始 T3（T3b） → <b>生效 T3（T3b）</b><br>迁移类型 <b>same</b>｜确认状态 <b>confirmed</b>｜状态保持不变，需连续2个完整周线确认</td></tr>
+</table>
+<div class="goodbox"><b>本期最重要的状态变化：T3a → T3b 升级（四只中唯一发生状态升级的标的）。</b>MA60 = 0.885，斜率 <b>+0.34% 已转正（up）</b>；周线 10 周斜率 +18.64% 且 <b>breakout_confirmed = True</b>（连续两周周线收盘高于前 10 周高点）；周线量比 3.17 显著放量。按硬约束矩阵，T3b 允许「维持 + 可分批增加」，但<b>禁止追高</b>。</div>
+<div class="warnbox"><b>两个必须同时看到的限制：</b><br>
+① <b>子态仅 1 周</b>：父状态 T3 已连续 3 周故引擎标记 confirmed，但 <b>T3b 子态本周才首次出现</b>（上次记录为 T3a），按 SOP 需在下一完整周线复核确认。<br>
+② <b>Gate 1 数据门未通过</b>：weekly_bar_status = incomplete_current_week（当周仅 2 根日线）<b>且状态刚切换</b>，按五层门控规则「当前周未完成且状态刚切换 → 禁止新增仓位建议」，故本期<b>不生成新增仓位动作</b>，引擎原始输出的 ADD 降级为 HOLD（仅观察）。</div>
+<div class="chart" id="mainchart"></div>
+</div>
+
+<h2 class="sec">五、技术结构和形态（辅助层）</h2>
+<div class="card">
+<table>
+<tr><th style="width:150px">关键价位</th><td></td></tr>
+<tr><th>S1 / S2（60·120 日低）</th><td>0.81 / 0.81</td></tr><tr><th>R1（60 日高，9/8 当日）</th><td>1.066</td></tr><tr><th>R2（120 日高）</th><td>1.16</td></tr><tr><th>MA20 / MA60 / MA120 / MA250</th><td>0.9431 / 0.885 / 0.958 / 1.00</td></tr><tr><th>成本锚（账面均价 / 回本价）</th><td>0.8592 / 0.86213（现价 +22.33% / +21.91%）</td></tr><tr><th>本轮突破结构低点</th><td>0.98（9/4 收盘、9/7 低点，本轮上升腿起点）</td></tr><tr><th><b>结构失效位</b></th><td><b>0.96</b>　= 0.98 − 0.5×ATR20(0.0388)，跌破即视为 9/4 周线突破失败</td></tr><tr><th><b>灾难保护位</b></th><td><b>0.92</b>　= 0.96 − 1.0×ATR20，回到前期箱体上沿 0.90 附近</td></tr><tr><th>趋势观察位</th><td>1.00（整数关 + 9/7 收盘位）</td></tr>
+</table>
+<h3 style="font-size:14px;color:#154360;margin-bottom:4px">五形态辅助评分（<b>不可覆盖趋势状态动作</b>）</h3>
+<table>
+<tr><th style="width:34%">形态</th><th style="width:14%">评分</th><th>标签</th></tr>
+<tr><td>碗底</td><td style="text-align:right"><b>10</b></td><td>⚪ 观望</td></tr><tr><td>箱体</td><td style="text-align:right"><b>8</b></td><td>⚪ 趋势行情</td></tr><tr><td>W 底</td><td style="text-align:right"><b>0</b></td><td>非W底</td></tr><tr><td>头肩底</td><td style="text-align:right"><b>0</b></td><td>⚪ 非头肩底</td></tr><tr><td>2B 底</td><td style="text-align:right"><b>0</b></td><td>无2B信号</td></tr>
+</table>
+<div class="infobox">五形态评分<b>全部归零或接近零</b>（碗底 10 / 箱体 8 / W 底 0 / 头肩底 0 / 2B 0）。这不是利空信号，而是<b>形态已「用完」</b>：价格已完成底部形态的量度目标并向上突破，形态层不再提供左侧证据。此时决策<b>完全由趋势状态主导</b>——这正是本框架的设计意图：T3b 允许分批增加，但超买 + 追高禁止 + Gate 1 未过三重限制下，本期仍为持有。</div>
+</div>
+
+<h2 class="sec">六、未来 1–3 个月情景</h2>
+<div class="card">
+<table>
+<tr><th style="width:11%">情景</th><th style="width:26%">触发条件</th><th style="width:24%">仓位后果</th><th style="width:19%">确认条件</th><th style="width:10%">证据强度</th><th style="width:10%">数据完整度</th></tr>
+<tr><td><b>主场景<br>（T3b 延续）</b></td><td>周线维持 up，价格在 1.00–1.066 上方消化超买，等待 MA20（0.9431）上移跟进</td><td>维持 1,200 份不动；待完整周线复核 T3b 且回踩 1.00–0.98 不破 0.96，再按缺口 20% 首次增加</td><td>9/11 完整周线仍为 T3b；回踩过程中 250 日分位不跌破 45%</td><td>中</td><td>中</td></tr><tr><td><b>备选场景<br>（突破延续）</b></td><td>直接放量突破 1.066 并向 1.10–1.16 推进，量能维持</td><td><b>仍不追高</b>：等下一次回踩 1.05–1.00 区且不失守 0.96 再考虑增加；若持续单边不回头，则维持原仓不动</td><td>突破后 3 个交易日站稳 1.066 上方且周线量比不大幅萎缩</td><td>低</td><td>中</td></tr><tr><td><b>失效场景</b></td><td>连续 2 日收盘跌破 0.96（9/4 突破失败），或完整周线进入 T8</td><td>降低战术仓 50%；跌破 0.92 退出剩余战术仓</td><td>收盘确认（非盘中瞬时跌破）＋持续 2 日；ATR 比 1.43 扩张期需防止假摔</td><td>高</td><td>中</td></tr>
+</table>
+<p class="muted">不输出未经回测校准的百分比概率。情景用于框定应对方式，而非预测。</p>
+</div>
+
+<h2 class="sec">七、操作计划</h2>
+<div class="card">
+<h3 style="font-size:14px;color:#154360;margin-bottom:4px">战术仓位动作（价值型战术仓）</h3>
+<p>T3b 的硬约束为「维持 + 可分批增加 + <b>禁止追高</b>」。但按五层门控，<b>Gate 1（数据门）未通过</b>：当周周线未完成且 T3a→T3b 子态刚切换 → <b>本期禁止新增仓位建议，输出「仅观察」</b>。当前持仓 1,200 份、占目标 21.0%，<b>维持不动</b>。操作引擎原始输出为 ADD，本报告按 Gate 1 降级为 HOLD 并保留全部触发参数，待完整周线形成后自动恢复可执行。</p>
+
+<div class="trig"><b>本期不执行任何加仓批次。</b>以下条件<b>全部满足</b>后方可执行（预计最早 2026-09-11 周五收盘后评估）：<br>
+① <b>9/11 完整周线形成</b>，状态仍为 T3b（子态复核确认，连续第 2 周）；<br>
+② 日线<b>回踩 1.00–0.98 区</b>后收盘重新站回 1.02 以上（注意：回踩参考是本轮上升腿的浅回踩，<b>不是 MA20(0.9431)/MA60(0.885)</b>——那两个位置已低于结构失效位 0.96，触及即视为失效而非买点）；<br>
+③ 风险收益 RR ≥ 2 且通过交易成本门。<br>
+满足后首次增加：按目标缺口 20%（≈948 元）、1.00 元/份 → <b>900 份（9 手）= 900 元</b>，单笔成本 max(5, 900×0.00025)=5.00 + 0.45 = <b>5.45 元（占 0.606%）</b>，成本占预期收益 <b>6.06%</b>，成本调整后 RR = <b>2.35</b> —— 三项成本门全部通过。<br>
+<span class="muted">第二周继续确认且未明显扩张，再增加 20%（引擎 size_desc 原文：「首次增加战术仓目标仓位 20%（第二周继续确认且未明显扩张，再增加 20%）」）。</span></div>
+<div class="warnbox"><b>不应采取的动作：</b><b>禁止追高</b>（引擎已程序化拒绝 CHASE）：现价 1.051 的 RR 仅 0.54，且距 MA60 达 +4.28 ATR（over_extended）。禁止因 FAO 指数创新高、10 只 ETF 涨超 4%、厄尔尼诺题材等新闻在脉冲日买入——新闻不作交易触发器。禁止把「回踩 MA20/MA60」当作买点：MA20(0.9431)/MA60(0.885) 均低于结构失效位 0.96，触及即为失效信号而非加仓信号。</div>
+<p><b>最大可接受风险：</b>单标的风险预算 600.00 元。按计划买入价 1.00、结构失效位 0.96 计算，单份风险 0.04 元（≈1.03 ATR，属动量腿的合理紧止损）；900 份对应最大损失 36 元，占风险预算 6%。<b>真正的风险是波幅扩张</b>：ATR 比 1.43 且仍在放大，若按 0.96 止损可能被日常波动打掉，故要求「连续 2 日收盘确认」而非盘中触发。</p>
+</div>
+
+<h2 class="sec">八、未来 3–6 个月观察区间</h2>
+<div class="card">
+<table>
+<tr><th style="width:150px">第一观察区</th><td><b>1.10 – 1.16</b>　（距现价 +4.7% ~ +10.4%）<div class="muted">计算方法：120 日高点 1.16 与整数关 1.10 构成的压力带；亦为 0.81–1.066 区间向上量度后的第一个目标区</div></td></tr>
+<tr><th>第二观察区</th><td><b>1.16 – 1.24</b><div class="muted">计算方法：250 日高点 1.24；突破 1.16 后按国证粮食指数的前期成交密集区外推</div></td></tr>
+<tr><th>趋势跟随退出</th><td>完整周线进入 T7/T8，或价格站上 1.16 后周线 10 周斜率重新转负、量比萎缩至 1.0 以下 → 由跟随转为保护收益，降低战术仓 50%</td></tr>
+</table>
+<div class="infobox"><b>风险收益门（Gate 4）复算：</b>现价 1.051 追高：RR = (1.10−1.051)/(1.051−0.96) = <b>0.54</b> <span class='down'>✗ 不通过（<2）→ 追高被否</span>。<br>回踩 1.00 买入（成本调整前）：RR = (1.10−1.00)/(1.00−0.96) = <b>2.50</b> <span class='up'>✓ 通过</span>；扣每股成本 0.0061 后 RR_net = <b>2.35</b> <span class='up'>✓ 通过</span>。<br><b>结论：风险收益门本身放行「回踩 1.00 加仓」，但 Gate 1（当周未完成 + 子态刚切换）先行禁止本期新增 → 最终动作 HOLD（仅观察）。</b>这是五层门控的逐层过滤结果，不是对 T3b 升级的否定。</div>
+</div>
+
+<h2 class="sec">九、下次复评条件</h2>
+<div class="card">
+<ul>
+<li><b>定期：</b>2026-09-11（周五）收盘后 —— 完整自然交易周形成，重新计算 T0–T8 状态与迁移</li>
+<li><b>价格：</b>触及 1.066（60 日高）/ 1.00（趋势观察位）/ 0.98（本轮结构低点）/ 0.96（结构失效位）任一位置</li>
+<li><b>需特别确认（最高优先级）：</b>9/11 完整周线是否仍为 T3b —— 子态连续第 2 周即转为 confirmed，届时若回踩 1.00–0.98 不失守 0.96，加仓批次自动可执行</li>
+<li><b>趋势：</b>完整周线状态发生迁移（尤其是升/降至 T3b、T4、T7、T8）；MA120 方向由 down 转 flat/up；周线突破或失效确认翻转</li>
+<li><b>事件：</b>FAO 月度食品价格指数（次月 4 日前后）；国内粮食主产区利益补偿政策落地细则；极端天气（厄尔尼诺）与黑海航运等题材的证伪或强化；板块单日涨停/跌停家数（拥挤度指标）</li>
+</ul>
+</div>
+
+<h2 class="sec">十、风险和限制</h2>
+<div class="card">
+<ul>
+<li><b>数据限制：</b>本报告基于 2026-09-08 收盘定稿数据，生成于 2026-09-09 开盘前；当日盘中如有重大变化需重新计算。周线口径采用最后一个完整自然交易周（2026-08-31 ~ 09-04），当前周仅作预览，不触发最终迁移。</li>
+<li><b>模型限制：</b>趋势状态机依赖周线斜率、均线与高低点结构的阈值划分，存在边界抖动；形态评分为辅助证据，不可覆盖趋势状态动作；情景分析不含未经校准的概率。</li>
+<li><b>未校准指标：</b>观察区间为价位区间而非收益预测；ATR 缓冲基于近 20 日波幅，波幅扩张时会低估风险；距 250 日高回撤与分位为描述性指标。</li>
+<li><b>组合配置提醒：</b>组合总资产 30,000 元、单标的目标 20%（6,000 元）、风险预算 2%（600 元）。ETF 免印花税，但佣金万 2.5 单笔最低 5 元 + 单边价差 0.05% + 最小交易单位 1 手（100 份），千元级订单单边成本易超 0.5%，小资金分批加仓须逐笔通过成本门。</li>
+<li><b>免责：</b>本报告仅供研究参考，不构成投资建议。市场有风险，决策请自行判断。</li>
+</ul>
+</div>
+
+</div>
+<script>
+(function(){
+  var c = document.getElementById('mainchart');
+  if(!c || typeof echarts === 'undefined') return;
+  var ch = echarts.init(c);
+  var dates = ["2026-04-30", "2026-05-06", "2026-05-07", "2026-05-08", "2026-05-11", "2026-05-12", "2026-05-13", "2026-05-14", "2026-05-15", "2026-05-18", "2026-05-19", "2026-05-20", "2026-05-21", "2026-05-22", "2026-05-25", "2026-05-26", "2026-05-27", "2026-05-28", "2026-05-29", "2026-06-01", "2026-06-02", "2026-06-03", "2026-06-04", "2026-06-05", "2026-06-08", "2026-06-09", "2026-06-10", "2026-06-11", "2026-06-12", "2026-06-15", "2026-06-16", "2026-06-17", "2026-06-18", "2026-06-22", "2026-06-23", "2026-06-24", "2026-06-25", "2026-06-26", "2026-06-29", "2026-06-30", "2026-07-01", "2026-07-02", "2026-07-03", "2026-07-06", "2026-07-07", "2026-07-08", "2026-07-09", "2026-07-10", "2026-07-13", "2026-07-14", "2026-07-15", "2026-07-16", "2026-07-17", "2026-07-20", "2026-07-21", "2026-07-22", "2026-07-23", "2026-07-24", "2026-07-27", "2026-07-28", "2026-07-29", "2026-07-30", "2026-07-31", "2026-08-03", "2026-08-04", "2026-08-05", "2026-08-06", "2026-08-07", "2026-08-10", "2026-08-11", "2026-08-12", "2026-08-13", "2026-08-14", "2026-08-17", "2026-08-18", "2026-08-19", "2026-08-20", "2026-08-21", "2026-08-24", "2026-08-25", "2026-08-26", "2026-08-27", "2026-08-28", "2026-08-31", "2026-09-01", "2026-09-02", "2026-09-03", "2026-09-04", "2026-09-07", "2026-09-08"];
+  var close = [1.08, 1.08, 1.07, 1.07, 1.07, 1.06, 1.06, 1.04, 1.02, 1.0, 1.0, 0.99, 0.97, 0.98, 0.96, 0.97, 0.95, 0.94, 0.94, 0.96, 0.94, 0.94, 0.92, 0.92, 0.9, 0.9, 0.9, 0.91, 0.92, 0.93, 0.91, 0.89, 0.88, 0.9, 0.88, 0.87, 0.85, 0.84, 0.84, 0.83, 0.85, 0.85, 0.85, 0.86, 0.83, 0.82, 0.82, 0.83, 0.82, 0.83, 0.84, 0.84, 0.82, 0.83, 0.83, 0.84, 0.86, 0.83, 0.84, 0.85, 0.86, 0.87, 0.88, 0.89, 0.87, 0.88, 0.89, 0.88, 0.9, 0.88, 0.88, 0.87, 0.86, 0.89, 0.96, 0.93, 0.93, 0.9, 0.91, 0.92, 0.93, 0.96, 0.98, 0.96, 1.02, 0.96, 0.96, 0.98, 1.01, 1.051];
+  var ma20 = [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 1.0105, 1.0035, 0.9965, 0.989, 0.9815, 0.973, 0.965, 0.957, 0.9505, 0.9455, 0.942, 0.9375, 0.9325, 0.928, 0.924, 0.92, 0.915, 0.91, 0.905, 0.9, 0.8935, 0.889, 0.8845, 0.881, 0.878, 0.8745, 0.8705, 0.8665, 0.8625, 0.8575, 0.8525, 0.849, 0.8465, 0.8435, 0.84, 0.8375, 0.836, 0.8365, 0.836, 0.836, 0.837, 0.8375, 0.8385, 0.84, 0.8415, 0.8435, 0.8465, 0.85, 0.8525, 0.8565, 0.859, 0.861, 0.8625, 0.8645, 0.8675, 0.874, 0.8785, 0.882, 0.8855, 0.889, 0.8925, 0.896, 0.9005, 0.9055, 0.909, 0.9165, 0.9205, 0.924, 0.929, 0.9345, 0.9431];
+  var ma60 = [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0.9137, 0.91, 0.9065, 0.9033, 0.9003, 0.897, 0.894, 0.8912, 0.8885, 0.8865, 0.8845, 0.8825, 0.8805, 0.8787, 0.8772, 0.8772, 0.8765, 0.8762, 0.8755, 0.875, 0.8743, 0.8742, 0.8745, 0.8755, 0.8762, 0.8782, 0.8792, 0.8802, 0.8813, 0.8828, 0.8849];
+  ch.setOption({
+    animation:false,
+    tooltip:{trigger:'axis'},
+    legend:{data:['收盘','MA20','MA60'],top:0},
+    grid:{left:56,right:24,top:36,bottom:56},
+    xAxis:{type:'category',data:dates,axisLabel:{rotate:45,fontSize:10}},
+    yAxis:{type:'value',scale:true,axisLabel:{fontSize:10}},
+    series:[
+      {name:'收盘',type:'line',data:close,showSymbol:false,lineStyle:{width:2,color:'#1a5276'}},
+      {name:'MA20',type:'line',data:ma20,showSymbol:false,lineStyle:{width:1,color:'#e67e22'}},
+      {name:'MA60',type:'line',data:ma60,showSymbol:false,lineStyle:{width:1,color:'#7f8c8d'}},
+      {name:'结构失效位',type:'line',data:[0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96, 0.96],showSymbol:false,lineStyle:{width:1,type:'dashed',color:'#c0392b'}},
+      {name:'灾难保护位',type:'line',data:[0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92, 0.92],showSymbol:false,lineStyle:{width:1,type:'dotted',color:'#8e44ad'}},
+      {name:'第一观察区',type:'line',data:[1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1],showSymbol:false,lineStyle:{width:1,type:'dashed',color:'#27ae60'}}
+    ]
+  });
+  window.addEventListener('resize',function(){ch.resize();});
+})();
+</script>
+</body></html>

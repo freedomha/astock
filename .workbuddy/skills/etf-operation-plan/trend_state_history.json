@@ -2,20 +2,20 @@
   "sh518880": {
     "state": "T3",
     "sub_state": "T3a",
-    "consecutive_weeks": 4,
-    "last_update": "2026-09-03"
+    "consecutive_weeks": 5,
+    "last_update": "2026-09-09"
   },
   "sh512710": {
     "state": "T1",
     "sub_state": null,
-    "consecutive_weeks": 3,
-    "last_update": "2026-09-03"
+    "consecutive_weeks": 4,
+    "last_update": "2026-09-09"
   },
   "sz159698": {
     "state": "T3",
-    "sub_state": "T3a",
-    "consecutive_weeks": 2,
-    "last_update": "2026-09-03"
+    "sub_state": "T3b",
+    "consecutive_weeks": 3,
+    "last_update": "2026-09-09"
   },
   "sh516110": {
     "state": "T1",
@@ -126,9 +126,9 @@
     "last_update": "2026-08-18"
   },
   "sh513070": {
-    "state": "T2",
+    "state": "T6",
     "sub_state": null,
-    "consecutive_weeks": 2,
-    "last_update": "2026-09-03"
+    "consecutive_weeks": 1,
+    "last_update": "2026-09-09"
   }
 }
