@@ -315,8 +315,11 @@ def decide(state_code, sub_state=None, role="core", config=None, code=None,
         gap = target_value - current_value
         current_weight = current_value / portfolio_value * 100 if portfolio_value else 0.0
 
-        # single-add cap = 20% of gap (first batch), risk budget = portfolio * budget%
-        single_add_cap = max(gap, 0.0) * 0.20
+        # single-add cap = 20% of the TARGET POSITION (first batch), risk budget = portfolio * budget%
+        # 口径澄清：SKILL 与 size_desc 文案均为「首次增加【目标仓位】20%」，
+        # 故基数取 target_value 而非 gap。用 gap 会使增量随缺口收敛而递减
+        # （缺口越小→可加越少），既与文案矛盾，也让接近目标仓位的标的永远加不满。
+        single_add_cap = max(target_value, 0.0) * 0.20
         risk_budget = portfolio_value * risk_budget_pct / 100.0
 
         if proposed == "ADD":

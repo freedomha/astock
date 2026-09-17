@@ -518,9 +518,9 @@ def classify_trend_state(ma, structure, weekly, closes, highs, lows):
     ma60 = ma.get("ma60")
     price_above_ma60 = ma60 is not None and cur > ma60
 
-    def st(code, label, confidence, reasons, sub=None):
+    def st(code, label, confidence, reasons, sub=None, fallback=False):
         return {"code": code, "label": label, "confidence": confidence,
-                "reasons": reasons, "sub_state": sub}
+                "reasons": reasons, "sub_state": sub, "is_fallback": fallback}
 
     # T8 结构破坏 — weekly breakdown confirmed + weekly down (immediate)
     if wk_breakdown and wk_dir == "down":
@@ -623,10 +623,19 @@ def classify_trend_state(ma, structure, weekly, closes, highs, lows):
             f"均线多头排列({ma.get('alignment')})",
             "MA60向上，趋势偏多",
         ])
-    return st("T6", "高位整理", "low", [
+    # Fallback 兜底态 —— 所有具名状态的条件均不满足（典型情形：价格在低位，
+    # 但 higher_low 为 False，导致 T3 与 T2 同时不可达）。
+    #
+    # 口径说明：此处【不是】「高位整理」，故不得复用 T6 的正常标签文案
+    # （历史上 pos250 仅 15% 的标的会被标成「高位整理」，与语义直接矛盾）。
+    # 状态码仍沿用 T6，目的是复用其「不新增 / 不追高」的保守硬约束，
+    # 以及回测中 T6 的暴露映射（避免引入新状态码而被迫重新定义暴露、
+    # 使既有回测结果失效）。下游请以 is_fallback 与结构字段判别，勿只看 label。
+    return st("T6", "信号混合（兜底）", "low", [
         f"价格位置 {pos250*100:.0f}%，20日动量 {d20:+.1f}%",
-        "信号混合，趋势方向不明确",
-    ])
+        "信号混合，未满足任何具名状态条件（周线方向 / 低点抬升 / 均线排列均不足以归类）",
+        "⚠ 兜底态，非「高位整理」；方向判断请以 structure.higher_low 等结构字段为准",
+    ], fallback=True)
 
 
 # ─── State machine (persistence + legal migrations) ────────────────────────
