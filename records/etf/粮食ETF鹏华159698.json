@@ -15,6 +15,13 @@
       "price": 0.856,
       "shares": 1100,
       "amount": 941.6
+    },
+    {
+      "date": "2026-09-17",
+      "action": "buy",
+      "price": 0.935,
+      "shares": 1300,
+      "amount": 1215.5
     }
   ]
 }

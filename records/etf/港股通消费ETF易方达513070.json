@@ -8,6 +8,13 @@
       "price": 1.119,
       "shares": 2000,
       "amount": 2238.0
+    },
+    {
+      "date": "2026-09-17",
+      "action": "sell",
+      "price": 1.021,
+      "shares": 1000,
+      "amount": 1021.0
     }
   ]
 }
