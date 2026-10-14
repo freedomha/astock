@@ -25,13 +25,42 @@ ETF操作计划 趋势状态机回测 (v1)
   - 数据：默认仓库根 etf_kline_data_500.json（346 ETF × 500 日），
     可回退 etf_kline_data.json（250 日）。
 
+回撤止盈（可选，默认关闭；--trailing-tp / --tp-grid）
+  概念区分（重要）：本规则是【盈利侧暴露上限（ceiling）】，与下面两者都不是一回事——
+    (i) 亏损侧的 结构失效位 / 灾难保护位 三层退出（SKILL.md「三层退出」、
+        operation_engine.py 的 reduce/exit 触发）——那是「跌破支撑才减仓」；
+    (ii) 状态 T7「保护收益、降低」——T7 的进入条件是 pos250 >= 0.70
+         （trend_analysis.py 的 classify_trend_state），对「250 日分位从未达到
+         0.70」的标的【结构性不可达】。典型例子：某 ETF 从 250 日高点深跌后强
+         反弹，浮盈曾达 +10.7%，但 250 日分位峰值仅 37.5% → 永远进不了 T7，
+         于是一路回吐到负收益而无任何减仓信号。本规则补的就是这个洞。
+  规则：
+    · 峰值锚点 = 持仓建立以来的最高收盘（peak_close），建仓日锚点 entry_close；
+      持仓归零后全部锚点重置（防陈旧上限将来静默重新绑定）。
+    · 触发：peak_close > entry_close*(1+gain)  且
+            peak_close - close >= max(atr_k*ATR20, min_pct*peak_close)
+    · 触发时冻结上限 cap_exp = reduce * (shares*price / position_value)
+      （reduce=0.5 即把「触发时持有的名义市值」减半）。
+    · 生效：tgt_exp = min(EXPOSURE[state], cap_exp) —— min() 保证【只减不增】。
+    · 解除：回到 T4/T5/T6 且价格创出高于触发前峰值的新高（rearm）；
+            或仓位被状态机打到 0（clear）。
+  口径说明：
+    · 上限用「冻结的暴露比例」而非份额数——基线模型是每日再平衡到固定名义市值，
+      份额数上限会引入一个非再平衡的新策略，与基线不可比。
+    · 同 bar 触发 + 同 bar 成交（用 close[i]）；状态机作用于 close[idx-1]，
+      故本规则刻意比状态机「快一根 bar」（价格信号 vs 结构信号）。
+    · 网格 A/B：--tp-grid 'gain=8,k=2,min=4,reduce=0.5;...'，结果写 --tp-output。
+
 Usage:
   python3 .workbuddy/skills/etf-operation-plan/backtest.py \
       [--kline-file <path>] [--code sh518880] [--max-etfs N] \
       [--eval-step 5] [--min-history 150] [--use-confirmed] \
       [--commission-rate 0.00025] [--min-commission 5] [--half-spread 0.0005] \
       [--impact-pct 0] [--lot-size 100] [--position-value 20000] \
-      [--output backtest_trend_state_results.json]
+      [--output backtest_trend_state_results.json] \
+      [--trailing-tp] [--tp-gain 0.08] [--tp-atr-k 2.0] [--tp-min-pct 0.04] \
+      [--tp-reduce 0.5] [--tp-grid 'gain=8,k=2,min=4,reduce=0.5;...'] \
+      [--tp-output backtest_tp_ab_results.json]
 
 交易成本模型（官方口径：ETF 免印花税；佣金万2.5-3 最低5元/笔；最小交易单位 1手=100份）：
   每笔交易成本 = max(最低佣金, 成交额×佣金率) + 成交额×(单边价差 + 冲击成本)
@@ -82,6 +111,18 @@ COST_DEFAULTS = {
     "lot_size": 100,             # 最小交易单位 1手=100份（上交所官方）
 }
 
+# ─── 回撤止盈默认参数（盈利侧暴露上限：只减不增；默认关闭）──────────────────
+# gain   触发所需最小浮盈（相对建仓日收盘，peak_close > entry_close*(1+gain)）
+# atr_k  回撤阈值 ATR 倍数：max(atr_k*ATR20, min_pct*peak_close)
+# min_pct 回撤阈值的最小百分比（低波动资产下限，与 SKILL 波动率自适应口径一致）
+# reduce 触发后暴露上限系数（0.5 = 相对触发时持有的名义市值减半）
+TP_DEFAULTS = {
+    "gain": 0.08,
+    "atr_k": 2.0,
+    "min_pct": 0.04,
+    "reduce": 0.5,
+}
+
 
 def eff_key(eff_code, eff_sub):
     """effective 状态 → 暴露映射键（T3 用子态 T3a/T3b）。"""
@@ -111,6 +152,24 @@ def load_kline(raw, min_bars):
             continue
     records.sort(key=lambda x: x["date"])
     return records if len(records) >= min_bars else None
+
+
+def atr_series(highs, lows, closes, window=20):
+    """滚动 ATR 序列（对齐输入），前 window-1 项为 None。
+
+    口径与 trend_analysis.atr 一致（window 个真实波幅 TR 的简单平均）：
+    atr_series(...)[-1] == ta.atr(highs, lows, closes, window)（>= window+1 根后）。
+    回撤止盈用 atr_series[i]（含当日），无未来函数。
+    """
+    n = len(closes)
+    out = [None] * n
+    trs = []
+    for i in range(n):
+        prev = closes[i - 1] if i > 0 else closes[i]
+        trs.append(max(highs[i] - lows[i], abs(highs[i] - prev), abs(lows[i] - prev)))
+        if i >= window - 1:
+            out[i] = sum(trs[i - window + 1:i + 1]) / window
+    return out
 
 
 # ─── 历史时点快照：只用 end_idx 之前的数据分类趋势状态 ─────────────────────
@@ -307,7 +366,25 @@ def compute_metrics(daily_rets, exposure_series, rf=0.0):
     }
 
 
-def simulate_strategy(closes, daily, n, cost, position_value):
+def _tp_event(kind, i, price, state, peak, entry, atr, cap, shares, pv):
+    """回撤止盈事件记录（kind: fire / rearm / clear）。日期由调用方按 i 映射。"""
+    return {
+        "event": kind,
+        "i": i,
+        "state": state,
+        "price": round(price, 4),
+        "peak_close": round(peak, 4) if peak is not None else None,
+        "entry_close": round(entry, 4) if entry is not None else None,
+        "retrace_pct": round((peak - price) / peak * 100, 2) if peak else None,
+        "atr20": round(atr, 4) if atr else None,
+        "cap_exp": round(cap, 4) if cap is not None else None,
+        "shares": shares,
+        "exposure": round(shares * price / pv, 4) if shares else 0.0,
+    }
+
+
+def simulate_strategy(closes, daily, n, cost, position_value,
+                      atr20=None, tp_cfg=None, collect_path=False):
     """份额制策略模拟，含交易成本模型（小资金最低佣金/价差/冲击/最小交易单位）。
 
     daily: 每日活跃暴露键（effective 状态 → 目标暴露）。
@@ -316,12 +393,18 @@ def simulate_strategy(closes, daily, n, cost, position_value):
     每笔交易成本 = max(最低佣金, 成交额×佣金率) + 成交额×(单边价差+冲击)，从净值扣除。
     净值曲线逐日构建（盈亏与成本折叠进当日收益），net/gross 天数对齐。
 
-    Returns (net_metrics, gross_metrics, bh_metrics, trade_count, cost_drag_pct, total_cost_pct).
+    atr20/tp_cfg: 可选，回撤止盈（盈利侧暴露上限）。tp_cfg=None 时本函数行为与
+    不传该参数时逐位一致（所有新分支跳过）。上限只减不增：
+        tgt_exp = min(EXPOSURE[daily[i]], cap_exp)
+    collect_path=True 时额外返回逐日暴露/状态路径与事件列表（仅单标的 case study 用）。
+
+    Returns (net_metrics, gross_metrics, bh_metrics, trade_count, cost_drag_pct,
+             total_cost_pct, tp_info)。
     net = 含成本；gross = 同份额路径但不扣成本；bh = 买入持有（一次建仓+一次清仓成本）。
     """
     start = next((i for i in range(n) if daily[i] is not None), None)
     if start is None or start + 1 >= n:
-        return None, None, None, 0, 0.0, 0.0
+        return None, None, None, 0, 0.0, 0.0, None
     lot = cost["lot_size"]
 
     def trade_cost(amount):
@@ -335,6 +418,13 @@ def simulate_strategy(closes, daily, n, cost, position_value):
     trades = 0
     total_cost_frac = 0.0
 
+    # ── 回撤止盈局部状态（函数局部，绝不共享，避免跨标的泄漏上限）─────────
+    tp_on = tp_cfg is not None and atr20 is not None
+    entry_close = peak_close = pre_fire_peak = cap_exp = None
+    tp_fires = tp_rearms = tp_clears = tp_binding = tp_cap_days = 0
+    tp_log = [] if (tp_on and collect_path) else None
+    state_path = [] if collect_path else None
+
     for i in range(start, n):
         prev_close = closes[i - 1] if i > start else closes[i]
         exp_by_day.append(shares * prev_close / position_value if shares else 0.0)
@@ -345,9 +435,63 @@ def simulate_strategy(closes, daily, n, cost, position_value):
             eq_net *= (1 + pnl)
             eq_gross *= (1 + pnl)
 
-        # 在当日 close 调整到目标暴露（决策基于前一日 close 算出的状态）
         price = closes[i]
-        target_shares = int(EXPOSURE[daily[i]] * position_value / price / lot) * lot
+
+        # ── 回撤止盈：维护锚点 / 判定触发 / 判定重新武装 ──────────────────
+        # 用 close[i]（含当日）同时做判断与成交，与 sim 的「同 bar close 成交」一致。
+        if tp_on:
+            a = atr20[i] or 0.0
+            if shares == 0:
+                # 仓位被状态机打到 0：清空全部锚点与上限（防陈旧上限将来静默重新绑定）
+                if cap_exp is not None:
+                    tp_clears += 1
+                    if tp_log is not None:
+                        tp_log.append(_tp_event("clear", i, price, daily[i],
+                                                peak_close, entry_close, a, cap_exp,
+                                                shares, position_value))
+                entry_close = peak_close = pre_fire_peak = cap_exp = None
+            else:
+                if entry_close is None:            # (重)建仓日锚点
+                    entry_close = price
+                    peak_close = price
+                elif price > peak_close:
+                    peak_close = price
+                if cap_exp is None:
+                    gain_ok = peak_close > entry_close * (1 + tp_cfg["gain"])
+                    retr_thr = max(tp_cfg["atr_k"] * a, peak_close * tp_cfg["min_pct"])
+                    retrace_ok = retr_thr > 0 and (peak_close - price) >= retr_thr
+                    if gain_ok and retrace_ok:
+                        cap_exp = tp_cfg["reduce"] * (shares * price / position_value)
+                        pre_fire_peak = peak_close
+                        tp_fires += 1
+                        if tp_log is not None:
+                            tp_log.append(_tp_event("fire", i, price, daily[i],
+                                                    peak_close, entry_close, a, cap_exp,
+                                                    shares, position_value))
+                else:
+                    # 重新武装：确认上升趋势 且 价格创出高于触发前峰值的新高
+                    if daily[i] in ("T4", "T5", "T6") and price > pre_fire_peak:
+                        cap_exp = pre_fire_peak = None
+                        peak_close = price
+                        tp_rearms += 1
+                        if tp_log is not None:
+                            tp_log.append(_tp_event("rearm", i, price, daily[i],
+                                                    peak_close, entry_close, a, None,
+                                                    shares, position_value))
+
+        # 在当日 close 调整到目标暴露（决策基于前一日 close 算出的状态）
+        # 回撤止盈只做「上限」：min() 保证目标暴露 <= 状态机暴露，永不抬高仓位。
+        base_exp = EXPOSURE[daily[i]]
+        tgt_exp = base_exp
+        if tp_on and cap_exp is not None:
+            if cap_exp < base_exp:
+                tp_binding += 1
+            else:
+                tp_cap_days += 1                 # 上限存在但当日未绑定（保留，不下调）
+            tgt_exp = min(base_exp, cap_exp)
+            if os.environ.get("ETF_TP_ASSERT"):
+                assert tgt_exp <= base_exp + 1e-12, "trailing TP must never raise exposure"
+        target_shares = int(tgt_exp * position_value / price / lot) * lot
         if target_shares != shares:
             amount = abs(target_shares - shares) * price
             if amount > 0:
@@ -356,6 +500,13 @@ def simulate_strategy(closes, daily, n, cost, position_value):
                 total_cost_frac += cf
                 trades += 1
             shares = target_shares
+
+        # 建仓日补锚点（首日 shares 由 0 变正，上面 TP 块跑在成交之前）
+        if tp_on and shares > 0 and entry_close is None:
+            entry_close = price
+            peak_close = price
+        if collect_path:
+            state_path.append(daily[i])
 
         eq_net_curve.append(eq_net)
         eq_gross_curve.append(eq_gross)
@@ -388,7 +539,17 @@ def simulate_strategy(closes, daily, n, cost, position_value):
     cost_drag = 0.0
     if gross_m and net_m:
         cost_drag = round(gross_m["total_return_pct"] - net_m["total_return_pct"], 2)
-    return net_m, gross_m, bh_m, trades, cost_drag, round(total_cost_frac * 100, 2)
+
+    tp_info = None
+    if tp_on:
+        tp_info = {
+            "fires": tp_fires, "rearms": tp_rearms, "clears": tp_clears,
+            "binding_days": tp_binding, "cap_offset_days": tp_cap_days,
+            "events": tp_log,
+            "exposure_path": exp_by_day[:len(net_rets)] if collect_path else None,
+            "state_path": state_path[:len(net_rets)] if collect_path else None,
+        }
+    return net_m, gross_m, bh_m, trades, cost_drag, round(total_cost_frac * 100, 2), tp_info
 
 
 # ─── Part 3: 关键迁移事件 ──────────────────────────────────────────────────
@@ -495,7 +656,12 @@ def print_transitions(trans):
 
 
 # ─── 主流程 ────────────────────────────────────────────────────────────────
-def backtest_etf(code, records, cfg):
+def _prepare(records, cfg, need_atr=False):
+    """共享预处理（与 TP 无关，成本最高的分类步骤只跑一次，供 A/B 各变体复用）。
+
+    纯搬移自 backtest_etf 的 evals/seq/daily 构造，口径必须保持不变。
+    Returns (n, closes, evals, seq, daily, atr20) 或 None。
+    """
     n = len(records)
     closes = [r["close"] for r in records]
 
@@ -508,13 +674,28 @@ def backtest_etf(code, records, cfg):
         return None
 
     seq = simulate_state_machine([s for _, s in evals])
-    signals = build_signal_records(evals, seq, closes, n, code)
     daily = build_daily_exposure(evals, seq, n, cfg.use_confirmed)
-    net_m, gross_m, bh_m, trades, cost_drag, total_cost_pct = simulate_strategy(
-        closes, daily, n, cfg.cost, cfg.position_value)
+    atr20 = None
+    if need_atr:
+        atr20 = atr_series([r["high"] for r in records],
+                           [r["low"] for r in records], closes, 20)
+    return n, closes, evals, seq, daily, atr20
+
+
+def backtest_etf(code, records, cfg):
+    need_atr = getattr(cfg, "tp_cfg", None) is not None
+    prep = _prepare(records, cfg, need_atr)
+    if prep is None:
+        return None
+    n, closes, evals, seq, daily, atr20 = prep
+    signals = build_signal_records(evals, seq, closes, n, code)
+    net_m, gross_m, bh_m, trades, cost_drag, total_cost_pct, tp_info = simulate_strategy(
+        closes, daily, n, cfg.cost, cfg.position_value,
+        atr20=atr20, tp_cfg=getattr(cfg, "tp_cfg", None),
+        collect_path=getattr(cfg, "collect_path", False))
     transitions = collect_transitions(evals, seq, closes, n)
 
-    return {
+    out = {
         "signals": signals,
         "strategy": net_m,
         "strategy_gross": gross_m,
@@ -524,6 +705,51 @@ def backtest_etf(code, records, cfg):
         "cost_drag_pct": cost_drag,
         "total_cost_pct": total_cost_pct,
     }
+    if tp_info is not None:
+        out["tp_stats"] = {k: tp_info[k] for k in
+                           ("fires", "rearms", "clears", "binding_days", "cap_offset_days")}
+        out["tp_events"] = [{**e, "date": records[e["i"]]["date"]}
+                            for e in (tp_info.get("events") or [])]
+        out["tp_exposure_path"] = tp_info.get("exposure_path")
+        out["tp_state_path"] = tp_info.get("state_path")
+    return out
+
+
+def backtest_etf_grid(code, records, cfg, variants):
+    """A/B：一次预处理 + 多变体廉价模拟（分类最贵，只跑一次）。
+
+    variants: [(name, tp_cfg_or_None), ...]；tp_cfg=None 即基线。
+    Returns {"signals", "transitions", "variants": {name: {...}}} 或 None。
+    """
+    prep = _prepare(records, cfg, need_atr=True)
+    if prep is None:
+        return None
+    n, closes, evals, seq, daily, atr20 = prep
+    signals = build_signal_records(evals, seq, closes, n, code)
+    transitions = collect_transitions(evals, seq, closes, n)
+
+    variants_out = {}
+    for name, tp_cfg in variants:
+        net_m, gross_m, bh_m, trades, cost_drag, total_cost_pct, tp_info = simulate_strategy(
+            closes, daily, n, cfg.cost, cfg.position_value,
+            atr20=atr20, tp_cfg=tp_cfg, collect_path=getattr(cfg, "collect_path", False))
+        variants_out[name] = {
+            "strategy": net_m,
+            "strategy_gross": gross_m,
+            "buyhold": bh_m,
+            "trade_count": trades,
+            "cost_drag_pct": cost_drag,
+            "total_cost_pct": total_cost_pct,
+            "tp_stats": None if tp_info is None else
+                {k: tp_info[k] for k in
+                 ("fires", "rearms", "clears", "binding_days", "cap_offset_days")},
+        }
+        if tp_info is not None:
+            variants_out[name]["tp_events"] = [{**e, "date": records[e["i"]]["date"]}
+                                               for e in (tp_info.get("events") or [])]
+            variants_out[name]["tp_exposure_path"] = tp_info.get("exposure_path")
+            variants_out[name]["tp_state_path"] = tp_info.get("state_path")
+    return {"signals": signals, "transitions": transitions, "variants": variants_out}
 
 
 def main():
@@ -540,11 +766,27 @@ def main():
     # 交易成本参数（默认取自 records/portfolio_config.json["costs"]，否则内置官方默认）
     p.add_argument("--commission-rate", type=float, default=None, help="佣金费率（万2.5=0.00025）")
     p.add_argument("--min-commission", type=float, default=None, help="单笔最低佣金（元）")
-    p.add_argument("--half-spread", type=float, default=None, help="单边买卖价差（占价格比例，0.05%=0.0005）")
+    p.add_argument("--half-spread", type=float, default=None, help="单边买卖价差（占价格比例，0.05%%=0.0005）")
     p.add_argument("--impact-pct", type=float, default=None, help="冲击成本占成交额比例")
     p.add_argument("--lot-size", type=int, default=None, help="最小交易单位（1手=100份）")
     p.add_argument("--position-value", type=float, default=None,
                    help="单标的策略名义本金（默认取 portfolio_config.portfolio_value，否则 20000）；越小最低佣金拖累越明显")
+    # 回撤止盈（盈利侧暴露上限；默认关闭；与 T7 / 结构失效位概念不同，见模块 docstring）
+    p.add_argument("--trailing-tp", action="store_true",
+                   help="启用回撤止盈（暴露上限，只减不增）")
+    p.add_argument("--tp-gain", type=float, default=TP_DEFAULTS["gain"],
+                   help="触发所需最小浮盈（相对建仓日收盘），默认 0.08")
+    p.add_argument("--tp-atr-k", type=float, default=TP_DEFAULTS["atr_k"],
+                   help="回撤阈值 ATR 倍数，默认 2.0")
+    p.add_argument("--tp-min-pct", type=float, default=TP_DEFAULTS["min_pct"],
+                   help="回撤阈值最小百分比，默认 0.04")
+    p.add_argument("--tp-reduce", type=float, default=TP_DEFAULTS["reduce"],
+                   help="触发后暴露上限系数，默认 0.5（减半）")
+    p.add_argument("--tp-grid", default=None,
+                   help="A/B 网格：分号分隔变体，如 'gain=8,k=2,min=4,reduce=0.5;gain=10,k=2,min=5,reduce=0.5'"
+                        "（自动包含 baseline；gain/min 按百分数，k/reduce 为倍数）")
+    p.add_argument("--tp-output", default=os.path.join(_skill_dir, "backtest_tp_ab_results.json"),
+                   help="A/B 对比输出 JSON 路径")
     args = p.parse_args()
 
     kline_file = args.kline_file
@@ -593,6 +835,32 @@ def main():
         position_value=position_value,
     )
 
+    # ── 回撤止盈：单参数模式 / A/B 网格模式（网格自动含 baseline）────────
+    def _parse_grid(spec):
+        vs = [("baseline", None)]
+        for chunk in spec.split(";"):
+            chunk = chunk.strip()
+            if not chunk:
+                continue
+            kv = dict(part.split("=", 1) for part in chunk.split(",") if "=" in part)
+            c = {"gain": float(kv.get("gain", 8)) / 100.0,
+                 "atr_k": float(kv.get("k", 2.0)),
+                 "min_pct": float(kv.get("min", 4)) / 100.0,
+                 "reduce": float(kv.get("reduce", 0.5))}
+            nm = "gain%g_k%g_min%g_r%g" % (c["gain"] * 100, c["atr_k"],
+                                           c["min_pct"] * 100, c["reduce"])
+            vs.append((nm, c))
+        return vs
+
+    tp_variants = _parse_grid(args.tp_grid) if args.tp_grid else None
+    tp_cfg = None
+    if args.trailing_tp and not tp_variants:
+        tp_cfg = {"gain": args.tp_gain, "atr_k": args.tp_atr_k,
+                  "min_pct": args.tp_min_pct, "reduce": args.tp_reduce}
+    cfg.tp_cfg = tp_cfg
+    # 仅在单标的 case study 时收集逐日路径/事件，避免全量输出膨胀
+    cfg.collect_path = bool(args.code) and (tp_cfg is not None or tp_variants is not None)
+
     items = list(raw_data.items())
     if args.code:
         items = [(c, r) for c, r in items if c == args.code]
@@ -609,6 +877,11 @@ def main():
           f"单边价差 {cost['half_spread']*100:.2f}% 冲击 {cost['impact_pct']*100:.2f}% "
           f"最小{cost['lot_size']}份 | 名义本金 {position_value:.0f}元")
     print(f"ETF 数: {len(items)}")
+    if tp_variants:
+        print(f"回撤止盈 A/B 网格: {len(tp_variants)} 个变体（含 baseline） -> {args.tp_output}")
+    elif tp_cfg:
+        print(f"回撤止盈: 开启 gain={tp_cfg['gain']:.0%} k={tp_cfg['atr_k']:g} "
+              f"min={tp_cfg['min_pct']:.0%} reduce={tp_cfg['reduce']:g}")
 
     all_signals = []
     strat_list, gross_list, bh_list = [], [], []
@@ -616,31 +889,74 @@ def main():
     per_etf = {}
     transitions_all = defaultdict(list)
     n_done = 0
+    variant_agg = {}
+    case_study = None
+    if tp_variants:
+        for name, _ in tp_variants:
+            variant_agg[name] = {"strategy": [], "trade": [], "cost_drag": [],
+                                 "fires": 0, "rearms": 0, "clears": 0, "etfs_fired": 0,
+                                 "improved_ret": 0, "improved_mdd": 0}
 
     for code, raw in items:
         records = load_kline(raw, args.min_history + 5)
         if records is None:
             continue
-        res = backtest_etf(code, records, cfg)
-        if res is None:
-            continue
-        all_signals.extend(res["signals"])
-        if res["strategy"] and res["buyhold"]:
-            strat_list.append(res["strategy"])
-            if res["strategy_gross"]:
-                gross_list.append(res["strategy_gross"])
-            bh_list.append(res["buyhold"])
-            cost_drag_list.append(res["cost_drag_pct"])
-            trade_list.append(res["trade_count"])
+        if tp_variants:
+            gridres = backtest_etf_grid(code, records, cfg, tp_variants)
+            if gridres is None:
+                continue
+            all_signals.extend(gridres["signals"])
+            variants = gridres["variants"]
+            base = variants["baseline"]
+            transitions_src = gridres["transitions"]
+            if args.code:
+                case_study = {"code": code, "variants": variants}
+        else:
+            res = backtest_etf(code, records, cfg)
+            if res is None:
+                continue
+            all_signals.extend(res["signals"])
+            variants = None
+            base = res
+            transitions_src = res["transitions"]
+            if args.code and res.get("tp_stats") is not None:
+                case_study = {"code": code, "baseline": res}
+
+        if base["strategy"] and base["buyhold"]:
+            strat_list.append(base["strategy"])
+            if base["strategy_gross"]:
+                gross_list.append(base["strategy_gross"])
+            bh_list.append(base["buyhold"])
+            cost_drag_list.append(base["cost_drag_pct"])
+            trade_list.append(base["trade_count"])
             per_etf[code] = {
-                "strategy": res["strategy"],
-                "strategy_gross": res["strategy_gross"],
-                "buyhold": res["buyhold"],
-                "trade_count": res["trade_count"],
-                "cost_drag_pct": res["cost_drag_pct"],
-                "total_cost_pct": res["total_cost_pct"],
+                "strategy": base["strategy"],
+                "strategy_gross": base["strategy_gross"],
+                "buyhold": base["buyhold"],
+                "trade_count": base["trade_count"],
+                "cost_drag_pct": base["cost_drag_pct"],
+                "total_cost_pct": base["total_cost_pct"],
             }
-        for to_state, evs in res["transitions"].items():
+        if variants:
+            b_strat = base["strategy"]
+            for name, v in variants.items():
+                agg = variant_agg[name]
+                if v["strategy"] and b_strat:
+                    agg["strategy"].append(v["strategy"])
+                    agg["trade"].append(v["trade_count"])
+                    agg["cost_drag"].append(v["cost_drag_pct"])
+                    if v["strategy"]["total_return_pct"] > b_strat["total_return_pct"]:
+                        agg["improved_ret"] += 1
+                    if v["strategy"]["max_drawdown_pct"] > b_strat["max_drawdown_pct"]:
+                        agg["improved_mdd"] += 1
+                    ts = v.get("tp_stats")
+                    if ts:
+                        agg["fires"] += ts["fires"]
+                        agg["rearms"] += ts["rearms"]
+                        agg["clears"] += ts["clears"]
+                        if ts["fires"] > 0:
+                            agg["etfs_fired"] += 1
+        for to_state, evs in transitions_src.items():
             transitions_all[to_state].extend(evs)
         n_done += 1
         if n_done % 50 == 0:
@@ -713,9 +1029,114 @@ def main():
         "per_etf": per_etf,
         "signals": all_signals,
     }
+    # 仅在启用回撤止盈时注入配置（保证关闭时输出与改动前逐位一致）
+    if tp_cfg or tp_variants:
+        output["config"]["trailing_tp"] = {
+            "enabled": True,
+            "params": tp_cfg,
+            "grid": None if not tp_variants else [n for n, _ in tp_variants],
+            "concept_note": (
+                "盈利侧暴露上限（只减不增），独立于 (i) 亏损侧 结构失效位/灾难保护位 三层退出 "
+                "与 (ii) 状态 T7「保护收益、降低」。T7 进入条件为 pos250>=0.70"
+                "（trend_analysis.classify_trend_state），对 250 日分位从未达 0.70 的标的"
+                "（如深跌后强反弹的标的）结构性不可达 —— 本规则用于补该缺口。"
+            ),
+        }
     with open(args.output, "w") as f:
         json.dump(output, f, ensure_ascii=False)
     print(f"\n回测结果已保存: {args.output}（{os.path.getsize(args.output) / 1024 / 1024:.1f} MB）")
+
+    # ── 回撤止盈 A/B 汇总输出 ────────────────────────────────────────────
+    if not tp_variants:
+        return
+
+    def _vavg(mlist, key):
+        vals = [m[key] for m in mlist if key in m]
+        return round(sum(vals) / len(vals), 2) if vals else None
+
+    vkeys = ("total_return_pct", "annualized_pct", "max_drawdown_pct",
+             "ann_vol_pct", "sharpe", "avg_exposure")
+    base_summary = {k: _vavg(variant_agg["baseline"]["strategy"], k) for k in vkeys}
+    base_summary["avg_trade_count"] = (
+        round(sum(variant_agg["baseline"]["trade"]) / len(variant_agg["baseline"]["trade"]), 1)
+        if variant_agg["baseline"]["trade"] else None)
+    base_summary["cost_drag_pct"] = (round(sum(variant_agg["baseline"]["cost_drag"])
+                                           / len(variant_agg["baseline"]["cost_drag"]), 2)
+                                     if variant_agg["baseline"]["cost_drag"] else None)
+    base_summary["etfs"] = len(variant_agg["baseline"]["strategy"])
+
+    variants_out = []
+    for name, params in tp_variants:
+        agg = variant_agg[name]
+        summ = {k: _vavg(agg["strategy"], k) for k in vkeys}
+        n = len(agg["strategy"])
+        summ["avg_trade_count"] = round(sum(agg["trade"]) / len(agg["trade"]), 1) if agg["trade"] else None
+        summ["cost_drag_pct"] = round(sum(agg["cost_drag"]) / len(agg["cost_drag"]), 2) if agg["cost_drag"] else None
+        summ["etfs"] = n
+        delta = None
+        if n and base_summary["etfs"]:
+            delta = {k: (None if (summ[k] is None or base_summary[k] is None)
+                         else round(summ[k] - base_summary[k], 2))
+                     for k in ("total_return_pct", "annualized_pct", "max_drawdown_pct",
+                               "ann_vol_pct", "sharpe", "avg_exposure", "cost_drag_pct")}
+            delta["avg_trade_count"] = (round(summ["avg_trade_count"] - base_summary["avg_trade_count"], 1)
+                                        if summ["avg_trade_count"] is not None
+                                        and base_summary["avg_trade_count"] is not None else None)
+        variants_out.append({
+            "name": name,
+            "params": params,
+            "summary": summ,
+            "delta_vs_baseline": delta,
+            "tp_activity": {"fire_count": agg["fires"], "rearm_count": agg["rearms"],
+                            "clear_count": agg["clears"], "etfs_fired": agg["etfs_fired"]},
+            "distribution": {"etfs_improved_return": agg["improved_ret"],
+                             "etfs_improved_mdd": agg["improved_mdd"]},
+        })
+
+    ab = {
+        "config": {
+            "kline_file": kline_file, "eval_step": args.eval_step,
+            "min_history": args.min_history, "use_confirmed": args.use_confirmed,
+            "cost_model": cost, "position_value": position_value, "etfs": n_done,
+            "tp_grid": [{"name": n, "params": p} for n, p in tp_variants],
+        },
+        "baseline_strategy": base_summary,
+        "buyhold_summary": buyhold_avg,
+        "variants": variants_out,
+    }
+    if case_study:
+        ab["case_study"] = case_study
+    with open(args.tp_output, "w") as f:
+        json.dump(ab, f, ensure_ascii=False)
+
+    # 控制台对比表
+    hdr = f"{'变体':<24}{'总收益%':>9}{'年化%':>8}{'最大回撤%':>10}{'波动%':>8}{'夏普':>7}{'暴露':>7}{'换手':>7}{'成本拖累%':>10}{'触发数':>7}{'触发标的':>8}"
+    print("\n" + "=" * len(hdr.encode("gbk", errors="ignore")))
+    print(" 回撤止盈 A/B（策略均值；baseline = 关闭该规则）")
+    print("=" * len(hdr.encode("gbk", errors="ignore")))
+    print(hdr)
+    print("-" * len(hdr.encode("gbk", errors="ignore")))
+    for v in variants_out:
+        s = v["summary"]
+        print(f"{v['name']:<24}{s['total_return_pct']:>9.2f}{s['annualized_pct']:>8.2f}"
+              f"{s['max_drawdown_pct']:>10.2f}{s['ann_vol_pct']:>8.2f}{s['sharpe']:>7.2f}"
+              f"{s['avg_exposure']:>7.3f}{s['avg_trade_count']:>7.1f}{s['cost_drag_pct']:>10.2f}"
+              f"{v['tp_activity']['fire_count']:>7}{v['tp_activity']['etfs_fired']:>8}")
+    print(f"\nA/B 对比已保存: {args.tp_output}（{os.path.getsize(args.tp_output) / 1024 / 1024:.1f} MB）")
+
+    if case_study:
+        print("\n单标的 case study:")
+        for name, v in case_study.get("variants", {}).items():
+            if not v["strategy"]:
+                continue
+            evs = v.get("tp_events") or []
+            print(f"  [{name}] 总收益 {v['strategy']['total_return_pct']:+.2f}% | "
+                  f"最大回撤 {v['strategy']['max_drawdown_pct']:+.2f}% | "
+                  f"夏普 {v['strategy']['sharpe']:.2f} | 换手 {v['trade_count']}")
+            for e in evs:
+                print(f"       {e['event']:<6} {e['date']}  price={e['price']}  "
+                      f"peak={e['peak_close']}  entry={e['entry_close']}  "
+                      f"回撤={e['retrace_pct']}%  cap_exp={e['cap_exp']}")
 
 
 if __name__ == "__main__":
