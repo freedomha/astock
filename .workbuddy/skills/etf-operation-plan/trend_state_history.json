@@ -1,21 +1,21 @@
 {
   "sh518880": {
-    "state": "T6",
+    "state": "T0",
     "sub_state": null,
     "consecutive_weeks": 1,
-    "last_update": "2026-10-08"
+    "last_update": "2026-10-14"
   },
   "sh512710": {
-    "state": "T2",
+    "state": "T0",
     "sub_state": null,
     "consecutive_weeks": 1,
-    "last_update": "2026-10-08"
+    "last_update": "2026-10-14"
   },
   "sz159698": {
     "state": "T2",
     "sub_state": null,
-    "consecutive_weeks": 1,
-    "last_update": "2026-10-08"
+    "consecutive_weeks": 2,
+    "last_update": "2026-10-14"
   },
   "sh516110": {
     "state": "T1",
@@ -128,7 +128,7 @@
   "sh513070": {
     "state": "T0",
     "sub_state": null,
-    "consecutive_weeks": 2,
-    "last_update": "2026-10-08"
+    "consecutive_weeks": 3,
+    "last_update": "2026-10-14"
   }
 }
