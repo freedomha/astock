@@ -20,7 +20,20 @@ import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 WESTOCK_BIN = "/Users/aldiadmin/.workbuddy/westock-data/scripts/index.js"
-NODE_BIN = "/Users/aldiadmin/.workbuddy/binaries/node/versions/22.22.2/bin/node"
+
+
+def _resolve_node():
+    """Resolve a usable node binary (version dir names change, e.g. 22.22.2-6)."""
+    import glob
+    import shutil
+    candidates = sorted(glob.glob("/Users/aldiadmin/.workbuddy/binaries/node/versions/*/bin/node"))
+    for c in candidates:
+        if os.path.exists(c):
+            return c
+    return shutil.which("node") or "node"
+
+
+NODE_BIN = _resolve_node()
 
 KLINE_DAYS = 250
 MAX_WORKERS = 8
