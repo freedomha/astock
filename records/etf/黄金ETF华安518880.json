@@ -15,6 +15,13 @@
       "price": 8.516,
       "shares": 100,
       "amount": 851.6
+    },
+    {
+      "date": "2026-10-15",
+      "action": "sell",
+      "price": 8.501,
+      "shares": 200,
+      "amount": 1700.2
     }
   ]
 }
