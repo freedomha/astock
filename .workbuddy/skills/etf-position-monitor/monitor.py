@@ -170,7 +170,60 @@ def check_drift(cfg):
                 rb=rb)
 
 
-def render_console(cfg, batches, drift, today):
+def check_swing(cfg, today):
+    sw = cfg.get("swing")
+    if not sw:
+        return None
+    out = []
+    for p in sw.get("positions", []):
+        q = fetch_quote(p["code"])
+        if not q:
+            out.append(dict(p, signal=None, detail="行情获取失败"))
+            continue
+        px = float(q["price"])
+        center, center_src = None, ""
+        if p.get("band_mode") == "ma":
+            period = p.get("ma_period", 20)
+            center = ma_of(fetch_kline(p["code"]), period)
+            center_src = f"MA{period}"
+        else:
+            center = p.get("ref_price")
+            center_src = "ref_price"
+        if not center:
+            out.append(dict(p, signal=None, px=px, detail=f"无基准价({center_src})"))
+            continue
+        b = p["band_pct"] / 100
+        sell, buy = center * (1 + b), center * (1 - b)
+        stop = center * (1 - p["stop_pct"] / 100)
+        state = p.get("satellite_state", "holding")
+        if state == "holding":
+            if px >= sell:
+                sig, why = "SELL", f"现价 {px:.3f} ≥ 上轨 {sell:.3f} → 卖出卫星仓 {p['satellite_shares']}份"
+            elif px <= stop:
+                sig, why = "WARN", f"现价 {px:.3f} ≤ 止损位 {stop:.3f} → 核心仓需复核，暂停波段"
+            else:
+                sig, why = "HOLD", f"现价 {px:.3f} 在 {buy:.3f} ~ {sell:.3f} 区间内"
+        else:  # sold
+            if px <= stop:
+                sig, why = "STOP", f"现价 {px:.3f} ≤ 止损位 {stop:.3f} → 趋势破位，不买回"
+            elif px <= buy:
+                sig, why = "BUY", f"现价 {px:.3f} ≤ 下轨 {buy:.3f} → 买回卫星仓 {p['satellite_shares']}份"
+            else:
+                sig, why = "WAIT", f"现价 {px:.3f} > 下轨 {buy:.3f}，等回落"
+        # 波段经济性：卫星仓名义金额与该笔往返成本
+        amt = p["satellite_shares"] * px
+        one_way = max(cfg["costs"]["min_commission"],
+                      amt * cfg["costs"]["commission_rate"]) + amt * cfg["costs"]["half_spread"]
+        rt_pct = one_way * 2 / amt * 100 if amt else 0
+        out.append(dict(p, px=px, center=center, center_src=center_src,
+                        sell=sell, buy=buy, stop=stop, state=state,
+                        signal=sig, detail=why, amt=amt,
+                        rt_cost=one_way * 2, rt_pct=rt_pct,
+                        capture_pct=p["band_pct"] * 2, net_pct=p["band_pct"] * 2 - rt_pct))
+    return out
+
+
+def render_console(cfg, batches, drift, swing, today):
     L = []
     L.append("=" * 78)
     L.append(f"ETF 持仓监控  ·  {today.isoformat()}")
@@ -211,12 +264,27 @@ def render_console(cfg, batches, drift, today):
                              f"≈{r['trade_amount']:.0f}元（费用{r['trade_cost']:.2f}元）")
         else:
             L.append("\n  → 无资产超限，无需再平衡。")
+    if swing:
+        L.append("\n【卫星仓波段检查】")
+        for s in swing:
+            icon = {"SELL": "🔴 卖出信号", "BUY": "🟢 买回信号", "STOP": "⛔ 止损",
+                    "WARN": "⚠️ 警示", "HOLD": "⏳ 持有中", "WAIT": "⏳ 等待"}.get(s.get("signal"), "⚠️ 数据缺失")
+            state_txt = "持有中" if s.get("satellite_state") == "holding" else "已卖出"
+            L.append(f"\n  [{icon}] {s['name']}({s['code']})  核心 {s['core_shares']}份 / 卫星 {s['satellite_shares']}份（{state_txt}）")
+            if s.get("px") is not None and s.get("center"):
+                L.append(f"      现价 {s['px']:.3f}｜上轨卖 {s['sell']:.3f}｜下轨买 {s['buy']:.3f}｜止损 {s['stop']:.3f}"
+                         f"  (基准 {s['center_src']} {s['center']:.3f}，带 ±{s['band_pct']}%)")
+                L.append(f"      卫星仓 {s['amt']:.0f}元｜往返成本 {s['rt_cost']:.1f}元({s['rt_pct']:.2f}%)｜"
+                         f"单次捕获 {s['capture_pct']:.1f}% → 净 {s['net_pct']:.2f}%")
+            L.append(f"      {s.get('detail', '')}")
+            if s.get("note"):
+                L.append(f"      注：{s['note']}")
     L.append("\n" + "-" * 78)
     L.append("提示：价格类触发每日可查；权重漂移建议每周末（完整周线形成后）跑一次。")
     return "\n".join(L)
 
 
-def render_html(cfg, batches, drift, today, path):
+def render_html(cfg, batches, drift, swing, today, path):
     def esc(s):
         return str(s).replace("&", "&amp;").replace("<", "&lt;")
     rows_b = ""
@@ -239,6 +307,20 @@ def render_html(cfg, batches, drift, today, path):
                        f"<td>{r['actual_pct']:.2f}%</td><td>{r['target_weight_pct']:.1f}%</td>"
                        f"<td>{r['dev_abs']:+.2f}pp</td><td>{r['dev_rel']:.1f}%</td>"
                        f"<td class='{cls}'>{st}</td><td>{tr}</td></tr>")
+    rows_s = ""
+    SICON = {"SELL": "卖出", "BUY": "买回", "STOP": "止损", "WARN": "警示", "HOLD": "持有", "WAIT": "等待"}
+    for s in (swing or []):
+        sig = SICON.get(s.get("signal"), "缺失")
+        cls = "no" if s.get("signal") in ("SELL", "STOP", "WARN") else ("ok" if s.get("signal") in ("BUY", "HOLD") else "m")
+        if s.get("px") is not None and s.get("center"):
+            lv = (f"卖 {s['sell']:.3f} / 买 {s['buy']:.3f} / 止损 {s['stop']:.3f}"
+                  f"<br><span class=m>卫星 {s['amt']:.0f}元 · 往返 {s['rt_pct']:.2f}% · 净 {s['net_pct']:.2f}%</span>")
+        else:
+            lv = esc(s.get("detail", ""))
+        rows_s += (f"<tr><td>{esc(s['name'])}<br><span class=m>{esc(s['code'])}</span></td>"
+                   f"<td>{s['core_shares']}/{s['satellite_shares']}</td>"
+                   f"<td>{'持有中' if s.get('satellite_state') == 'holding' else '已卖出'}</td>"
+                   f"<td class='{cls}'>{sig}</td><td style='text-align:left'>{lv}</td></tr>")
     html = f"""<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8">
 <title>ETF持仓监控 {today}</title><style>
 body{{font-family:-apple-system,"PingFang SC",sans-serif;background:#f5f6f8;color:#2c3e50;padding:24px;line-height:1.7}}
@@ -255,6 +337,9 @@ ul{{margin:0 0 0 16px;padding:0;font-size:12px;color:#5a6b7b}}.sub{{color:#7f8c8
 <div class="card"><h2>权重漂移检查</h2><table>
 <thead><tr><th>资产</th><th>现价</th><th>市值</th><th>占比</th><th>目标</th><th>绝对偏离</th><th>相对偏离</th><th>状态</th><th>建议调整</th></tr></thead>
 <tbody>{rows_d}</tbody></table></div>
+<div class="card"><h2>卫星仓波段检查</h2><table>
+<thead><tr><th>标的</th><th>核心/卫星(份)</th><th>状态</th><th>信号</th><th>关键位与经济性</th></tr></thead>
+<tbody>{rows_s}</tbody></table></div>
 <div class="card"><div class="sub">阈值：绝对偏离&gt;{cfg['rebalance']['band_abs_pct']}pp 或 相对偏离&gt;{cfg['rebalance']['band_rel_pct']}% 触发再平衡。
 费用口径：佣金 max(5元, 成交额×万2.5) + 单边价差0.05%。非投资建议。</div></div>
 </div></body></html>"""
@@ -267,21 +352,25 @@ def main():
     ap.add_argument("--config", default=DEFAULT_CONFIG)
     ap.add_argument("--batch", action="store_true", help="只查批次")
     ap.add_argument("--drift", action="store_true", help="只查权重漂移")
+    ap.add_argument("--swing", action="store_true", help="只查卫星仓波段")
     ap.add_argument("--html", default=None)
     ap.add_argument("--save-state", action="store_true")
     args = ap.parse_args()
 
     cfg = json.load(open(args.config, encoding="utf-8"))
     today = date.today()
-    do_batch = args.batch or not (args.batch or args.drift)
-    do_drift = args.drift or not (args.batch or args.drift)
+    all_off = not (args.batch or args.drift or args.swing)
+    do_batch = args.batch or all_off
+    do_drift = args.drift or all_off
+    do_swing = args.swing or all_off
 
     batches = check_batches(cfg, today) if do_batch else None
     drift = check_drift(cfg) if do_drift else None
+    swing = check_swing(cfg, today) if do_swing else None
 
-    print(render_console(cfg, batches, drift, today))
+    print(render_console(cfg, batches, drift, swing, today))
     if args.html:
-        p = render_html(cfg, batches, drift, today, args.html)
+        p = render_html(cfg, batches, drift, swing, today, args.html)
         print(f"\nHTML 已写入：{p}")
     if args.save_state and drift:
         hist = []

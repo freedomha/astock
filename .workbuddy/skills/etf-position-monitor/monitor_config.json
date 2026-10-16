@@ -46,5 +46,34 @@
     "band_abs_pct": 5.0,
     "band_rel_pct": 25.0,
     "_note": "任一资产 绝对偏离>5pp 或 相对偏离>25% 即提示再平衡（先到即执行）"
+  },
+  "swing": {
+    "_note": "卫星仓波段规则。核心仓 core_shares 不动；卫星仓 satellite_shares 在上轨卖出、下轨买回。satellite_state: holding=当前持有卫星仓(等卖出信号) / sold=已卖出(等买回信号)。band_mode: fixed=以 ref_price 为中心 / ma=以 MA(ma_period) 为中心。更新基准价：改 ref_price 或把 satellite_state 切到 sold 后重设。",
+    "positions": [
+      {
+        "code": "sh510050",
+        "name": "上证50ETF华夏",
+        "core_shares": 3700,
+        "satellite_shares": 1500,
+        "satellite_state": "holding",
+        "band_mode": "fixed",
+        "ref_price": 2.866,
+        "band_pct": 2.5,
+        "stop_pct": 5.0,
+        "note": "VR5=0.66 回归最强；T+1。⚠️现贴 52 周低 2.837，买回位 2.794 在 52 周低之下——须先确认低点未破再执行买回，否则视为趋势破位"
+      },
+      {
+        "code": "sh513500",
+        "name": "标普500ETF博时",
+        "core_shares": 2400,
+        "satellite_shares": 800,
+        "satellite_state": "holding",
+        "band_mode": "fixed",
+        "ref_price": 2.679,
+        "band_pct": 2.5,
+        "stop_pct": 5.0,
+        "note": "T+0；QDII 有溢价风险且隔夜跳空大，波段本质是「溢价+汇率+美股期货」，非纯指数波动"
+      }
+    ]
   }
 }
