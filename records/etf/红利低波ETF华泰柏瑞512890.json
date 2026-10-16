@@ -1,0 +1,13 @@
+{
+  "name": "红利低波ETF华泰柏瑞",
+  "code": "sh512890",
+  "trades": [
+    {
+      "date": "2026-10-16",
+      "action": "buy",
+      "price": 1.215,
+      "shares": 3000,
+      "amount": 3645.0
+    }
+  ]
+}

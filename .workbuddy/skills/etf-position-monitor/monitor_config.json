@@ -1,0 +1,50 @@
+{
+  "_note": "ETF持仓监控配置。holdings 为当前实际持仓(份额/成本/目标权重)，pending_batches 为待执行批次，rebalance 为权重漂移规则。修改后直接运行 monitor.py。目标权重合计须=100（含cash）。",
+  "as_of": "2026-10-16",
+  "portfolio_value": 48533.20,
+  "cash": 16786.80,
+  "costs": {
+    "commission_rate": 0.00025,
+    "min_commission": 5.0,
+    "half_spread": 0.0005,
+    "lot_size": 100
+  },
+  "holdings": [
+    { "code": "sh510050", "name": "上证50ETF华夏",        "shares": 5200, "cost": 2.3381, "target_weight_pct": 30.5, "role": "core_beta" },
+    { "code": "sh513500", "name": "标普500ETF博时",       "shares": 3200, "cost": 1.0141, "target_weight_pct": 17.8, "role": "overseas_beta" },
+    { "code": "sh512890", "name": "红利低波ETF华泰柏瑞",   "shares": 3000, "cost": 1.2167, "target_weight_pct": 15.0, "role": "defensive" },
+    { "code": "sh518880", "name": "黄金ETF华安",          "shares": 300,  "cost": 8.5710, "target_weight_pct": 15.0, "role": "hedge" },
+    { "code": "sz159698", "name": "粮食ETF鹏华",          "shares": 2500, "cost": 0.9040, "target_weight_pct": 4.5,  "role": "tactical" }
+  ],
+  "pending_batches": [
+    {
+      "id": "gold-2", "code": "sh518880", "name": "黄金ETF华安", "shares": 300,
+      "desc": "黄金第2批",
+      "trigger": { "mode": "any", "conditions": [
+        { "type": "price_below", "level": 8.25, "label": "跌至 8.25 附近（近52周低 8.224）" }
+      ]}
+    },
+    {
+      "id": "gold-3", "code": "sh518880", "name": "黄金ETF华安", "shares": 200,
+      "desc": "黄金第3批",
+      "trigger": { "mode": "any", "conditions": [
+        { "type": "price_below", "level": 7.95, "label": "跌至 7.95 附近" },
+        { "type": "price_above_ma", "ma": 60, "label": "收盘站回 MA60 上方（止跌确认）" }
+      ]}
+    },
+    {
+      "id": "div-2", "code": "sh512890", "name": "红利低波ETF华泰柏瑞", "shares": 3000,
+      "desc": "红利低波第2批",
+      "trigger": { "mode": "any", "conditions": [
+        { "type": "price_below_ma", "ma": 20, "label": "回踩 MA20 附近" },
+        { "type": "time_elapsed", "ref_date": "2026-10-16", "days": 14, "label": "距首批 14 天（时间分批）" }
+      ]}
+    }
+  ],
+  "rebalance": {
+    "rule": "5/25",
+    "band_abs_pct": 5.0,
+    "band_rel_pct": 25.0,
+    "_note": "任一资产 绝对偏离>5pp 或 相对偏离>25% 即提示再平衡（先到即执行）"
+  }
+}
