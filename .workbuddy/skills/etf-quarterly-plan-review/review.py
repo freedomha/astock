@@ -292,8 +292,16 @@ def main():
     states = {}
     if not a.no_trend:
         intraday = now_is_intraday(now)
+        sprox = rules.get("state_proxy") or {}
         for c in codes:
-            states[c] = trend_state(c, klines[c], intraday)
+            if c in sprox:
+                pk = fetch_kline(sprox[c], 600)
+                st_ = trend_state(sprox[c], pk, intraday)
+                if st_:
+                    st_["src"] = f"底层指数 {sprox[c]}"
+                states[c] = st_
+            else:
+                states[c] = trend_state(c, klines[c], intraday)
 
     # ── 状态变化（与上次运行对比）
     prev = st.get("last_states") or {}
@@ -388,18 +396,20 @@ def main():
         best_nas = min(nas_ok, key=lambda c: prem[c]["prem"]) if nas_ok else None
     cond_premium = dict(
         id="premium", met=False,
-        label="纳指首选溢价收敛至 %.1f%% 以内" % rules.get("max_premium_pct", 1.5),
+        label="任一纳指ETF溢价收敛至 %.1f%% 以内（且底层状态合格）" % rules.get("max_premium_pct", 1.5),
         detail="—")
-    if best_nas:
-        bp = prem[best_nas]["prem"]
-        alt = [c for c in nas_ok if c != best_nas]
-        extra = ""
-        if alt:
-            alt_c = min(alt, key=lambda x: prem[x]["prem"])
-            extra = f"；备选最低 {prem[alt_c].get('name', alt_c)} {prem[alt_c]['prem']:+.2f}%"
-        cond_premium.update(met=bp <= rules.get("max_premium_pct", 1.5),
-                            detail=f"首选 {prem[best_nas].get('name', best_nas)} {bp:+.2f}%"
-                                   f"（还需回落 {max(0.0, bp - rules.get('max_premium_pct', 1.5)):.1f}pp）{extra}")
+    lim = rules.get("max_premium_pct", 1.5)
+    ok_nas = [c for c in nas_ok if prem[c]["prem"] <= lim]
+    if ok_nas:
+        pick = min(ok_nas, key=lambda c: prem[c]["prem"])
+        cond_premium.update(met=True,
+                            detail=f"可买 {prem[pick].get('name', pick)} {prem[pick]['prem']:+.2f}%"
+                                   f"（四只中溢价最低）；仍需底层状态合格")
+    elif nas_ok:
+        best = min(nas_ok, key=lambda c: prem[c]["prem"])
+        cond_premium.update(met=False,
+                            detail=f"最低 {prem[best].get('name', best)} {prem[best]['prem']:+.2f}%"
+                                   f"（还需回落 {max(0.0, prem[best]['prem'] - lim):.1f}pp）")
     gold = next((r for r in rows if r["code"] == "sh518880"), None)
     gold_states = rules.get("gate_overrides", {}).get("sh518880", rules["gate_states"])
     cond_gold = dict(id="gold_t1", met=False, label="黄金升到 T1 及以上（T0 仍禁）", detail="—")
@@ -440,7 +450,9 @@ def main():
     print("  " + "─" * (W - 4))
     for r in rows:
         s = r["state"]
-        stxt = f"{s['eff']} {s['label'][:6]}" if s else "—"
+        stxt = f"{s['eff']} {s['label'][:5]}" if s else "—"
+        if s and s.get("src"):
+            stxt += "※"
         if c in (rules.get("state_suspect") or []):
             stxt += " ⚠"
         if r["eligible"]:
@@ -452,7 +464,7 @@ def main():
         if pm.get("prem") is not None and pm["prem"] > rules.get("max_premium_pct", 1.5):
             pr = pr + "!"
         print(f"  {r['code']:10} {r['name'][:11]:<12} {r['px']:>7.3f} {pr:>8} {r['w']:>6.1f}% {r['tgt']:>5.1f}%"
-              f" {r['gap_amt']:>+9,.0f}  {stxt:<13} {mark}")
+              f" {r['gap_amt']:>+9,.0f}  {stxt:<17} {mark}")
 
     lim = rules.get("max_premium_pct", 1.5)
     over = [r for r in rows if (r.get("prem") or {}).get("prem") is not None
@@ -501,7 +513,8 @@ def main():
             print(f"          {rc_['detail']}")
         print(f"  当前：{'全部满足' if allmet else '均未满足'}"
               f"{'（下一季可按常规执行）' if allmet else '（继续空仓）'}")
-        print("  备注：溢价若靠价格下跌而收敛，纳指的 T4 可能同时失效，恢复时须重判状态。")
+        print("  备注：四只中哪只先满足就买哪只，多只满足取溢价最低；"
+              "且必须底层指数状态合格（当前 usNDX=T6，不在合格池）。")
 
     print(f"\n【触发】")
     if trig:
