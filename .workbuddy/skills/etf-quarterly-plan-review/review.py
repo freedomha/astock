@@ -268,6 +268,11 @@ def main():
     names = {c: q_all[c].get("name", c) for c in codes}
     prem_codes = codes + [c for c in rules.get("fallback_nasdaq", []) if c not in codes]
     prem = {c: fetch_premium(c) for c in prem_codes}
+    # 估值价格统一用 etf detail 的官方收盘价（与净值同日），取不到才退回实时报价
+    for c in codes:
+        px = (prem.get(c) or {}).get("px")
+        if px:
+            prices[c] = float(px)
 
     klines = {c: fetch_kline(c, max(rules["cov_window_bars"], 250) + 10) for c in codes}
     empty = [c for c in codes if len(klines[c]) < 60]
@@ -329,8 +334,9 @@ def main():
         c = h["code"]
         w = m2["w_pct"][c]
         tgt = h["target_pct"]
+        cap_tot = m2["tot"] + float(rules["quarterly_amount"])
         gap_pp = tgt - w
-        gap_amt = tgt / 100 * m2["tot"] - h["shares"] * prices[c]
+        gap_amt = tgt / 100 * cap_tot - h["shares"] * prices[c]
         s = states.get(c)
         allowed_states = rules.get("gate_overrides", {}).get(c, rules["gate_states"])
         gate = bool(s and s["eff"] in allowed_states)
@@ -399,12 +405,19 @@ def main():
         label="任一纳指ETF溢价收敛至 %.1f%% 以内（且底层状态合格）" % rules.get("max_premium_pct", 1.5),
         detail="—")
     lim = rules.get("max_premium_pct", 1.5)
+    nas_state_ok = any((states.get(c) or {}).get("eff") in rules["gate_states"]
+                       for c in nasdaq if c in codes)
     ok_nas = [c for c in nas_ok if prem[c]["prem"] <= lim]
-    if ok_nas:
+    if ok_nas and nas_state_ok:
         pick = min(ok_nas, key=lambda c: prem[c]["prem"])
         cond_premium.update(met=True,
                             detail=f"可买 {prem[pick].get('name', pick)} {prem[pick]['prem']:+.2f}%"
-                                   f"（四只中溢价最低）；仍需底层状态合格")
+                                   f"（四只中溢价最低），底层状态亦合格")
+    elif ok_nas:
+        pick = min(ok_nas, key=lambda c: prem[c]["prem"])
+        cond_premium.update(met=False,
+                            detail=f"{prem[pick].get('name', pick)} 溢价 {prem[pick]['prem']:+.2f}% 已达标，"
+                                   f"但底层指数状态不合格（{__import__('json').dumps({c:(states.get(c) or {}).get('eff') for c in nasdaq if c in codes}, ensure_ascii=False)}）")
     elif nas_ok:
         best = min(nas_ok, key=lambda c: prem[c]["prem"])
         cond_premium.update(met=False,
@@ -412,7 +425,7 @@ def main():
                                    f"（还需回落 {max(0.0, prem[best]['prem'] - lim):.1f}pp）")
     gold = next((r for r in rows if r["code"] == "sh518880"), None)
     gold_states = rules.get("gate_overrides", {}).get("sh518880", rules["gate_states"])
-    cond_gold = dict(id="gold_t1", met=False, label="黄金升到 T1 及以上（T0 仍禁）", detail="—")
+    cond_gold = dict(id="gold_t1", met=False, label="黄金进入分散腿合格集 {T1,T2,T3a,T3b,T4}", detail="—")
     if gold and gold.get("state"):
         gs = gold["state"]
         ok_prem = (gold.get("prem") or {}).get("prem")
