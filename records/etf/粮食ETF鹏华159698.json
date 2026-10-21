@@ -22,6 +22,18 @@
       "price": 0.935,
       "shares": 1300,
       "amount": 1215.5
+    },
+    {
+      "date": "2026-10-21",
+      "action": "sell",
+      "price": 0.864,
+      "shares": 2500,
+      "amount": 2160.0,
+      "time": "13:43:07",
+      "note": "全部清仓（计划为减半1250份，实际执行清仓）；T0降级 + 10/20收盘连续2日破0.865"
     }
-  ]
+  ],
+  "closed": true,
+  "realized_pnl": -86.5,
+  "closed_note": "重新纳入观察需站回MA60（约0.915）且完整周线转flat/up"
 }
