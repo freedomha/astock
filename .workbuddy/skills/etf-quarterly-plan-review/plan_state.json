@@ -124,10 +124,8 @@
       "sz159941": "usNDX"
     },
     "qdii_proxy_note": "QDII 用底层指数 lag1 收益替代场内价：剥离溢价污染 + 修正中美时差。市值仍按场内价计。",
-    "state_suspect": [
-      "sh513500"
-    ],
-    "state_suspect_note": "513500 距52周低+24.6%、距250日高-4.5%、MA60上行，却判 T0，属状态机误判，复评时标注 ⚠ 待人工复核。",
+    "state_suspect": [],
+    "state_suspect_note": "已解决：513500 的 T0 误判通过 state_proxy（usINX）修正为 T6 高位整理。保留字段供将来标注其他可疑判定。",
     "state_proxy": {
       "sz159941": "usNDX",
       "sh513500": "usINX"
@@ -145,5 +143,5 @@
     "sh512890": "T3b",
     "sh518880": "T0"
   },
-  "last_run": "2026-10-21T17:49:59"
+  "last_run": "2026-10-21T18:03:42"
 }
