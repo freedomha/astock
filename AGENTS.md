@@ -6,10 +6,11 @@ This file provides guidance to CodeBuddy Code when working with code in this rep
 
 A-share quantitative analysis workspace producing sector and ETF research reports. Not a traditional software project — no package manager, build system, or test suite. All logic lives in standalone Python scripts under `.workbuddy/skills/`. Data source is Tencent 自选股 via the `westock-data` Node.js CLI. Output is self-contained HTML reports with Chart.js/ECharts visualizations.
 
-Two categories of skills exist:
+Four categories of skills exist:
 - **Sector scanners** (1 skill): bowl-bottom pattern scanning on 861 industry/concept sectors
 - **ETF scanners** (7 skills): bowl-bottom, box-consolidation, W-bottom, head-shoulder-bottom, 2B-bottom pattern scanning + T2区间 state-machine scanning + T2/T3a低吸 scanning on 352 largest A-share ETFs
 - **Deep analysis** (2 skills): sell-side quality research reports for individual sectors or ETFs
+- **Plan monitoring** (2 skills): `etf-operation-plan` 趋势状态机操作建议 + `etf-quarterly-plan-review` 季度定投计划周度复评
 
 ## Environment & Prerequisites
 
@@ -77,6 +78,11 @@ $PYTHON .workbuddy/skills/etf-operation-plan/backtest.py
 $PYTHON .workbuddy/skills/etf-operation-plan/backtest.py --use-confirmed  # 暴露上调需连续2周确认
 $PYTHON .workbuddy/skills/etf-operation-plan/backtest.py --code sh518880   # 单只ETF
 $PYTHON .workbuddy/skills/etf-operation-plan/backtest.py --commission-rate 0.00025 --min-commission 5 --half-spread 0.0005 --position-value 30000  # 覆盖成本参数/名义本金
+
+# ETF 季度定投计划 · 周度复评 — 四道门判定 + 状态变化追踪 + 本季下单指令
+$PYTHON .workbuddy/skills/etf-quarterly-plan-review/review.py              # 周度复评
+$PYTHON .workbuddy/skills/etf-quarterly-plan-review/review.py --quarter-end # 季末执行模式
+$PYTHON .workbuddy/skills/etf-quarterly-plan-review/review.py --save --json # 存档 + 机器可读
 ```
 
 **Refresh intraday data (盘中刷新, 默认开启):** All ETF `analyze.py` scanners force-refresh same-date kline bars by default — a bar fetched at 10:30 (intraday) is replaced with the latest data when re-run (e.g., after 15:00 post-close). Use `--no-refresh` to skip same-date re-fetching.
@@ -130,6 +136,7 @@ westock-data CLI (Node.js) → raw JSON → Python scripts → processed JSON �
 | ETF T2区间 | `etf-t2-scanner/` | analyze.py (T0-T8状态机+5维置信度), generate_report.py | 352 ETFs | etf_t2_results.json |
 | ETF 低吸(T2+T3a) | `etf-lowdip-scanner/` | analyze.py (T0-T8状态机+6维低吸置信度), generate_report.py | 352 ETFs | etf_lowdip_results.json |
 | ETF Operation Plan | `etf-operation-plan/` | trend_analysis.py (844L), score_patterns.py (2056L), operation_engine.py (363L), backtest.py (577L) | 1 held ETF | reports/etf/operation/*-操作建议.html + backtest_trend_state_results.json |
+| ETF 季定投复评 | `etf-quarterly-plan-review/` | review.py（约 460L，仅标准库） | 5 只持仓 + 目标权重 | 控制台报告 + review_history.json |
 | Sector Deep Analysis | `sector-deep-analysis/` | AI-driven, no scripts | 1 sector | reports/sectors/<name>.html |
 | ETF Deep Analysis | `etf-deep-analysis/` | AI-driven, no scripts | 1 ETF | reports/etf/<name>.html |
 

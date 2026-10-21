@@ -1,0 +1,100 @@
+{
+  "as_of": "2026-10-21",
+  "plan_report": "reports/etf/allocation/20261021-季定投计划.html",
+  "cash": 15300.8,
+  "peak_value": 48452.8,
+  "holdings": [
+    {
+      "code": "sh510050",
+      "name": "上证50ETF华夏",
+      "shares": 5200,
+      "cost": 2.3381,
+      "target_pct": 20.0,
+      "locked": true,
+      "role": "core-index",
+      "note": "永久停止买入，只靠新资金稀释"
+    },
+    {
+      "code": "sh513500",
+      "name": "标普500ETF博时",
+      "shares": 3200,
+      "cost": 1.0141,
+      "target_pct": 20.0,
+      "locked": false,
+      "role": "diversifier-overseas",
+      "note": "T0 判定存疑（距52周低+24.6%、距250日高-4.5%），复核后可能改判 T1/T6"
+    },
+    {
+      "code": "sh513100",
+      "name": "纳指ETF国泰",
+      "shares": 0,
+      "cost": null,
+      "target_pct": 15.0,
+      "locked": false,
+      "role": "diversifier-overseas",
+      "note": "当前唯一 T4，本季首选；另有 sz159941 / sz159632 / sh513110 可替换"
+    },
+    {
+      "code": "sh512890",
+      "name": "红利低波ETF华泰柏瑞",
+      "shares": 6000,
+      "cost": 1.2135,
+      "target_pct": 15.0,
+      "locked": false,
+      "role": "same-factor-value",
+      "note": "与上证50 同属 A 股价值组，受风格组 60% 上限约束"
+    },
+    {
+      "code": "sh518880",
+      "name": "黄金ETF华安",
+      "shares": 300,
+      "cost": 8.571,
+      "target_pct": 10.0,
+      "locked": false,
+      "role": "diversifier-commodity",
+      "note": "距 52 周低仅 2.4%，兜底保护 1 会挡住"
+    }
+  ],
+  "style_group": [
+    "sh510050",
+    "sh512890"
+  ],
+  "rules": {
+    "quarterly_amount": 3000,
+    "max_trade": 3000,
+    "min_trade": 2000,
+    "lot_size": 100,
+    "style_group_limit_pct": 60.0,
+    "style_group_clear_pct": 55.0,
+    "drawdown_alert_pct": 15.0,
+    "drawdown_recover_pct": 10.0,
+    "cov_window_bars": 500,
+    "cov_window_short_bars": 250,
+    "gate_states": [
+      "T3b",
+      "T4"
+    ],
+    "reserve_fill_states": [
+      "T3b",
+      "T4"
+    ],
+    "fallback_nasdaq": [
+      "sh513100",
+      "sz159941",
+      "sz159632",
+      "sh513110"
+    ]
+  },
+  "executed": {
+    "2026Q3": true,
+    "2026Q4": false
+  },
+  "last_states": {
+    "sh510050": "T0",
+    "sh513500": "T0",
+    "sh513100": "T4",
+    "sh512890": "T3b",
+    "sh518880": "T0"
+  },
+  "last_run": "2026-10-21T16:28:42"
+}
