@@ -83,6 +83,19 @@ def fetch_kline(code, limit=500):
     return sorted(d, key=lambda b: b["date"])          # 统一升序，末位＝最新
 
 
+def fetch_premium(code):
+    """通过 etf detail 取 收盘价/净值/申购状态 → 溢价率。QDII 溢价是硬门，必须查。"""
+    d = _run([find_node(), f"{WD}/scripts/index.js", "etf", "detail", code, "--raw"])
+    try:
+        s = d["sections"][0][0]
+        px, nav = s.get("closePrice"), s.get("nav")
+        prem = (px / nav - 1) * 100 if px and nav else None
+        return dict(px=px, nav=nav, prem=prem,
+                    purchase=s.get("purchaseStatus"), etf_type=s.get("etfType"), date=s.get("date"))
+    except (KeyError, IndexError, TypeError):
+        return None
+
+
 def trend_state(code, klines, intraday):
     """调用 etf-operation-plan/trend_analysis.py，返回 (T码, 标签, 关键指标) """
     if not os.path.exists(TREND) or len(klines) < 60:
@@ -229,6 +242,8 @@ def main():
         return 1
     prices = {c: float(q_all[c]["price"]) for c in codes}
     names = {c: q_all[c].get("name", c) for c in codes}
+    prem_codes = codes + [c for c in rules.get("fallback_nasdaq", []) if c not in codes]
+    prem = {c: fetch_premium(c) for c in prem_codes}
 
     klines = {c: fetch_kline(c, max(rules["cov_window_bars"], 250) + 10) for c in codes}
     empty = [c for c in codes if len(klines[c]) < 60]
@@ -284,7 +299,8 @@ def main():
         gap_pp = tgt - w
         gap_amt = tgt / 100 * m2["tot"] - h["shares"] * prices[c]
         s = states.get(c)
-        gate = bool(s and s["eff"] in rules["gate_states"])
+        allowed_states = rules.get("gate_overrides", {}).get(c, rules["gate_states"])
+        gate = bool(s and s["eff"] in allowed_states)
         blocked = []
         if h.get("locked"):
             blocked = ["锁定不买"]
@@ -294,10 +310,14 @@ def main():
             blocked.append("风格组>%.0f%%" % rules["style_group_limit_pct"])
         if not h.get("locked") and gap_amt <= 0:
             blocked.append("已达标")
+        pm = prem.get(c) or {}
+        if not h.get("locked") and pm.get("prem") is not None \
+                and pm["prem"] > rules.get("max_premium_pct", 1.5):
+            blocked.append(f"溢价{pm['prem']:+.1f}%")
         rows.append(dict(code=c, name=names[c], px=prices[c], w=w, tgt=tgt,
                          gap_pp=gap_pp, gap_amt=gap_amt, state=s,
                          eligible=len(blocked) == 0, blocked=blocked,
-                         shares=h["shares"]))
+                         shares=h["shares"], prem=prem.get(c)))
 
     # ── 本季下单建议
     cand = [r for r in rows if r["eligible"] and r["gap_amt"] > 0]
@@ -332,6 +352,31 @@ def main():
             trig.append(("🟠 状态转弱", f"{ch['name']} {ch['old']} → {ch['new']}",
                          "当季改投次优合格标的；无则留现金"))
 
+    # ── 恢复条件（任一生效即可恢复）
+    resume = rules.get("resume") or {}
+    nasdaq = rules.get("fallback_nasdaq", [])
+    nas_ok = [c for c in nasdaq if (prem.get(c) or {}).get("prem") is not None]
+    best_nas = min(nas_ok, key=lambda c: prem[c]["prem"]) if nas_ok else None
+    cond_premium = dict(
+        id="premium", met=False, label="任一纳指ETF溢价收敛至 %.1f%% 以内" % rules.get("max_premium_pct", 1.5),
+        detail="—")
+    if best_nas:
+        bp = prem[best_nas]["prem"]
+        cond_premium.update(met=bp <= rules.get("max_premium_pct", 1.5),
+                            detail=f"{prem[best_nas].get('name', best_nas)} {bp:+.2f}%"
+                                   f"（还需回落 {max(0.0, bp - rules.get('max_premium_pct', 1.5)):.1f}pp）")
+    gold = next((r for r in rows if r["code"] == "sh518880"), None)
+    gold_states = rules.get("gate_overrides", {}).get("sh518880", rules["gate_states"])
+    cond_gold = dict(id="gold_t1", met=False, label="黄金升到 T1 及以上（T0 仍禁）", detail="—")
+    if gold and gold.get("state"):
+        gs = gold["state"]
+        ok_prem = (gold.get("prem") or {}).get("prem")
+        ok_prem = ok_prem is not None and ok_prem <= rules.get("max_premium_pct", 1.5)
+        cond_gold.update(met=(gs["eff"] in gold_states and ok_prem),
+                         detail=f"当前 {gs['eff']} {gs['label']}｜周线 {gs.get('weekly_slope')}%"
+                                f"｜距MA60 {gs.get('price_vs_ma60')}%｜溢价 {(gold.get('prem') or {}).get('prem', 0):+.2f}%")
+    resume_rows = [cond_premium, cond_gold]
+
     # ── 输出
     qe = quarter_end_date(now.date())
     left = trading_days_between(now.date(), qe)
@@ -354,7 +399,7 @@ def main():
           f" | 回撤 {dd:+.1f}%（峰值 {peak:,.0f}）")
 
     print(f"\n【标的】")
-    hdr = f"  {'代码':10}{'名称':16}{'现价':>8}{'权重':>8}{'目标':>7}{'缺口':>12}  {'状态':<14}"
+    hdr = f"  {'代码':10}{'名称':14}{'现价':>7}{'溢价':>8}{'权重':>7}{'目标':>6}{'缺口':>10}  {'状态':<13}"
     print(hdr)
     print("  " + "─" * (W - 4))
     for r in rows:
@@ -364,8 +409,29 @@ def main():
             mark = "可买"
         else:
             mark = "/".join(r["blocked"])[:14]
-        print(f"  {r['code']:10}{r['name'][:14]:16}{r['px']:>8.3f}{r['w']:>7.1f}%{r['tgt']:>6.1f}%"
-              f"{r['gap_pp']:>+7.1f}pp{r['gap_amt']:>+9,.0f}  {stxt:<14} {mark}")
+        pm = r.get("prem") or {}
+        pr = f"{pm['prem']:+.2f}%" if pm.get("prem") is not None else "—"
+        if pm.get("prem") is not None and pm["prem"] > rules.get("max_premium_pct", 1.5):
+            pr = pr + "!"
+        print(f"  {r['code']:10} {r['name'][:11]:<12} {r['px']:>7.3f} {pr:>8} {r['w']:>6.1f}% {r['tgt']:>5.1f}%"
+              f" {r['gap_amt']:>+9,.0f}  {stxt:<13} {mark}")
+
+    lim = rules.get("max_premium_pct", 1.5)
+    over = [r for r in rows if (r.get("prem") or {}).get("prem") is not None
+            and r["prem"]["prem"] > lim]
+    disc = [r for r in rows if (r.get("prem") or {}).get("prem") is not None
+            and r["prem"]["prem"] < -lim]
+    if over:
+        print(f"\n【溢价】> {lim}% 上限，买入一律禁止：")
+        for r in over:
+            pm = r["prem"]
+            tag = "｜不可申购·套利进不来，溢价难收敛" if pm.get("purchase") == "不可申购" else ""
+            print(f"  {r['name']}：{pm['prem']:+.2f}%（净值 {pm['nav']} / 收盘 {pm['px']}）{tag}")
+    if disc:
+        print(f"【折价】< -{lim}%，买入相对划算（不构成门槛）：")
+        for r in disc:
+            pm = r["prem"]
+            print(f"  {r['name']}：{pm['prem']:+.2f}%（净值 {pm['nav']} / 收盘 {pm['px']}）")
 
     print(f"\n【本季 {q}】已执行：{'是' if done else '否'} | 距季末约 {left} 个交易日（{qe}）")
     if action:
@@ -388,6 +454,17 @@ def main():
     elif prev:
         print(f"\n【状态变化】无（与上次一致）")
 
+    if not cand:
+        allmet = all(r_["met"] for r_ in resume_rows)
+        print(f"\n【等待恢复】恢复策略：A 或 B 任一成立即恢复长期执行")
+        for tag, rc_ in zip(("A", "B"), resume_rows):
+            icon = "✅" if rc_["met"] else "⏳"
+            print(f"  {icon} 条件{tag}｜{rc_['label']}")
+            print(f"          {rc_['detail']}")
+        print(f"  当前：{'全部满足' if allmet else '均未满足'}"
+              f"{'（下一季可按常规执行）' if allmet else '（继续空仓）'}")
+        print("  备注：溢价若靠价格下跌而收敛，纳指的 T4 可能同时失效，恢复时须重判状态。")
+
     print(f"\n【触发】")
     if trig:
         for t, cond, act in trig:
@@ -403,8 +480,14 @@ def main():
         print("  季末执行窗口：按上方指令下单，成交后跑 --mark-executed 并更新 shares/cash。")
     elif done:
         print(f"  本季（{q}）已执行，本周仅监控，无需动作。")
+    elif action is None and not cand:
+        met = [r_["id"] for r_ in resume_rows if r_["met"]]
+        if met:
+            print(f"  恢复条件已满足（{', '.join(met)}），下季按常规规则执行。")
+        else:
+            print(f"  空仓等待：本季 3,000 元并入现金，等溢价收敛或黄金转 T1 后恢复。")
     else:
-        print("  本周无需动作；等季末（%s）再执行。" % qe)
+        print(f"  本周无需动作；等季末（{qe}）再执行。")
     print("═" * W)
 
     # ── 存档
@@ -413,8 +496,11 @@ def main():
                 sd=m2["sd"], rc50=rc50, rc50_abs=rc50_abs,
                 style2=style_rc2, style1=style_rc1, drawdown=dd, peak=peak,
                 states={c: (states[c]["eff"] if states.get(c) else None) for c in codes},
+                premium={c: (prem[c]["prem"] if prem.get(c) else None) for c in codes},
                 action=action, triggers=[t[0] for t in trig], executed=done,
-                changes=changes)
+                changes=changes,
+                resume={r_["id"]: r_["met"] for r_ in resume_rows},
+                resume_detail={r_["id"]: r_["detail"] for r_ in resume_rows})
 
     if a.save:
         hist = []

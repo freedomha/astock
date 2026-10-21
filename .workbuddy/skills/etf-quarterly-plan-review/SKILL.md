@@ -1,6 +1,6 @@
 ---
 name: etf-quarterly-plan-review
-description: Use when the user wants to review the quarterly contribution plan (季度定投计划 / 季定投复评 / 每周复评 / 该投了吗 / 检查定投计划), or asks whether this quarter's 3,000 元 contribution should be deployed and where. Reads plan_state.json (holdings with shares/cost/target weights, cash, six execution rules, executed-quarter flags) plus the plan report at reports/etf/allocation/20261021-季定投计划.html, pulls live quotes and 500-day klines from westock-data, delegates trend states to etf-operation-plan/trend_analysis.py, then: (a) computes weights / σp / RC50 share & absolute / A-share-value style-group risk on both 2-year and 1-year windows; (b) diffs each ETF's trend state against the previous run and flags upgrades (预备队启用) or degradations; (c) evaluates every target's gap and the four gates (state T3b/T4, 2,000 元 minimum trade, 60% style-group cap, 3,000 元 cap) to produce the single legitimate order, lot-rounded; (d) checks drawdown / style / state triggers; (e) prints 无需动作 / 到季末该执行了 / 暂停复核, with --json and --save for archiving. Triggers on "周度复评"、"季定投"、"定投计划复评"、"这季该投吗"、"buy check"、"plan review".
+description: Use when the user wants to review the quarterly contribution plan (季度定投计划 / 季定投复评 / 每周复评 / 该投了吗 / 检查定投计划), or asks whether this quarter's 3,000 元 contribution should be deployed and where. Reads plan_state.json (holdings with shares/cost/target weights, cash, six execution rules, executed-quarter flags) plus the plan report at reports/etf/allocation/20261021-季定投计划.html, pulls live quotes and 500-day klines from westock-data, delegates trend states to etf-operation-plan/trend_analysis.py, then: (a) computes weights / σp / RC50 share & absolute / A-share-value style-group risk on both 2-year and 1-year windows; (b) diffs each ETF's trend state against the previous run and flags upgrades (预备队启用) or degradations; (c) evaluates every target's gap and the five gates (state T3b/T4, **QDII premium ≤1.5%**, 2,000 元 minimum trade, 60% style-group cap, 3,000 元 cap) to produce the single legitimate order, lot-rounded — premium is read from etf detail (closePrice/nav/purchaseStatus) because a cross-border ETF at a high premium can lose 15%+ on premium convergence even if the underlying is flat; (d) checks drawdown / style / state triggers; (e) prints 无需动作 / 到季末该执行了 / 暂停复核, with --json and --save for archiving. Triggers on "周度复评"、"季定投"、"定投计划复评"、"这季该投吗"、"buy check"、"plan review".
 ---
 
 # 季度定投计划 · 周度复评
@@ -72,14 +72,28 @@ description: Use when the user wants to review the quarterly contribution plan (
 - **`cash` / `shares` 必须与实际券商持仓一致**——本 skill 不从 `records/etf/*.json` 反推（流水可能不完整）。
 - 会计状态（`peak_value` / `last_states` / `last_run`）由脚本自动维护，不要手改。
 
-### 六条执行规则（脚本内置，改规则改 `rules`）
+### 七条执行规则（脚本内置，改规则改 `rules`）
 
+0. **QDII 溢价门（最硬的一道）**：买入前查 `etf detail` 的 `closePrice / nav`，**溢价 > `max_premium_pct`（1.5%）一律不买**；折价不构成门槛（买入相对划算，仅提示）。跨境 ETF 在**不可申购**时套利资金进不来，溢价可持续也可突然收敛——按高溢价买入，标的不动也可能亏 15%。**所有纳指 ETF 共用同一底层，溢价会同步走高，换标的往往没用**。
 1. 每季 3,000 元，单笔上限 3,000；缺口按 `目标权重 × 总资产 − 当前市值` 每季重算，**不跨季结转额度**。
 2. **单笔 < 2,000 元跳过**（5 元最低佣金 = 0.25%，高于策略容忍度）。
-3. 只买**状态合格**（`gate_states`）的标的，多头候选取缺口最大者，每季至多 1 只。
+3. 只买**状态合格**（`gate_states`）的标的，多头候选取缺口最大者，每季至多 1 只。**支持按标的重载**：`gate_overrides` 中的标的用各自的状态集——当前黄金 `sh518880` 放宽到 `T1` 及以上（它是不付溢价的唯一分散腿），T0 仍禁，不接飞刀。
 4. **风格组 60% 上限只约束同因子标的**（`style_group` 内的红利类）；**低相关腿（纳指/标普/黄金）不受此限**——它们的作用就是把该组占比压下去，若也受限则规则自我否定。
 5. **双窗口判定**：2 年与 1 年窗口的风格组风险**都**低于 60% 才放行红利类。
 6. 兜底（可选，当前未启用）：当季无成交时买分散腿 2,000～3,000 元，受三条保护约束（距 52 周低 <5% 不触发、回撤暂停期不触发、缺口 <2,000 不触发）。
+
+### 空仓等待与恢复（当前生效）
+
+当没有任何标的过门时，本季 **3,000 元并入现金**，进入"空仓等待"，**恢复策略为"任一条件成立"**：
+
+| 条件 | 判定 | 说明 |
+|---|---|---|
+| **A 溢价收敛** | 任一纳指 ETF（`fallback_nasdaq` 四只）溢价 ≤ `max_premium_pct` | 溢价收敛后纳指仍要过状态门（当前 T4） |
+| **B 黄金转 T1** | 黄金状态 ∈ `gate_overrides` 允许集 且 溢价合理 | 黄金当前折价，一旦转 T1 立刻可买 |
+
+⚠ **A 的陷阱**：溢价若靠价格下跌而收敛，纳指的 T4 可能同时失效——恢复时必须重判状态，不能看到"溢价<1.5%"就直接下单。
+
+复评输出会打印【等待恢复】段，逐条给出距离（还需回落多少 pp、当前是什么状态），用于观察进展。
 
 ## Workflow
 
@@ -108,9 +122,11 @@ $PY $SK/review.py --save --json      # 存档 + 机器可读
 |------|--------|
 | 【组合】 | 仓位、现金占比。现金持续 >35% 说明合格标的太少，不是执行不到位 |
 | 【风险】 | **RC50 占比**（份额）与**绝对贡献**（占比×σp）要一起看，单独看占比会被"加高波动资产"机械稀释 |
-| 【标的】 | `可买` ＝ 四道门全过；否则显示被哪道门挡住（锁定/状态门/风格组/已达标） |
+| 【标的】 | `可买` ＝ 五道门全过；否则显示被哪道门挡住（锁定/状态门/风格组/已达标/溢价）。溢价列带 `!` 表示超限 |
+| 【溢价】/【折价】 | 溢价 >1.5% 列黑名单（含**已持仓**，用于判断"预备队补缺口"该不该补）；折价仅作参考 |
 | 【状态变化】 | 周度复评的核心增量。升级到 T3b/T4 → 预备队可补；降级出 T3b/T4 → 当季改投 |
 | 【本季】 | 已执行？距季末几天？此刻执行会买什么、多少份、多少钱 |
+| 【等待恢复】 | 空仓时出现。条件 A（溢价收敛）／B（黄金转 T1），任一满足即恢复，附当前差距 |
 | 【触发】 | 🟢 状态恢复 / 🟠 风格组超限 / 🟠 状态转弱 / 🔴 回撤 → 按提示动作 |
 | 【结论】 | 无需动作 / 季末执行 / 暂停复核 |
 
@@ -132,6 +148,8 @@ $PY $SK/review.py --save --json      # 存档 + 机器可读
 
 - **周中不交易**：额度按季释放。周度复评只用于发现状态变化与提前识别风险。
 - **状态机口径**：`trend_analysis.py` 返回 `T3` + `sub_state=T3b`，脚本用 `eff = sub or code` 做门判定；**不要**用 `T3` 直接比 `T3b`。
+- **⚠ 跨境 ETF 的 T 码会被溢价污染**：状态机吃的是场内价格，而 QDII 场内价 = 净值 + 溢价。实测 513100 在 2026-10 被判 T4「中期上升确认」，但同期净值仅 +8%、价格 +22.9%，用底层指数（`kline usNDX`）跑出来是 **T6 信号混合**。**对跨境 ETF，T 码只能当参考，真实趋势要用净值或底层指数复核**；溢价门才是第一道闸。
+- **溢价会污染协方差**：RC50 / σp / 相关性同样用场内价格算，QDII 的溢价波动会抬高波动率、扭曲相关性。当前未改用净值序列，属已知偏差。
 - **状态机降级有 pending 确认期**，单日跳变不会立刻改判；这也是本 skill **不另设价格止损**的原因——价格止损会与规则 3 互相抵消（跌破 MA60 时规则 3 已禁买，缓冲轮不到生效）。
 - **周末运行**：周六/周日跑时最新 K 线是周五收盘，`bar_date` 会显示周五日期，属正常。
 - **数据源限流**：报价缺失会直接报错退出（不静默降级）。重试即可；`--no-trend` 可跳过 5 次趋势计算加快。
