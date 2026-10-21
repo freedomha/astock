@@ -131,7 +131,25 @@ def trend_state(code, klines, intraday):
 
 
 # ─────────────────────────── 组合计算 ───────────────────────────
-def build_cov(codes, klines_by_code, bars):
+def proxy_returns(proxy_code, dates):
+    """底层指数 lag1 收益：对每个 A 股交易日 d，取「d 之前最近两个美股交易日」的收益。
+    理由：美股收盘早于 A 股开盘，同日对齐会把"未来"信息塞进当期，压低相关性。"""
+    kl = fetch_kline(proxy_code, 600)
+    if len(kl) < 60:
+        return None
+    m = {b["date"]: float(b["last"]) for b in kl}
+    ds = sorted(m)
+    r = {ds[i]: m[ds[i]] / m[ds[i - 1]] - 1 for i in range(1, len(ds))}
+    out, last = [], None
+    for d in dates:                      # dates 为升序的 A 股交易日（含首日）
+        cand = [x for x in ds if x < d]
+        if len(cand) >= 2:
+            last = r.get(cand[-1], last)
+        out.append(last)
+    return out
+
+
+def build_cov(codes, klines_by_code, bars, proxy_map=None):
     """按交易日对齐，返回 (Σ 为 list[list], 实际交易日数, 收益率字典)。纯标准库实现。"""
     maps = {}
     for c in codes:
@@ -146,7 +164,13 @@ def build_cov(codes, klines_by_code, bars):
     if len(dates) < 60:
         return None, 0, {}
     rets = {}
+    proxy_map = proxy_map or {}
     for c in codes:
+        if c in proxy_map:
+            px = proxy_returns(proxy_map[c], dates)
+            if px and all(x is not None for x in px[1:]):
+                rets[c] = [x for x in px[1:]]
+                continue
         v = [maps[c][d] for d in dates]
         rets[c] = [(v[i] / v[i - 1] - 1) for i in range(1, len(v))]
     n = len(codes)
@@ -252,8 +276,9 @@ def main():
         return 1
 
     # ── 协方差（双窗口）
-    S2, n2, _ = build_cov(codes, klines, rules["cov_window_bars"])
-    S1, n1, _ = build_cov(codes, klines, rules["cov_window_short_bars"])
+    pmap = rules.get("qdii_proxy") or {}
+    S2, n2, _ = build_cov(codes, klines, rules["cov_window_bars"], pmap)
+    S1, n1, _ = build_cov(codes, klines, rules["cov_window_short_bars"], pmap)
     mv = [holdings[i]["shares"] * prices[holdings[i]["code"]] for i in range(len(codes))]
     m2 = metrics(codes, mv, cash, S2)
     m1 = metrics(codes, mv, cash, S1)
@@ -404,7 +429,8 @@ def main():
 
     pos_pct = (1 - cash / m2["tot"]) * 100
     print(f"\n【组合】总资产 {m2['tot']:,.0f} | 仓位 {pos_pct:.1f}% | 现金 {cash:,.0f} ({cash / m2['tot'] * 100:.1f}%)")
-    print(f"【风险】σp {m2['sd']:.2f}% | RC50 占比 {rc50:.1f}% | 绝对贡献 {rc50_abs:.2f}%")
+    pnote = "QDII已用指数代理" if pmap else "全用场内价"
+    print(f"【风险】σp {m2['sd']:.2f}% | RC50 占比 {rc50:.1f}% | 绝对贡献 {rc50_abs:.2f}%  ({pnote})")
     print(f"       风格组 {style_rc2:.1f}%（2年）/ {style_rc1:.1f}%（1年）"
           f" | 回撤 {dd:+.1f}%（峰值 {peak:,.0f}）")
 
@@ -415,6 +441,8 @@ def main():
     for r in rows:
         s = r["state"]
         stxt = f"{s['eff']} {s['label'][:6]}" if s else "—"
+        if c in (rules.get("state_suspect") or []):
+            stxt += " ⚠"
         if r["eligible"]:
             mark = "可买"
         else:
