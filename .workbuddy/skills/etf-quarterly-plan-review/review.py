@@ -356,15 +356,25 @@ def main():
     resume = rules.get("resume") or {}
     nasdaq = rules.get("fallback_nasdaq", [])
     nas_ok = [c for c in nasdaq if (prem.get(c) or {}).get("prem") is not None]
-    best_nas = min(nas_ok, key=lambda c: prem[c]["prem"]) if nas_ok else None
+    prim = rules.get("nasdaq_primary")
+    if prim and prim in nas_ok:
+        best_nas = prim                      # 只认首选标的的溢价，不用备选最低值替代
+    else:
+        best_nas = min(nas_ok, key=lambda c: prem[c]["prem"]) if nas_ok else None
     cond_premium = dict(
-        id="premium", met=False, label="任一纳指ETF溢价收敛至 %.1f%% 以内" % rules.get("max_premium_pct", 1.5),
+        id="premium", met=False,
+        label="纳指首选溢价收敛至 %.1f%% 以内" % rules.get("max_premium_pct", 1.5),
         detail="—")
     if best_nas:
         bp = prem[best_nas]["prem"]
+        alt = [c for c in nas_ok if c != best_nas]
+        extra = ""
+        if alt:
+            alt_c = min(alt, key=lambda x: prem[x]["prem"])
+            extra = f"；备选最低 {prem[alt_c].get('name', alt_c)} {prem[alt_c]['prem']:+.2f}%"
         cond_premium.update(met=bp <= rules.get("max_premium_pct", 1.5),
-                            detail=f"{prem[best_nas].get('name', best_nas)} {bp:+.2f}%"
-                                   f"（还需回落 {max(0.0, bp - rules.get('max_premium_pct', 1.5)):.1f}pp）")
+                            detail=f"首选 {prem[best_nas].get('name', best_nas)} {bp:+.2f}%"
+                                   f"（还需回落 {max(0.0, bp - rules.get('max_premium_pct', 1.5)):.1f}pp）{extra}")
     gold = next((r for r in rows if r["code"] == "sh518880"), None)
     gold_states = rules.get("gate_overrides", {}).get("sh518880", rules["gate_states"])
     cond_gold = dict(id="gold_t1", met=False, label="黄金升到 T1 及以上（T0 仍禁）", detail="—")
