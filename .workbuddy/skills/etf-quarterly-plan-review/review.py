@@ -678,6 +678,12 @@ def main():
                 states={c: (states[c]["eff"] if states.get(c) else None) for c in codes},
                 scores={c: ({k: scores[c][k] for k in ("trend", "momentum", "risk", "div", "total")}
                             if scores.get(c) else None) for c in codes},
+                rows=[dict(code=r["code"], name=r["name"], px=r["price"] if "price" in r else r["px"],
+                           weight=r["w"], target=r["tgt"], gap=r["gap_amt"],
+                           score=(r["score"]["total"] if r.get("score") else None),
+                           drc50=(r["score"]["drc50"] if r.get("score") else None),
+                           blocked=r["blocked"], pass_all=r.get("pass_all", False))
+                      for r in rows],
                 score_max=max_score, selection=sel_note,
                 premium={c: (prem[c]["prem"] if prem.get(c) else None) for c in codes},
                 action=action, triggers=[t[0] for t in trig], executed=done,

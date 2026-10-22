@@ -195,7 +195,8 @@ $PY $SK/review.py --save --json      # 存档 + 机器可读
 
 ## 与报告的关系
 
-- 报告 `reports/etf/allocation/20261021-季定投计划.html` 是**旧规则的决策存档**（含甲路径两情景、债券口径、窗口敏感性），其中的「规则 3 状态门」已被 V1 取代。
+- 报告 `reports/etf/allocation/20261022-季定投计划-v14.html` 是**当前规则的决策存档**（硬门 + V1 评分），由 `research/plan-v14/generate.py` 直接消费 `review.py --json` 快照生成，与 skill 同源。
+- `reports/etf/allocation/20261021-季定投计划.html`（v13）是**旧规则的存档**，其中「规则 3 状态门」已被 V1 取代，引用时注意版本。
 - `reports/research/T-State-Validation-20261022.html`：T3b 为什么被降级；`Gate-Redesign-20261022.html`：V1 的设计依据与七变体对抗。
 - 本目录 `V1-SPEC.md` / `v1_spec.json` 是**生产口径的唯一来源**；研究目录的同名文件是研究快照，若冲突以本目录为准。
 - 报告里数字是某一时点的快照；脚本**每次实时重算**，因此 σp、RC50 会有 ±0.5pp 的漂移（价格变动 + 窗口滚动），**属正常**，不要当成矛盾。
