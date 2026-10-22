@@ -8,6 +8,8 @@ ser = {}
 for c, bars in kl.items():
     cl, dt = ga.build_series(bars)
     ser[c] = (cl, {d: i for i, d in enumerate(dt)})
+CAL = sorted({d for _, dt in ser.values() for d in dt})
+CIDX = {d: i for i, d in enumerate(CAL)}
 rows = []
 for s in raw['signals']:
     if s.get('fwd20d') is None: continue
@@ -33,14 +35,35 @@ def spearman(xs, ys):
     num = sum((a-mx)*(b-my) for a,b in zip(rx,ry))
     den = (sum((a-mx)**2 for a in rx)*sum((b-my)**2 for b in ry))**0.5
     return num/den if den else None
+def nw_t(vals, lag):
+    """Newey-West t：前瞻 20 日、采样间隔 5 日 → 相邻 IC 重叠，普通 t 会偏大。"""
+    n = len(vals)
+    m = sum(vals) / n
+    d = [v - m for v in vals]
+    var = sum(x * x for x in d) / n
+    for L in range(1, lag + 1):
+        w = 1 - L / (lag + 1)
+        var += 2 * w * sum(d[i] * d[i - L] for i in range(L, n)) / n
+    return m / (var / n) ** 0.5 if var > 0 else None
+
+
 def ic_for(g, key):
     byd = defaultdict(list)
     for r in g: byd[r['date']].append(r)
-    per = [v for dt, gg in byd.items() if (v := spearman([r[key] for r in gg], [r['fwd'] for r in gg])) is not None]
-    if not per: return None
-    per.sort()
-    return dict(mean=round(sum(per)/len(per),3), pos=round(sum(1 for x in per if x>0)/len(per)*100,1), n=len(per),
-                tstat=round(sum(per)/len(per)/((sum((x-sum(per)/len(per))**2 for x in per)/(len(per)-1))**0.5/len(per)**0.5),2) if len(per)>1 and sum((x-sum(per)/len(per))**2 for x in per)>0 else None)
+    pairs = sorted((dt, v) for dt, gg in byd.items()
+                   if (v := spearman([r[key] for r in gg], [r['fwd'] for r in gg])) is not None)
+    if not pairs: return None
+    per = [v for _, v in pairs]
+    n = len(per)
+    m = sum(per) / n
+    sd = (sum((x - m) ** 2 for x in per) / (n - 1)) ** 0.5 if n > 1 else 0
+    gaps = [CIDX[pairs[i][0]] - CIDX[pairs[i - 1][0]] for i in range(1, n)]
+    gap = sum(gaps) / len(gaps) if gaps else None
+    lag = max(1, round(20 / gap)) - 1 if gap else 0
+    return dict(mean=round(m, 3), pos=round(sum(1 for x in per if x > 0) / n * 100, 1), n=n,
+                tstat=round(m / (sd / n ** 0.5), 2) if sd > 0 else None,
+                nw_tstat=round(nw_t(per, lag), 2) if sd > 0 else None,
+                avg_gap=round(gap, 1) if gap else None, nw_lag=lag)
 segs = {'全样本': rows, '剔除2025Q3': [r for r in rows if r['q']!='2025Q3'], '2025Q3': [r for r in rows if r['q']=='2025Q3'], '2026': [r for r in rows if r['date'][:4]=='2026']}
 out = {}
 for name, g in segs.items():

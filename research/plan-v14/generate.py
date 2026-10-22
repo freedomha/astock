@@ -139,13 +139,14 @@ def main():
             if not d:
                 return '<span class="muted">—</span>'
             c = "up" if d["mean"] > 0 else ("down" if d["mean"] < 0 else "")
-            return '<span class="%s">%s</span> <span class="muted">(%s)</span>' % (
-                c, n(d["mean"], 3, True), n(d["tstat"], 2, True))
-        rows_ = [("Trend", "30", "trend", "唯一全样本 t&gt;2，但剔除 2025Q3 后 t 掉到 &lt;1"),
-                 ("Momentum（钟形）", "30", "mom", "三段同号、幅度都小——最稳也最弱"),
+            return ('<span class="%s">%s</span><br><span class="muted" style="font-size:11px;white-space:nowrap">'
+                    't %s → %s</span>' % (c, n(d["mean"], 3, True),
+                                          n(d["tstat"], 2, True), n(d["nw_tstat"], 2, True)))
+        rows_ = [("Trend", "30", "trend", "普通 t 唯一过 2；NW 修正后 1.31，剔除 2025Q3 后 &lt;1"),
+                 ("Momentum<br>（钟形）", "30", "mom", "三段同号、幅度都小——最稳也最弱"),
                  ("Risk", "20", "risk", "IC≈0 甚至为负；它的作用是压波动，不是选券"),
                  ("Diversification", "20", "div", "依赖组合持仓，信号层无定义；政策层恒 20、横截面方差为零"),
-                 ("<b>总分</b>", "100", "total", "三段全正，但无一段 t&gt;2")]
+                 ("<b>总分</b>", "100", "total", "三段全正；普通 t 也只 1.65，NW 后 1.07")]
         out = []
         for name, w, key, note in rows_:
             if key == "div":
@@ -250,15 +251,15 @@ def main():
 <div class="card">
   <h2>一、架构：三个职责分离</h2>
   <div class="flow">
-    <div class="g"><b>HARD GATES</b>溢价 ≤1.5%<br>回撤 ≥15%（DD ≤ −15%）暂停<br>风格组 ≤60%（组内）<br>锁定不买<br>数据质量作废<br>单笔 &lt;2,000</div>
+    <div class="g"><b>HARD GATES</b>溢价 ≤1.5%<br>回撤 ≥15%（DD ≤ −15%）暂停<br>风格组 ≤60%（组内）<br>锁定不买<br>数据质量作废</div>
     <div class="s"><b>SOFT SCORE</b>Trend 30<br>Momentum 30（钟形）<br>Risk 20<br>Diversification 20</div>
     <div class="t"><b>ELIGIBILITY</b>Floor = __FLOOR__<br>Band = max − __BAND__<br>两者同时满足<br>否则 → 现金</div>
-    <div><b>EXECUTE</b>按分排序<br>→ 缺口<br>→ 买入 ≤3,000</div>
+    <div><b>EXECUTE</b>按分排序<br>→ 缺口<br>→ 单笔 ≥2,000<br>→ 买入 ≤3,000</div>
   </div>
   <table>
     <thead><tr><th>层</th><th>回答的问题</th><th>典型规则</th><th>能否被「分数高」抵消</th></tr></thead>
     <tbody>
-      <tr><td><b>硬门</b></td><td class="l">这个风险我是否根本不该承担？</td><td class="l">溢价（规则 0）、风格组（4/5）、锁定（L）、数据质量（6）、回撤（D）</td><td>不能</td></tr>
+      <tr><td><b>硬门</b></td><td class="l">这个风险我是否根本不该承担？</td><td class="l">溢价（规则 0）、风格组（4/5）、锁定（L）、数据质量（6）、回撤（D）<br><span class="muted">注：单笔 &lt;2,000 不是风险门，是执行规则（规则 2），在最后一格</span></td><td>不能</td></tr>
       <tr><td><b>软分</b></td><td class="l">在可买的里面，哪个现在更值得优先？</td><td class="l">趋势 / 动量 / 波动 / 分散</td><td>能</td></tr>
       <tr><td><b>阈值</b></td><td class="l">今天到底有没有值得买的？</td><td class="l"><b>Eligibility Floor</b> = __FLOOR__（绝对资格线）<br><b>Candidate Band</b> = max − __BAND__（相对候选带）</td><td>—</td></tr>
     </tbody>
@@ -270,7 +271,7 @@ def main():
 </div>
 
 <div class="card">
-  <h2>二、为什么废除状态门：四条证据</h2>
+  <h2>二、为什么废除状态门：三条证据 ＋ 一条限定</h2>
   <ol>
     <li><b>+4.33pp 里 64% 是时间效应。</b>完整链条：T3b 日原始 20 日收益 <b>5.62%</b>，池化基准 1.29%，差 <b>4.33pp</b>；
       这 4.33pp 中，同日全市场平均（<b>4.05%</b>）比池化基准高出的 <b>2.76pp（64%）</b>来自「那些日子什么都在涨」，
@@ -363,7 +364,8 @@ def main():
     <tbody>__DECROWS__</tbody>
   </table></div>
   <div class="note ok" style="margin-bottom:0">下一步要看的是：在 <b>≥4 个新的季度决策点</b>之前，不得用收益对 V1 做「优于/劣于」判断。
-    计数起点是 <b>2026Q4</b>（本季为第一次），随后 2027Q1／Q2／Q3，<b>最早 2027Q3 末</b>才能凑满 4 个（原写 2027Q4，差一个季度）。
+    计数起点是 <b>2026Q4</b>（本季为第一次），随后 2027Q1／Q2／Q3，<b>最早 2027Q3 末</b>才能凑满 4 个。
+    <span class="muted">注意不要和 V1-SPEC §6 的「8 个决策点」混淆：8 个是<b>改权重/调阈值</b>的门槛，4 个是<b>允许用收益评判 V1</b> 的门槛，两者用途不同。</span>
     复评只看行为指标：符号一致性、<b>扣硬门后的真实投出率</b>、现金比、RC50 方向、纪律偏差。<b>60 与 __BAND__ 是预注册候选值，没有收益验证。</b></div>
 </div>
 
@@ -415,15 +417,19 @@ def main():
   <h3>同一套分段检验，对 V1 自己也做一遍</h3>
   <p>要避免双重标准，V1 必须接受和 T3b 完全相同的切法：全样本 → 剔除 2025Q3 → 2026 样本外。
     下表是各分项与总分的分日秩相关 IC（只用当日 ≥20 只的稠密横截面，括号内为 IC 均值的 t 值）。
-    三段的采样日分别是 __SDAY0__ / __SDAY1__ / __SDAY2__ 个，但能凑出 ≥20 只横截面的只有 __ICN0__ / __ICN1__ / __ICN2__ 个——这就是 IC 的样本量，也是它做不出显著性的直接原因。</p>
+    三段的采样日分别是 __SDAY0__ / __SDAY1__ / __SDAY2__ 个，但能凑出 ≥20 只横截面的只有 __ICN0__ / __ICN1__ / __ICN2__ 个——这就是 IC 的样本量。</p>
+</p>
   <div class="tw"><table>
-    <thead><tr><th>分项（权重）</th><th>全样本<br><span style="font-weight:400">__ICN0__ 个 IC 日</span></th>
-      <th>剔除 2025Q3<br><span style="font-weight:400">__ICN1__ 个 IC 日</span></th>
-      <th>2026 样本外<br><span style="font-weight:400">__ICN2__ 个 IC 日</span></th><th>读法</th></tr></thead>
+    <thead><tr><th>分项（权重）</th><th>全样本<br><span style="font-weight:400">__ICN0__ 个 IC 日<br>t → NW t</span></th>
+      <th>剔除 2025Q3<br><span style="font-weight:400">__ICN1__ 个 IC 日<br>t → NW t</span></th>
+      <th>2026 样本外<br><span style="font-weight:400">__ICN2__ 个 IC 日<br>t → NW t</span></th><th>读法</th></tr></thead>
     <tbody>__SEGROWS__</tbody>
   </table></div>
+  <div class="note warn"><b>t 值必须看 NW 那一列。</b>IC 日平均间隔 <b>__GAP0__ 个交易日</b>，而前瞻窗口是 <b>20 日</b>——相邻 IC 的收益窗口重叠约 4 倍，普通 t 明显偏大。
+    表中同时给出普通 t 与 Newey-West t（滞后 __NWLAG__ 期）。<b>全样本 Trend 的普通 t=2.04 是唯一过 2 的数字，NW 修正后只剩 __ICNWT2__；其余全部低于 1.35。</b>
+    所以「V1 未经验证」不是措辞保守，是数字本身就这样——按普通 t 不该称显著，按 NW t 更不该。</div>
   <div class="note"><b>结论必须照实写：</b>符号确实三段不翻（trend / momentum / 总分全为正），<b>但幅度和显著性都由 2025Q3 支撑</b>——
-    总分 IC 从全样本 __ICTOTAL_S__（t=__ICTOTT__）掉到剔除后 __ICTTOTEX__（t=__ICTOTEXT__）、2026 __ICTTOT26__（t=__ICTOT26T__），<b>没有任何一段达到 t&gt;2</b>。
+    总分 IC 从全样本 __ICTOTAL_S__（普通 t=__ICTOTT__、<b>NW t=__ICNWT__</b>）掉到剔除后 __ICTTOTEX__（NW t=__ICNWEX__）、2026 __ICTTOT26__（NW t=__ICNW26__）。
     这和 T3b 不是两种证据，是<b>同一段行情下的同一种证据，只是方向稳定一点</b>。所以本报告不再主张「V1 已被验证」，只主张「V1 没有翻符号，因而值得按预注册规则跑下去」。</div>
   <div class="note warn"><b>两个分项没有独立证据，必须点名：</b>
     <b>Momentum（权重 30）</b>的全样本 IC 只有 __ICMOM__（t=__ICMOMT__），虽然三段同号但幅度微弱；
@@ -436,6 +442,12 @@ def main():
 <div class="card">
   <h2>十、局限与失效条件</h2>
   <ul>
+    <li><b>IC 的适用范围被外推过。</b>第九节所有 IC 都来自 <b>319 只 ETF 的横截面</b>（每日稠密日 ≥20 只），
+      而本计划的菜单只有 <b>5 只，能评分的最多 4 只</b>。「在 319 只里排前 20%」和「在 4 只里排第一」不是同一个问题——
+      横截面 IC 为正，<b>不保证 4 只里挑出来的那只优于另外三只</b>。政策层 5 个决策点就是这个外推的唯一实测，而它不可判定。
+      这是 V1 从「研究结论」到「下单动作」之间最大的一道缝。</li>
+    <li><b>权重未经证据校准。</b>30/30/20/20 是<b>预注册</b>值，不是拟合结果：Momentum 的全样本 IC 只有 +__ICMOM__（NW t=__ICMOMNW__），
+      却与 Trend 同权 30；Div 的 IC 根本算不出来，却占 20。这就是为什么现在调权重更危险——<b>没有一段独立验证能告诉你该往哪调</b>。</li>
     <li><b>Div 分项有设计缺陷（未修）。</b>它只看 RC50 的改善，不看风格组：红利低波买入后 RC50 下降（拿满 20 分），
       却同时推高本来就 78.6% 的风格组风险——<b>分散分项在奖励一个加剧集中度的动作</b>。
       不立即改的原因：改 Div 会改变合格集，属模型变更（V1-SPEC 第 6 节）。
@@ -472,11 +484,12 @@ def main():
         证据基础改为 V1 自身并补三段分段 IC；投出率标注为「未扣硬门的上限」；结论改为「硬门否决 4/5」；复评节点 2027Q4 → 2027Q3；Div / 溢价 / 回撤口径入局限。<br>
         <b>澄清性修订</b>（不改变任何历史判定，只是把已执行的行为写进条文）：
         ① Candidate Band 的 max 明确为「硬门通过者最高」；② 锁定（规则 L）本来就是 <code>plan_state</code> 里的既有事实、v14 代码也一直在执行；
-        ③ 资金分配顺序（逐个尝试、不足顺延、不拆分），历史 5 次决策无一次触发顺延。<br>
+        ③ 资金分配顺序（逐个尝试、不足顺延、不拆分）——政策层模拟的 5 个决策点里无一次触发顺延。<br>
         <b>行为变更</b>（会让结果更严，需说明为何不走 §6）：
-        ④ 回撤改双口径取更深者——只可能「更早暂停」，历史上从未触发 15% 门槛，故不改变任何历史判定；
-        ⑤ 数据质量作废（规则 6）——历史上从未触发（报价与 K 线完整），属把既有报错行为写成条文。<br>
-        <span class="muted">上述 ④⑤ 都不改变权重、评分公式或阈值数值，因此按 V1-SPEC §6 的适用范围（权重/阈值变更）不需走 8 个决策点流程；
+        ④ 回撤改双口径取更深者——<b>总资产口径历史上从未触发 15% 门槛；持仓口径没有历史序列（本次才建基线），无法回溯</b>。
+        能保证的只有一件：取两者中更深的那个，<b>只会更早暂停、不会放宽</b>。<br>
+        ⑤ 数据质量作废（规则 6）——历史上从未触发（报价与 K 线一直完整），属把既有报错行为写成条文。<br>
+        <span class="muted">上述 ④⑤ 都不改变权重、评分公式或阈值数值，且方向只有「更早不出结论」，因此按 V1-SPEC §6b 的判据（能否让「以前不买、现在买」）不需走 §6 的 8 个决策点流程；
         它们改变的是「什么情况下不出结论」，而不是「出什么结论」。若日后要放宽（例如把回撤门改回单口径），则必须走 §6。</span></td></tr>
       <tr><td>v14</td><td class="nw">2026-10-22</td><td class="l">架构切换：T0-T8 状态门 → 硬门 + V1 连续评分（30/30/20/20）；Eligibility Floor 60 ＋ Candidate Band 5；T 码降为描述性特征</td></tr>
       <tr><td>v13</td><td class="nw">2026-10-21</td><td class="l">规则分级 A/B/C；删自相矛盾表述；规模补口径</td></tr>
@@ -584,6 +597,12 @@ echarts.init(document.getElementById('c3')).setOption(ax({
         "__ICN2__": str(SEG["2026"]["total"]["n"]),
         "__ICTOTAL_S__": n(SEG["全样本"]["total"]["mean"], 3, True),
         "__ICTOTT__": n(SEG["全样本"]["total"]["tstat"], 2, True),
+        "__ICNWT__": n(SEG["全样本"]["total"]["nw_tstat"], 2, True),
+        "__ICNWEX__": n(SEG["剔除2025Q3"]["total"]["nw_tstat"], 2, True),
+        "__ICNW26__": n(SEG["2026"]["total"]["nw_tstat"], 2, True),
+        "__ICNWT2__": n(SEG["全样本"]["trend"]["nw_tstat"], 2, True),
+        "__GAP0__": n(SEG["全样本"]["total"]["avg_gap"], 1),
+        "__NWLAG__": str(SEG["全样本"]["total"]["nw_lag"]),
         "__ICTTOTEX__": n(SEG["剔除2025Q3"]["total"]["mean"], 3, True),
         "__ICTOTEXT__": n(SEG["剔除2025Q3"]["total"]["tstat"], 2, True),
         "__ICTTOT26__": n(SEG["2026"]["total"]["mean"], 3, True),
@@ -592,6 +611,7 @@ echarts.init(document.getElementById('c3')).setOption(ax({
         "__SDAY2__": str(SEG["2026"]["_dates"]),
         "__ICMOM__": n(SEG["全样本"]["mom"]["mean"], 3, True),
         "__ICMOMT__": n(SEG["全样本"]["mom"]["tstat"], 2, True),
+        "__ICMOMNW__": n(SEG["全样本"]["mom"]["nw_tstat"], 2, True),
         "__ICTOTAL__": n(GR.get("signal", {}).get("ic", {}).get("total", {}).get("mean"), 3, True),
         "__PASS60__": n((TH.get("pass_rate") or {}).get("60"), 1),
         "__RC50A__": n(GR.get("policy", {}).get("models", {}).get("M0", {}).get("rc50_end"), 1),
