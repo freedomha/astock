@@ -1,5 +1,5 @@
 {
-  "version": "1.1",
+  "version": "1.2",
   "frozen_at": "2026-10-22",
   "status": "FROZEN",
   "doc": "V1-SPEC.md",
@@ -36,7 +36,9 @@
       1
     ],
     "min_trade_cny": 2000,
-    "max_trade_cny": 3000
+    "max_trade_cny": 3000,
+    "locked_assets_are_menu_policy": true,
+    "drawdown_caliber": "max_depth_of(total_assets, holdings_market_value)"
   },
   "score": {
     "weights": {
@@ -104,7 +106,8 @@
     "no_candidate_action": "cash",
     "retired": {
       "absolute_floor": 70
-    }
+    },
+    "max_definition": "highest score among hard-gate-passing candidates"
   },
   "execution": {
     "evaluate": "quarter_end_close",
@@ -114,7 +117,7 @@
   },
   "evaluation": {
     "min_new_decision_points_before_verdict": 4,
-    "earliest_review": "2027Q4",
+    "earliest_review": "2027Q3",
     "metrics": [
       "sign_consistency",
       "deployment_rate",

@@ -366,7 +366,15 @@ def main():
     # ── 峰值 / 回撤
     peak = st.get("peak_value") or m2["tot"]
     peak = max(peak, m2["tot"])
-    dd = (m2["tot"] / peak - 1) * 100 if peak else 0.0
+    dd_total = (m2["tot"] / peak - 1) * 100 if peak else 0.0
+    # 注资会机械抬高峰值（现金增加），使总资产口径低估回撤。
+    # 同时算「持仓市值口径」，取更深的那个做回撤门——保守，且不会被注资掩盖。
+    hold_now = sum(holdings[i]["shares"] * prices[holdings[i]["code"]] for i in range(len(codes)))
+    peak_hold_prev = st.get("peak_holdings")
+    # 首次运行没有历史峰值 → 只建立基线，不给出 0% 这种误导性读数
+    dd_hold = ((hold_now / peak_hold_prev - 1) * 100) if peak_hold_prev else None
+    peak_hold = max(peak_hold_prev or 0.0, hold_now)
+    dd = min(dd_total, dd_hold) if dd_hold is not None else dd_total
 
     # ── 缺口与候选
     rows = []
@@ -412,21 +420,28 @@ def main():
         cand = [r for r in hard_ok if r["code"] in ok_codes]
     action = None
     if cand:
-        if a.legacy_gate:
-            pick = max(cand, key=lambda r: r["gap_amt"])
-        else:
-            pick = max(cand, key=lambda r: (r["score"]["total"], r["gap_amt"]))
-        amt = min(rules["max_trade"], pick["gap_amt"])
-        shares = int(amt // (pick["px"] * rules["lot_size"])) * rules["lot_size"]
-        cost = shares * pick["px"]
-        if cost >= rules["min_trade"]:
-            action = dict(code=pick["code"], name=pick["name"], px=pick["px"],
-                          shares=shares, cost=cost, gap=pick["gap_amt"],
-                          score=(pick["score"]["total"] if pick.get("score") else None),
-                          reason=sel_note, blocked=[])
-        else:
-            action = dict(code=None, reason=f"{pick['name']} 缺口 {pick['gap_amt']:.0f} 元 < 最小交易额 "
-                                            f"{rules['min_trade']} 元 → 留现金")
+        # 资金分配顺序：按优先级逐个尝试，取第一只「可下单且金额≥最小交易额」的；不拆分两笔
+        order = sorted(cand, key=(lambda r: r["gap_amt"]) if a.legacy_gate
+                       else (lambda r: (-r["score"]["total"], -r["gap_amt"])))
+        skipped = []
+        for pick in order:
+            amt = min(rules["max_trade"], pick["gap_amt"])
+            shares = int(amt // (pick["px"] * rules["lot_size"])) * rules["lot_size"]
+            cost = shares * pick["px"]
+            if cost >= rules["min_trade"]:
+                action = dict(code=pick["code"], name=pick["name"], px=pick["px"],
+                              shares=shares, cost=cost, gap=pick["gap_amt"],
+                              score=(pick["score"]["total"] if pick.get("score") else None),
+                              reason=sel_note, blocked=[], skipped=skipped)
+                break
+            skipped.append(dict(code=pick["code"], name=pick["name"],
+                                gap=round(pick["gap_amt"], 0), cost=round(cost, 0)))
+        if action is None:
+            reason = "全部候选缺口 < 最小交易额 %d 元 → 留现金" % rules["min_trade"]
+            if len(order) == 1:
+                reason = (f"{order[0]['name']} 缺口 {order[0]['gap_amt']:.0f} 元 < 最小交易额 "
+                          f"{rules['min_trade']} 元 → 留现金")
+            action = dict(code=None, reason=reason, skipped=skipped)
     elif not a.legacy_gate:
         action = dict(code=None, reason=f"{sel_note} → 留现金")
 
@@ -677,6 +692,7 @@ def main():
                 total=m2["tot"], cash=cash, cash_pct=cash / m2["tot"] * 100,
                 sd=m2["sd"], rc50=rc50, rc50_abs=rc50_abs,
                 style2=style_rc2, style1=style_rc1, drawdown=dd, peak=peak,
+                drawdown_total=dd_total, drawdown_holdings=dd_hold, peak_holdings=peak_hold,
                 states={c: (states[c]["eff"] if states.get(c) else None) for c in codes},
                 scores={c: ({k: scores[c][k] for k in ("trend", "momentum", "risk", "div", "total")}
                             if scores.get(c) else None) for c in codes},
@@ -706,6 +722,7 @@ def main():
               f"{'，决策日' if left == 0 else '，监控记录'}）")
 
     st["peak_value"] = peak
+    st["peak_holdings"] = peak_hold
     if states:
         st["last_states"] = {c: states[c]["eff"] for c in codes if states.get(c)}
     st["last_run"] = now.isoformat(timespec="seconds")
