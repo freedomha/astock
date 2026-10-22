@@ -1,6 +1,6 @@
 ---
 name: etf-quarterly-plan-review
-description: Use when the user wants to review the quarterly contribution plan (季度定投计划 / 季定投复评 / 每周复评 / 该投了吗 / 检查定投计划), or asks whether this quarter's 3,000 元 contribution should be deployed and where. Reads plan_state.json (holdings with shares/cost/target weights, cash, six execution rules, executed-quarter flags) plus the plan report at reports/etf/allocation/20261021-季定投计划.html, pulls live quotes and 500-day klines from westock-data, delegates trend states to etf-operation-plan/trend_analysis.py, then: (a) computes weights / σp / RC50 share & absolute / A-share-value style-group risk on both 2-year and 1-year windows; (b) diffs each ETF's trend state against the previous run and flags upgrades (预备队启用) or degradations; (c) evaluates every target's gap and the five gates (state T3b/T4, **QDII premium ≤1.5%**, 2,000 元 minimum trade, 60% style-group cap, 3,000 元 cap) to produce the single legitimate order, lot-rounded — premium is read from etf detail (closePrice/nav/purchaseStatus) because a cross-border ETF at a high premium can lose 15%+ on premium convergence even if the underlying is flat; (d) checks drawdown / style / state triggers; (e) prints 无需动作 / 到季末该执行了 / 暂停复核, with --json and --save for archiving. Triggers on "周度复评"、"季定投"、"定投计划复评"、"这季该投吗"、"buy check"、"plan review".
+description: Use when the user wants to review the quarterly contribution plan (季度定投计划 / 季定投复评 / 每周复评 / 该投了吗 / 检查定投计划), or asks whether this quarter's 3,000 元 contribution should be deployed and where. Reads plan_state.json (holdings with shares/cost/target weights, cash, rules, executed-quarter flags) plus the frozen V1 spec (v1_spec.json / V1-SPEC.md), pulls live quotes and 500-day klines from westock-data, delegates trend states to etf-operation-plan/trend_analysis.py **as a descriptive feature only**, then: (a) computes weights / σp / RC50 share & absolute / A-share-value style-group risk on both 2-year and 1-year windows; (b) scores every candidate with the frozen V1 model — Trend 30 + Momentum 30 + Risk 20 + Diversification 20 = 100, where Diversification is the RC50 improvement per 1,000 元; (c) applies HARD GATES first (QDII premium ≤1.5%, portfolio drawdown, 60% style-group cap, 2,000 元 minimum trade, 3,000 元 cap) — these are reject-only and never scored; (d) then applies the threshold rule (absolute floor 60 AND max_score − 5) to decide buy vs cash, ranks survivors by score, picks the largest gap, lot-rounds; (e) prints 无需动作 / 到季末该执行了 / 暂停复核, with --json and --save for archiving; --legacy-gate falls back to the retired T0-T8 state gate for comparison. Triggers on "周度复评"、"季定投"、"定投计划复评"、"这季该投吗"、"buy check"、"plan review".
 ---
 
 # 季度定投计划 · 周度复评
@@ -10,11 +10,37 @@ description: Use when the user wants to review the quarterly contribution plan (
 对**真实券商账户**的季度定投计划做例行检查，回答四个问题：
 
 1. **组合现在偏离目标多少**——权重、σp、上证50 风险贡献（占比与绝对）、A股价值风格组风险（2 年／1 年双窗口）。
-2. **谁的状态变了**——与上一次运行相比，哪只 ETF 升级（预备队可启用）或降级（当季改投）。
-3. **这一季到底该买什么**——在四道门（状态门 / 最小交易额 / 风格组上限 / 单笔上限）下，唯一合法的下单指令与份数。
-4. **有没有触发暂停/复核**——回撤 15%、风格组 60%、状态转弱。
+2. **谁的状态变了**——与上一次运行相比，哪只 ETF 的 T 码升级或降级（**仅供参考**，不再决定买卖）。
+3. **这一季到底该买什么**——硬门过滤 → V1 连续评分排序 → 阈值判定 → 唯一合法的下单指令与份数。
+4. **有没有触发暂停/复核**——回撤 15%、风格组 60%。
 
 **不预测行情、不给投资建议、不自动下单**，只做规则判定与下单计算。每周跑一次即可，**周中不交易**——额度按季释放。
+
+## 判定架构（V1，2026-10-22 冻结）
+
+```
+HARD GATES（只做否决，不参与评分）
+  ├ QDII 静态溢价 ≤ 1.5%
+  ├ 组合回撤 > 15% → 暂停全部买入
+  ├ 风格组（上证50+红利低波）风险 ≤ 60%（双窗口）
+  ├ 数据质量 / 单笔 < 2,000 元
+  ↓ PASS
+SOFT SCORE（0–100，只负责排序）
+  ├ Trend            30   价格对 MA60 溢价 + MA60/MA120 斜率
+  ├ Momentum（钟形）  30   20/60/120 日收益，过热扣分
+  ├ Risk Fitness     20   波动 + 回撤 + 跳涨
+  └ Diversification  20   −ΔRC50 / 每 1,000 元
+  ↓
+阈值：Score ≥ 60 且 ≥ max(Score) − 5
+  ↓
+按分排序 → 缺口 → 买入 ≤ 3,000 元
+```
+
+**T0–T8 不参与买/不买判断**，只作为描述性特征写入输出。原因见
+`reports/research/T-State-Validation-20261022.html` 与 `Gate-Redesign-20261022.html`：
+T3b 的超额 64% 来自时间效应，剔除 2025Q3 后为 −0.52pp、2026 样本外 −1.46pp。
+
+**完整公式、证据等级、变更管控见 `V1-SPEC.md`（本目录）。改动前必读第 6 节。**
 
 ## When to use
 
@@ -24,21 +50,25 @@ description: Use when the user wants to review the quarterly contribution plan (
 | 想知道"这季该投了吗、买哪只" | `review.py --quarter-end` |
 | 需要机器可读结果 / 存档 | `--json` / `--save` |
 | 成交后回填 | `review.py --mark-executed` |
-| 数据源慢，只想看权重缺口 | 加 `--no-trend` |
+| 数据源慢，只想看评分与缺口 | 加 `--no-trend`（T 码留空，评分照算） |
+| 对照/回滚到旧状态门 | `--legacy-gate` |
 
 ## Prerequisites
 
 - **westock-data CLI**：`~/.workbuddy/westock-data/scripts/index.js`；node 用 `find_node()` 自动定位（**勿硬编码版本号**，路径会漂移）。
 - **Bash 调用必须 `dangerouslyDisableSandbox: true`**（网络访问）。
 - Python 3（项目内用 `/Users/aldiadmin/.workbuddy/binaries/python/versions/3.13.12/bin/python3`）。脚本**仅用标准库**，不依赖 numpy。
-- 同项目 `etf-operation-plan/trend_analysis.py`（趋势状态机），由本脚本以子进程调用。
+- 同项目 `etf-operation-plan/trend_analysis.py`（趋势状态机），由本脚本以子进程调用——**仅用于展示 T 码，不影响买卖判定**。
 
 ## Files
 
 | 文件 | 作用 |
 |------|------|
-| `plan_state.json` | **唯一需要维护的配置**：持仓份额/成本/目标权重、现金、六条规则、季度执行标记、上次状态快照 |
-| `review.py` | 主脚本 |
+| `plan_state.json` | **唯一需要维护的配置**：持仓份额/成本/目标权重、现金、规则、季度执行标记、上次状态快照 |
+| `v1_spec.json` | **V1 冻结参数**（权重/公式阈值/变更管控）。机器可读，`v1_score.py` 启动时加载 |
+| `V1-SPEC.md` | V1 规格说明书：公式、证据等级、变更流程、已知局限 |
+| `v1_score.py` | 评分引擎：`features()` / `score()` / `select()`，纯函数，无网络 |
+| `review.py` | 主脚本（取数 + 组合风险 + 评分 + 判定 + 输出） |
 | `review_history.json` | `--save` 追加的指标历史（首次运行后生成） |
 
 ## 配置说明（plan_state.json）
@@ -72,34 +102,51 @@ description: Use when the user wants to review the quarterly contribution plan (
 - **`cash` / `shares` 必须与实际券商持仓一致**——本 skill 不从 `records/etf/*.json` 反推（流水可能不完整）。
 - 会计状态（`peak_value` / `last_states` / `last_run`）由脚本自动维护，不要手改。
 
-### 六条执行规则（编号 0～5，脚本内置，改规则改 `rules`）
+### 执行规则（硬门 0～2、4～5 ＋ 评分门 3）
+
+**硬门（只做否决，不参与评分）**
 
 0. **QDII 溢价门（最硬的一道）**：买入前查 `etf detail` 的 `closePrice / nav`，**溢价 > `max_premium_pct`（1.5%）一律不买**（该比值为**静态溢价**：分母是最近一期已公布 NAV，QDII 净值滞后 1~3 个交易日、接口不返回净值日期，**不等于同日 IOPV**——用于风控筛查足够，不可当精确套利依据）；折价不构成门槛（买入相对划算，仅提示）。跨境 ETF 在**不可申购**时套利资金进不来，溢价可持续也可突然收敛——按高溢价买入，标的不动也可能亏 15%。**所有纳指 ETF 共用同一底层，溢价会同步走高，换标的往往没用**。
 1. 每季 3,000 元，单笔上限 3,000；缺口按 `目标权重 × 总资产 − 当前市值` 每季重算，**不跨季结转额度**。
 2. **单笔 < 2,000 元跳过**（5 元最低佣金 = 0.25%，高于策略容忍度）。
-3. 只买**状态合格**的标的，多头候选取缺口最大者，每季至多 1 只。**支持按标的重载**：`gate_overrides` 中的标的用各自的状态集——**低相关分散腿（黄金 `sh518880`、标普500 `sh513500`）的合格集是 {T1, T2, T3a, T3b, T4}**（分散价值来自低相关而非趋势，T3b 要求会错过最需配置的时点；但 T1 仍是下跌趋势中的减速，属主动承担左侧风险）。**T0 与 T6 都不合格**——不要写成"T1 及以上"，T6 编号更大但含义是"高位整理/信号混合"，不是趋势确认。
-   - **跨境 ETF 的 T 码要用底层指数判定**（`state_proxy`）：`sz159941→usNDX`、`sh513500→usINX`。场内价含溢价，会把溢价扩张读成趋势——实测 159941 场内 T4、底层 usNDX 实为 T6；输出里带 `※` 表示该状态取自指数。
+3. **V1 评分门（唯一决定「买不买」的一道）**：
+   - 每个候选算 `Score = Trend 30 + Momentum 30 + Risk 20 + Diversification 20`；
+   - 候选集 = `{ Score ≥ 60 且 Score ≥ max(Score) − 5 }`，**无候选 → 本季留现金**；
+   - 通过硬门的标的按 Score 降序，分差 <1 时取缺口更大者，每季至多 1 只；
+   - **绝对下限 60 是唯一能产生「不买」的开关**；相对带 5 永远挡不住买入，只把候选集从 4 只收窄到约 2 只；
+   - 60 / 5 是**预注册候选值**，只经过行为验证（会在最弱季度 2026Q1 挡住），**没有收益验证**。
 4. **风格组 60% 上限只约束同因子标的**（`style_group` 内的红利类）；**低相关腿（纳指/标普/黄金）不受此限**——它们的作用就是把该组占比压下去，若也受限则规则自我否定。
 5. **双窗口判定**：2 年与 1 年窗口的风格组风险**都**低于 60% 才放行红利类。
 
-### 空仓等待与恢复（当前生效）
+**T 码（仅描述性，不参与判定）**
 
-当没有任何标的过门时，本季 **3,000 元并入现金**，进入"空仓等待"，**恢复策略为"任一条件成立"**：
+- 跨境 ETF 的 T 码用底层指数判定（`state_proxy`：`sz159941→usNDX`、`sh513500→usINX`），输出带 `※`；
+- 升级/降级只写入【状态变化】供参考。**只有 `--legacy-gate` 时 T 码才恢复为门**（`gate_states` / `gate_overrides`）。
 
-| 条件 | 判定 | 说明 |
-|---|---|---|
-| **A 溢价收敛** | 任一纳指 ETF（`fallback_nasdaq` 四只）溢价 ≤ `max_premium_pct` **且**底层指数状态合格（T3b/T4） | **哪只先满足买哪只；多只满足买溢价最低的**（与"换当天溢价最低"一致）。当前最低 513110 |
-| **B 黄金转 T1** | 黄金状态 ∈ {T1,T2,T3a,T3b,T4} 且 溢价合理 | 黄金当前折价，一旦转 T1 立刻可买 |
+> **为什么废除状态门**：T3b 的 20 日超额 64% 来自时间效应（那些日子全市场都在涨），剔除 2025Q3 后为 −0.52pp、2026 样本外 −1.46pp；
+> 且 5 只标的的菜单上 T-state 门 5 个季度只放行 1 次——它不只是在防止错误投资，也在阻止资产配置发生。详见两份研究报告。
 
-⚠ **A 的陷阱**：溢价若靠价格下跌而收敛，价格趋势可能同时转坏——所以 A 是"两个条件"，不是"溢价一个条件"。
+### 空仓时看什么
 
-> **规则证据等级（报告 v13 起）**：A＝数据支持（T3b）；B＝风控政策（溢价门、风格组、金额约束、T0 禁买）；**C＝待验证（T4 可买、T6 禁买、14:45 下单）**。C 类不是"错"，但**不能拿"规则里写着"当依据**，需样本外验证后再定。
+V1 模式下没有「恢复条件」这个概念——每季独立按 `Score ≥ 60` 判定：分数够了就买，不够就留现金。
+输出会打印【本季不买】+ 两条**观察项**（溢价距离、黄金状态），只用于解释"为什么现在没得买"，不是恢复门槛：
+
+| 观察项 | 含义 |
+|---|---|
+| 纳指溢价 | 还需回落多少 pp 才可能进入候选（溢价是最常见的硬门否决原因） |
+| 黄金 T 码 | 当前处于什么形态；**仅供理解输出，不再触发买入** |
+
+`--legacy-gate` 下恢复为旧逻辑：A 溢价收敛 或 B 黄金转 T1，任一成立即恢复。
+
+> **规则证据等级（2026-10-22 更新）**：
+> - **A（数据支持）**：硬门 / 软分的职责划分（Risk 的 IC 为负但压波动、钟形动量优于单调、连续评分未翻符号）
+> - **B（风控政策）**：溢价门、风格组、金额约束、回撤暂停
+> - **C（待验证）**：阈值 60/5 的具体取值、Div 的 `full_at_pp=−0.15`、14:45 下单
 >
-> **状态门的证据强度**：见报告「十一、状态机有效性验证」。T3b 有前瞻优势（20 日超额 +4.33pp、胜率 75.9%），**T4 无优势**（-1.21pp、跌超 10% 概率 6.2% > 基准 4.7%），**T6 接近平均**（-0.94pp，60 日几乎持平）——"T6 不合格"是风控偏好而非统计结论。规则暂不调整，但解读输出时要记得这一点。
+> **状态门已从规则中移除**（T0-T8 降为描述性特征）。原「T3b +4.33pp、胜率 75.9%」是池化基准下的样本内数字，
+> 剔除 2025Q3 为 −0.52pp、2026 样本外 −1.46pp；同日置换检验 p<0.002 说明它不是噪声，但强度只够当准入条件，不够当收益预期。
 >
-> **不在本 skill 范围内**：债券效率测算、8 季路径模拟（含"兜底买入"对照）。这些只存在于决策存档报告中；报告 v10 已删除兜底方案（原"丙"），本 skill 同步删除规则 6。
-
-复评输出会打印【等待恢复】段，逐条给出距离（还需回落多少 pp、当前是什么状态），用于观察进展。
+> **不在本 skill 范围内**：债券效率测算、8 季路径模拟。这些只存在于决策存档报告中。
 
 ## Workflow
 
@@ -128,37 +175,45 @@ $PY $SK/review.py --save --json      # 存档 + 机器可读
 |------|--------|
 | 【组合】 | 仓位、现金占比。现金持续 >35% 说明合格标的太少，不是执行不到位 |
 | 【风险】 | **RC50 占比**（份额）与**绝对贡献**（占比×σp）要一起看，单独看占比会被"加高波动资产"机械稀释 |
-| 【标的】 | `可买` ＝ 五道门全过；否则显示被哪道门挡住（锁定/状态门/风格组/已达标/溢价）。溢价列带 `!` 表示超限 |
+| 【标的】 | `可买` ＝ **硬门全过 且 分数达阈值**；`分数不足` ＝ 硬门过了但 Score < 下限；其余显示被哪道硬门挡住（锁定/风格组/已达标/溢价）。溢价列带 `!` 表示超限 |
+| 【评分】 | V1 分项明细。看三样：① 谁的分最高；② `ΔRC50` 是否为负（Div 是否饱和）；③ 阈值行给出的「候选需 ≥ X」 |
 | 【溢价】/【折价】 | 溢价 >1.5% 列黑名单（含**已持仓**，用于判断"预备队补缺口"该不该补）；折价仅作参考 |
-| 【状态变化】 | 周度复评的核心增量。升级到 T3b/T4 → 预备队可补；降级出 T3b/T4 → 当季改投 |
+| 【状态变化】 | **仅供参考**（T 码已不参与判定）。`--legacy-gate` 下才恢复为「预备队可补 / 当季改投」 |
 | 【本季】 | 已执行？距季末几天？此刻执行会买什么、多少份、多少钱 |
-| 【等待恢复】 | 空仓时出现。条件 A（溢价收敛）／B（黄金转 T1），任一满足即恢复，附当前差距 |
-| 【触发】 | 🟢 状态恢复 / 🟠 风格组超限 / 🟠 状态转弱 / 🔴 回撤 → 按提示动作 |
+| 【本季不买】 | 空仓时出现，给出 `sel_note`（如「最高分 41.4 < 绝对下限 60」）+ 两条观察项 |
+| 【触发】 | 🟠 风格组超限 / 🔴 回撤 → 硬门动作。T 码变化在 V1 模式**不触发** |
 | 【结论】 | 无需动作 / 季末执行 / 暂停复核 |
 
 ### Step 4 执行
 
 只有 **`--quarter-end` 且未执行** 才下单。下单前：
 
-1. 用**收盘价**重跑一次（盘中 bar 会让 T3b/T4 边界抖动）。
+1. 用**收盘价**重跑一次（盘中 bar 会让 Trend / Momentum 分项与 T 码同时抖动）。
 2. QDII（纳指/标普）**查溢价**，>1.5% 换 `fallback_nasdaq` 里最低的一只；4 只全超 → 当季留现金。
 3. 份数取整到 100 的倍数，金额 ≤3,000 且 ≥2,000。
+4. 若当日分数与 `--quarter-end` 时相差 >5 分，以当日收盘重算为准（阈值是绝对分，会随价格移动）。
 
 ## 与报告的关系
 
-- 报告 `reports/etf/allocation/20261021-季定投计划.html` 是**决策存档**（含甲路径两情景、债券口径、窗口敏感性等论证），本 skill 是**执行监控**。
+- 报告 `reports/etf/allocation/20261021-季定投计划.html` 是**旧规则的决策存档**（含甲路径两情景、债券口径、窗口敏感性），其中的「规则 3 状态门」已被 V1 取代。
+- `reports/research/T-State-Validation-20261022.html`：T3b 为什么被降级；`Gate-Redesign-20261022.html`：V1 的设计依据与七变体对抗。
+- 本目录 `V1-SPEC.md` / `v1_spec.json` 是**生产口径的唯一来源**；研究目录的同名文件是研究快照，若冲突以本目录为准。
 - 报告里数字是某一时点的快照；脚本**每次实时重算**，因此 σp、RC50 会有 ±0.5pp 的漂移（价格变动 + 窗口滚动），**属正常**，不要当成矛盾。
 - 若报告规则变了，先改 `plan_state.json` 的 `rules`，再同步更新 SKILL.md 第六节的规则描述。
 
 ## Important Notes
 
 - **周中不交易**：额度按季释放。周度复评只用于发现状态变化与提前识别风险。
-- **状态机口径**：`trend_analysis.py` 返回 `T3` + `sub_state=T3b`，脚本用 `eff = sub or code` 做门判定；**不要**用 `T3` 直接比 `T3b`。
+- **状态机口径**：`trend_analysis.py` 返回 `T3` + `sub_state=T3b`，脚本用 `eff = sub or code`；**不要**用 `T3` 直接比 `T3b`。V1 模式下 T 码仅展示，`--legacy-gate` 才做门判定。
 - **缺口分母**：用**投入后总资产**（当前总资产 + 当季 3,000），与报告判定表一致。用投入前的值会系统性低估缺口。
 - **价格口径**：估值价格取 `etf detail` 的 `closePrice`（与净值同日），取不到才退回实时报价；否则同一标的会出现两个价格。
 - **⚠ 跨境 ETF 的 T 码会被溢价污染**：状态机吃的是场内价格，而 QDII 场内价 = 净值 + 溢价。实测 513100 在 2026-10 被判 T4「中期上升确认」，但同期净值仅 +8%、价格 +22.9%，用底层指数（`kline usNDX`）跑出来是 **T6 信号混合**。**对跨境 ETF，T 码只能当参考，真实趋势要用净值或底层指数复核**；溢价门才是第一道闸。
 - **溢价会污染协方差**：RC50 / σp / 相关性同样用场内价格算，QDII 的溢价波动会抬高波动率、扭曲相关性。当前未改用净值序列，属已知偏差。
-- **状态机降级有 pending 确认期**，单日跳变不会立刻改判；这也是本 skill **不另设价格止损**的原因——价格止损会与规则 3 互相抵消（跌破 MA60 时规则 3 已禁买，缓冲轮不到生效）。
+- **评分随价格逐日变化**：阈值是绝对分（60），价格移动会改变分数。**季末以收盘价重算的结果为准**；周中分数只用于观察。
+- **Div 会饱和**：现金比例 31.7% 时，任意非上证50 标的的 ΔRC50 都在 −1.7~−2.3pp，远超 `full_at_pp=−0.15`，因此 Div 恒为 20。
+  排序不受影响（同一常数），但**阈值 60 实际等价于核心分 ≥40**。现金降到 10% 以下前，Div 事实上是「非上证50」的门。
+- **权重与阈值不得在样本内调整**：变更需满足 V1-SPEC 第 6 节（≥8 个新决策点 + 事前假设 + 另一段数据验证）。
 - **周末运行**：周六/周日跑时最新 K 线是周五收盘，`bar_date` 会显示周五日期，属正常。
-- **数据源限流**：报价缺失会直接报错退出（不静默降级）。重试即可；`--no-trend` 可跳过 5 次趋势计算加快。
+- **数据源限流**：报价缺失会直接报错退出（不静默降级）。重试即可；`--no-trend` 只跳过 T 码计算（评分仍算，需 K 线）。
+- **`--legacy-gate` 的用途**：回滚与对照，不是并行策略。若连续 8 个季度 M2（MA200+双动量+ΔRC）不劣于 V1，才讨论替换（见 V1-SPEC 第 5 节）。
 - 涨跌配色遵循 A 股习惯（红涨绿跌）。非投资建议。

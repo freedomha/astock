@@ -4,12 +4,19 @@
 季度定投计划 · 周度复评
 
 用法：
-  python3 review.py                     # 周度复评（默认）
+  python3 review.py                     # 周度复评（默认，V1 连续评分）
   python3 review.py --quarter-end       # 季末执行模式：直接给下单指令
+  python3 review.py --legacy-gate       # 回退到 T0-T8 状态门（对照/回滚）
   python3 review.py --json              # 额外打印机器可读 JSON
   python3 review.py --save              # 把本次指标追加到 review_history.json
   python3 review.py --mark-executed     # 把本季标记为已执行（成交后跑）
   python3 review.py --state <path>      # 指定状态文件
+
+判定架构（冻结规格见 V1-SPEC.md / v1_spec.json）：
+  硬门（溢价 / 回撤 / 风格组 / 数据质量 / 最小交易额）→ 不参与评分，违反即不买
+  软分（Trend 30 / Momentum 30 / Risk 20 / Diversification 20）→ 只负责排序
+  阈值（绝对下限 60 + 相对带 5）→ 唯一能产生「本季不买」的开关
+  T0-T8 仅作描述性特征，不再决定买不买。
 
 依赖：westock-data CLI（~/.workbuddy/westock-data）+ 同项目 etf-operation-plan/trend_analysis.py。
 Bash 调用需 dangerouslyDisableSandbox: true（网络访问）。
@@ -34,6 +41,9 @@ DEFAULT_STATE = os.path.join(HERE, "plan_state.json")
 HISTORY = os.path.join(HERE, "review_history.json")
 WD = os.path.expanduser("~/.workbuddy/westock-data")
 TREND = os.path.join(ROOT, ".workbuddy", "skills", "etf-operation-plan", "trend_analysis.py")
+
+sys.path.insert(0, HERE)
+import v1_score                                                        # noqa: E402
 
 ANN = math.sqrt(252)
 
@@ -201,6 +211,21 @@ def metrics(codes, market_values, cash, S):
                 w_pct={c: w[i] * 100 for i, c in enumerate(codes)})
 
 
+def delta_rc50(codes, mv, cash, S, i, amount=1000.0):
+    """从现金挪 amount 到 codes[i]，RC50（上证50 风险占比）的变化，pp。负值=改善。
+
+    这是 Diversification 分的唯一输入——它直接对齐「每千元降多少集中度」，
+    而不是 1−ρ 这种间接代理。
+    """
+    if cash < amount or S is None:
+        return None
+    base = metrics(codes, mv, cash, S)
+    mv2 = list(mv)
+    mv2[i] += amount
+    after = metrics(codes, mv2, cash - amount, S)
+    return after["rc"][0] - base["rc"][0]
+
+
 # ─────────────────────────── 季度工具 ───────────────────────────
 def quarter_of(d):
     return f"{d.year}Q{(d.month - 1) // 3 + 1}"
@@ -238,11 +263,15 @@ def main():
     ap.add_argument("--save", action="store_true", help="追加到 review_history.json")
     ap.add_argument("--mark-executed", action="store_true", help="把本季标记为已执行")
     ap.add_argument("--no-trend", action="store_true", help="跳过趋势状态机（快跑）")
+    ap.add_argument("--legacy-gate", action="store_true",
+                    help="回退到 T0-T8 状态门（对照/回滚）；默认用 V1 连续评分")
     a = ap.parse_args()
 
     st = json.load(open(a.state))
     holdings = st["holdings"]
     rules = st["rules"]
+    legacy = bool(a.legacy_gate or rules.get("gate_mode") == "legacy")
+    a.legacy_gate = legacy
     cash = float(st["cash"])
     codes = [h["code"] for h in holdings]
     style_codes = st.get("style_group", [])
@@ -293,6 +322,17 @@ def main():
     rc50 = m2["rc"][0]
     rc50_abs = rc50 / 100 * m2["sd"]
 
+    # ── V1 连续评分（Trend / Momentum / Risk / Diversification）
+    spec = v1_score.load_spec()
+    scores = {}
+    for c in codes:
+        cl = [float(b["last"]) for b in (klines.get(c) or [])]
+        if len(cl) < 121:
+            scores[c] = None
+            continue
+        drc = delta_rc50(codes, mv, cash, S2, idx[c])
+        scores[c] = v1_score.score(cl, len(cl) - 1, drc, spec)
+
     # ── 趋势状态
     states = {}
     if not a.no_trend:
@@ -338,13 +378,14 @@ def main():
         gap_pp = tgt - w
         gap_amt = tgt / 100 * cap_tot - h["shares"] * prices[c]
         s = states.get(c)
-        allowed_states = rules.get("gate_overrides", {}).get(c, rules["gate_states"])
-        gate = bool(s and s["eff"] in allowed_states)
+        sc = scores.get(c)
         blocked = []
         if h.get("locked"):
             blocked = ["锁定不买"]
-        elif not gate:
-            blocked.append("状态门")
+        elif a.legacy_gate:
+            allowed_states = rules.get("gate_overrides", {}).get(c, rules["gate_states"])
+            if not (s and s["eff"] in allowed_states):
+                blocked.append("状态门")
         if not h.get("locked") and c in style_codes and max(style_rc2, style_rc1) > rules["style_group_limit_pct"]:
             blocked.append("风格组>%.0f%%" % rules["style_group_limit_pct"])
         if not h.get("locked") and gap_amt <= 0:
@@ -354,24 +395,40 @@ def main():
                 and pm["prem"] > rules.get("max_premium_pct", 1.5):
             blocked.append(f"溢价{pm['prem']:+.1f}%")
         rows.append(dict(code=c, name=names[c], px=prices[c], w=w, tgt=tgt,
-                         gap_pp=gap_pp, gap_amt=gap_amt, state=s,
+                         gap_pp=gap_pp, gap_amt=gap_amt, state=s, score=sc,
                          eligible=len(blocked) == 0, blocked=blocked,
                          shares=h["shares"], prem=prem.get(c)))
 
     # ── 本季下单建议
-    cand = [r for r in rows if r["eligible"] and r["gap_amt"] > 0]
+    if a.legacy_gate:
+        cand = [r for r in rows if r["eligible"] and r["gap_amt"] > 0]
+        sel_note = "T0-T8 状态门（--legacy-gate）"
+        max_score = None
+    else:
+        hard_ok = [r for r in rows if r["eligible"] and r["gap_amt"] > 0 and r["score"]]
+        pool = [dict(code=r["code"], score=r["score"]["total"], gap=r["gap_amt"]) for r in hard_ok]
+        picked, max_score, sel_note = v1_score.select(pool, spec)
+        ok_codes = {p["code"] for p in picked}
+        cand = [r for r in hard_ok if r["code"] in ok_codes]
     action = None
     if cand:
-        pick = max(cand, key=lambda r: r["gap_amt"])
+        if a.legacy_gate:
+            pick = max(cand, key=lambda r: r["gap_amt"])
+        else:
+            pick = max(cand, key=lambda r: (r["score"]["total"], r["gap_amt"]))
         amt = min(rules["max_trade"], pick["gap_amt"])
         shares = int(amt // (pick["px"] * rules["lot_size"])) * rules["lot_size"]
         cost = shares * pick["px"]
         if cost >= rules["min_trade"]:
             action = dict(code=pick["code"], name=pick["name"], px=pick["px"],
-                          shares=shares, cost=cost, gap=pick["gap_amt"], blocked=[])
+                          shares=shares, cost=cost, gap=pick["gap_amt"],
+                          score=(pick["score"]["total"] if pick.get("score") else None),
+                          reason=sel_note, blocked=[])
         else:
             action = dict(code=None, reason=f"{pick['name']} 缺口 {pick['gap_amt']:.0f} 元 < 最小交易额 "
                                             f"{rules['min_trade']} 元 → 留现金")
+    elif not a.legacy_gate:
+        action = dict(code=None, reason=f"{sel_note} → 留现金")
 
     # ── 触发检查
     trig = []
@@ -383,13 +440,26 @@ def main():
                      f"2年 {style_rc2:.1f}% / 1年 {style_rc1:.1f}% > {rules['style_group_limit_pct']:.0f}%",
                      "禁买红利类（低相关腿不受限）"))
     for ch in changes:
-        r = next((x for x in rows if x["code"] == ch["code"]), None)
-        if ch["dir"] == "up" and ch["new"] in rules["reserve_fill_states"]:
-            trig.append(("🟢 状态恢复", f"{ch['name']} {ch['old']} → {ch['new']}",
-                         f"预备队可一次性补足缺口约 {r['gap_amt']:,.0f} 元" if r else "可评估补仓"))
-        elif ch["dir"] == "down" and ch["old"] in rules["gate_states"]:
-            trig.append(("🟠 状态转弱", f"{ch['name']} {ch['old']} → {ch['new']}",
-                         "当季改投次优合格标的；无则留现金"))
+        if a.legacy_gate:
+            r = next((x for x in rows if x["code"] == ch["code"]), None)
+            if ch["dir"] == "up" and ch["new"] in rules["reserve_fill_states"]:
+                trig.append(("🟢 状态恢复", f"{ch['name']} {ch['old']} → {ch['new']}",
+                             f"预备队可一次性补足缺口约 {r['gap_amt']:,.0f} 元" if r else "可评估补仓"))
+            elif ch["dir"] == "down" and ch["old"] in rules["gate_states"]:
+                trig.append(("🟠 状态转弱", f"{ch['name']} {ch['old']} → {ch['new']}",
+                             "当季改投次优合格标的；无则留现金"))
+
+    # ── 逐行判定：硬门 → 阈值（口径与最终下单一致）
+    floor = spec["threshold"]["absolute_floor"]
+    band = spec["threshold"]["relative_band"]
+    for r in rows:
+        sv = r.get("score")
+        if a.legacy_gate:
+            r["pass_all"] = r["eligible"] and r["gap_amt"] > 0
+        else:
+            r["pass_all"] = bool(not r["blocked"] and r["gap_amt"] > 0 and sv
+                                 and sv["total"] >= floor
+                                 and (max_score is None or sv["total"] >= max_score - band))
 
     # ── 恢复条件（任一生效即可恢复）
     resume = rules.get("resume") or {}
@@ -402,7 +472,8 @@ def main():
         best_nas = min(nas_ok, key=lambda c: prem[c]["prem"]) if nas_ok else None
     cond_premium = dict(
         id="premium", met=False,
-        label="任一纳指ETF溢价收敛至 %.1f%% 以内（且底层状态合格）" % rules.get("max_premium_pct", 1.5),
+        label=("任一纳指ETF溢价收敛至 %.1f%% 以内（且底层状态合格）" if a.legacy_gate
+               else "任一纳指ETF溢价收敛至 %.1f%% 以内（之后按 V1 评分判定）") % rules.get("max_premium_pct", 1.5),
         detail="—")
     lim = rules.get("max_premium_pct", 1.5)
     nas_state_ok = any((states.get(c) or {}).get("eff") in rules["gate_states"]
@@ -425,7 +496,9 @@ def main():
                                    f"（还需回落 {max(0.0, prem[best]['prem'] - lim):.1f}pp）")
     gold = next((r for r in rows if r["code"] == "sh518880"), None)
     gold_states = rules.get("gate_overrides", {}).get("sh518880", rules["gate_states"])
-    cond_gold = dict(id="gold_t1", met=False, label="黄金进入分散腿合格集 {T1,T2,T3a,T3b,T4}", detail="—")
+    cond_gold = dict(id="gold_t1", met=False,
+                     label=("黄金进入分散腿合格集 {T1,T2,T3a,T3b,T4}" if a.legacy_gate
+                            else "黄金当前形态（观察项，不再触发买入）"), detail="—")
     if gold and gold.get("state"):
         gs = gold["state"]
         ok_prem = (gold.get("prem") or {}).get("prem")
@@ -446,8 +519,9 @@ def main():
     print("═" * W)
     print(f" 季度定投计划 · {'季末执行' if a.quarter_end else '周度复评'}")
     if a.no_trend:
-        print(" ⚠ 已跳过趋势状态机（--no-trend）：所有标的视为状态门不通过")
+        print(" ⚠ 已跳过趋势状态机（--no-trend）：T 码列为空；V1 评分不受影响")
     print(f" {now:%Y-%m-%d %H:%M} | 最新 K 线 {bar_date}{'（盘中未定稿）' if intraday else '（收盘）'}")
+    print(f" 判定架构 {'T0-T8 状态门（legacy）' if a.legacy_gate else 'V1 连续评分：硬门 → 软分 → 阈值 ' + str(spec['threshold']['absolute_floor'])}")
     print("═" * W)
 
     pos_pct = (1 - cash / m2["tot"]) * 100
@@ -458,7 +532,7 @@ def main():
           f" | 回撤 {dd:+.1f}%（峰值 {peak:,.0f}）")
 
     print(f"\n【标的】")
-    hdr = f"  {'代码':10}{'名称':14}{'现价':>7}{'溢价':>8}{'权重':>7}{'目标':>6}{'缺口':>10}  {'状态':<13}"
+    hdr = f"  {'代码':10}{'名称':14}{'现价':>7}{'溢价':>8}{'权重':>7}{'目标':>6}{'缺口':>10}{'评分':>6}  {'状态':<13}"
     print(hdr)
     print("  " + "─" * (W - 4))
     for r in rows:
@@ -468,16 +542,45 @@ def main():
             stxt += "※"
         if c in (rules.get("state_suspect") or []):
             stxt += " ⚠"
-        if r["eligible"]:
+        if r.get("pass_all"):
             mark = "可买"
-        else:
+        elif r["blocked"]:
             mark = "/".join(r["blocked"])[:14]
+        elif r.get("score"):
+            mark = "分数不足"
+        else:
+            mark = "无评分"
         pm = r.get("prem") or {}
         pr = f"{pm['prem']:+.2f}%" if pm.get("prem") is not None else "—"
         if pm.get("prem") is not None and pm["prem"] > rules.get("max_premium_pct", 1.5):
             pr = pr + "!"
+        sv = r.get("score")
+        stotal = f"{sv['total']:.0f}" if sv else "—"
         print(f"  {r['code']:10} {r['name'][:11]:<12} {r['px']:>7.3f} {pr:>8} {r['w']:>6.1f}% {r['tgt']:>5.1f}%"
-              f" {r['gap_amt']:>+9,.0f}  {stxt:<17} {mark}")
+              f" {r['gap_amt']:>+9,.0f} {stotal:>6}  {stxt:<17} {mark}")
+
+    # ── V1 评分明细
+    if not a.legacy_gate:
+        print(f"\n【评分】V1 = Trend30 + Mom30 + Risk20 + Div20 = 100")
+        print(f"  {'代码':10}{'名称':12}{'Trend':>7}{'Mom':>7}{'Risk':>7}{'Div':>7}{'ΔRC50':>8}{'合计':>7}  {'过门':<8}")
+        print("  " + "─" * (W - 4))
+        for r in sorted(rows, key=lambda x: -(x["score"]["total"] if x["score"] else -1)):
+            sv = r.get("score")
+            if not sv:
+                continue
+            tag = "✓" if r.get("pass_all") else ("硬门" if r["blocked"] else "分数不足")
+            drc = sv.get("drc50")
+            print(f"  {r['code']:10} {r['name'][:10]:<12}{sv['trend']:>7.1f}{sv['momentum']:>7.1f}"
+                  f"{sv['risk']:>7.1f}{sv['div']:>7.1f}"
+                  f"{(f'{drc:+.3f}' if drc is not None else '—'):>8}{sv['total']:>7.1f}  {tag:<8}")
+        if max_score is not None:
+            print(f"  阈值：下限 {floor} ＋ 相对带 {band}。硬门通过者最高分 {max_score:.1f}"
+                  f" → 候选需 ≥ {max(max_score - band, floor):.1f}（被硬门否决的不参与比较）")
+        else:
+            print(f"  阈值：下限 {floor} ＋ 相对带 {band}（无硬门通过者）")
+        if any(sv["div"] >= spec["score"]["diversification"]["points"] for sv in scores.values() if sv):
+            print(f"  注：Div 已饱和（ΔRC50 ≤ {spec['score']['diversification']['full_at_pp']}），"
+                  f"现金比例高时任何买入都能稀释 RC50，此时 Div 退化为门而非区分项。")
 
     lim = rules.get("max_premium_pct", 1.5)
     over = [r for r in rows if (r.get("prem") or {}).get("prem") is not None
@@ -518,16 +621,25 @@ def main():
         print(f"\n【状态变化】无（与上次一致）")
 
     if not cand:
-        allmet = all(r_["met"] for r_ in resume_rows)
-        print(f"\n【等待恢复】恢复策略：A 或 B 任一成立即恢复长期执行")
-        for tag, rc_ in zip(("A", "B"), resume_rows):
-            icon = "✅" if rc_["met"] else "⏳"
-            print(f"  {icon} 条件{tag}｜{rc_['label']}")
-            print(f"          {rc_['detail']}")
-        print(f"  当前：{'全部满足' if allmet else '均未满足'}"
-              f"{'（下一季可按常规执行）' if allmet else '（继续空仓）'}")
-        print("  备注：四只中哪只先满足就买哪只，多只满足取溢价最低；"
-              "且必须底层指数状态合格（当前 usNDX=T6，不在合格池）。")
+        if a.legacy_gate:
+            allmet = all(r_["met"] for r_ in resume_rows)
+            print(f"\n【等待恢复】恢复策略：A 或 B 任一成立即恢复长期执行")
+            for tag, rc_ in zip(("A", "B"), resume_rows):
+                icon = "✅" if rc_["met"] else "⏳"
+                print(f"  {icon} 条件{tag}｜{rc_['label']}")
+                print(f"          {rc_['detail']}")
+            print(f"  当前：{'全部满足' if allmet else '均未满足'}"
+                  f"{'（下一季可按常规执行）' if allmet else '（继续空仓）'}")
+            print("  备注：四只中哪只先满足就买哪只，多只满足取溢价最低；"
+                  "且必须底层指数状态合格（当前 usNDX=T6，不在合格池）。")
+        else:
+            print(f"\n【本季不买】{sel_note}")
+            print(f"  绝对下限 {spec['threshold']['absolute_floor']} 是唯一能产生「不买」的开关；"
+                  f"相对带 {spec['threshold']['relative_band']} 只收窄候选集。")
+            for rc_ in resume_rows:
+                icon = "✅" if rc_["met"] else "⏳"
+                print(f"  {icon} {rc_['label']}")
+                print(f"     {rc_['detail']}")
 
     print(f"\n【触发】")
     if trig:
@@ -547,19 +659,26 @@ def main():
     elif action is None and not cand:
         met = [r_["id"] for r_ in resume_rows if r_["met"]]
         if met:
-            print(f"  恢复条件已满足（{', '.join(met)}），下季按常规规则执行。")
-        else:
+            print(f"  观察条件已满足（{', '.join(met)}），下季按常规规则执行。")
+        elif a.legacy_gate:
             print(f"  空仓等待：本季 3,000 元并入现金，等溢价收敛或黄金转 T1 后恢复。")
+        else:
+            print(f"  本季不买：{sel_note}。3,000 元并入现金。")
     else:
         print(f"  本周无需动作；等季末（{qe}）再执行。")
     print("═" * W)
 
     # ── 存档
     snap = dict(date=now.date().isoformat(), quarter=q, bar_date=bar_date,
+                mode="legacy" if a.legacy_gate else "v1",
+                spec_version=spec.get("version"),
                 total=m2["tot"], cash=cash, cash_pct=cash / m2["tot"] * 100,
                 sd=m2["sd"], rc50=rc50, rc50_abs=rc50_abs,
                 style2=style_rc2, style1=style_rc1, drawdown=dd, peak=peak,
                 states={c: (states[c]["eff"] if states.get(c) else None) for c in codes},
+                scores={c: ({k: scores[c][k] for k in ("trend", "momentum", "risk", "div", "total")}
+                            if scores.get(c) else None) for c in codes},
+                score_max=max_score, selection=sel_note,
                 premium={c: (prem[c]["prem"] if prem.get(c) else None) for c in codes},
                 action=action, triggers=[t[0] for t in trig], executed=done,
                 changes=changes,

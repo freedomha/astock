@@ -60,6 +60,8 @@
     "sh512890"
   ],
   "rules": {
+    "gate_mode": "v1",
+    "gate_mode_note": "v1=连续评分（默认）；legacy=T0-T8 状态门（回滚/对照）。规格见 v1_spec.json",
     "quarterly_amount": 3000,
     "max_trade": 3000,
     "min_trade": 2000,
