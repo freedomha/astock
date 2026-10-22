@@ -15,7 +15,8 @@
 判定架构（冻结规格见 V1-SPEC.md / v1_spec.json）：
   硬门（溢价 / 回撤 / 风格组 / 数据质量 / 最小交易额）→ 不参与评分，违反即不买
   软分（Trend 30 / Momentum 30 / Risk 20 / Diversification 20）→ 只负责排序
-  阈值（绝对下限 60 + 相对带 5）→ 唯一能产生「本季不买」的开关
+  阈值（Eligibility Floor 60 + Candidate Band 5）→ 评分层里唯一能产生「本季不买」的开关
+  （硬门在前一步即可独立否决；今天的 4/5 就是硬门挡的）
   T0-T8 仅作描述性特征，不再决定买不买。
 
 依赖：westock-data CLI（~/.workbuddy/westock-data）+ 同项目 etf-operation-plan/trend_analysis.py。
@@ -453,7 +454,7 @@ def main():
     if max(style_rc2, style_rc1) > rules["style_group_limit_pct"]:
         trig.append(("🟠 风格组超限",
                      f"2年 {style_rc2:.1f}% / 1年 {style_rc1:.1f}% > {rules['style_group_limit_pct']:.0f}%",
-                     "禁买红利类（低相关腿不受限）"))
+                     "禁买组内标的（红利低波 ＋ 上证50；低相关腿不受限）"))
     for ch in changes:
         if a.legacy_gate:
             r = next((x for x in rows if x["code"] == ch["code"]), None)
@@ -649,8 +650,9 @@ def main():
             print("  备注：四只中哪只先满足就买哪只，多只满足取溢价最低；"
                   "且必须底层指数状态合格（当前 usNDX=T6，不在合格池）。")
         else:
-            print(f"\n【本季不买】{sel_note}")
-            print(f"  只有 Eligibility Floor {spec['threshold']['absolute_floor']} 能产生「不买」；"
+            print(f"\n【{'本季不买' if left == 0 else '当前观察'}】{sel_note}"
+                  f"{'' if left == 0 else f'（距季末 {left} 个交易日，正式决策在季末收盘后）'}")
+            print(f"  评分层里只有 Eligibility Floor {spec['threshold']['absolute_floor']} 能产生「不买」（硬门可独立否决）；"
                   f"Candidate Band {spec['threshold']['relative_band']} 只收窄候选集。")
             for rc_ in resume_rows:
                 icon = "✅" if rc_["met"] else "⏳"
@@ -672,14 +674,18 @@ def main():
         print("  季末执行窗口：按上方指令下单，成交后跑 --mark-executed 并更新 shares/cash。")
     elif done:
         print(f"  本季（{q}）已执行，本周仅监控，无需动作。")
-    elif action is None and not cand:
+    elif (not action or not action.get("code")) and not cand:
         met = [r_["id"] for r_ in resume_rows if r_["met"]]
         if met:
             print(f"  观察条件已满足（{', '.join(met)}），下季按常规规则执行。")
         elif a.legacy_gate:
             print(f"  空仓等待：本季 3,000 元并入现金，等溢价收敛或黄金转 T1 后恢复。")
         else:
-            print(f"  本季不买：{sel_note}。3,000 元并入现金。")
+            if left == 0:
+                print(f"  本季不买：{sel_note}。3,000 元并入现金。")
+            else:
+                print(f"  当前观察：{sel_note}。若今天就是决策日 → 不买，3,000 元留现金；"
+                      f"正式决策在 {qe} 收盘后。")
     else:
         print(f"  本周无需动作；等季末（{qe}）再执行。")
     print("═" * W)

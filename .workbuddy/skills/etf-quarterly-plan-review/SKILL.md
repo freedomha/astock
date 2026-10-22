@@ -113,7 +113,7 @@ T3b 的超额 64% 来自时间效应，剔除 2025Q3 后为 −0.52pp、2026 样
    - 每个候选算 `Score = Trend 30 + Momentum 30 + Risk 20 + Diversification 20`；
    - **Eligibility Floor = 60**（绝对资格线）：`Score ≥ 60` 才可能买；
    - **Candidate Band = max − 5**（相对候选带）：在已过 Floor 的标的中，只保留 `Score ≥ max − 5` 的；
-   - **只有 Floor 能产生「本季不买」**；Band 永远挡不住买入，只把候选集从 4 只收窄到约 2 只；
+   - **评分层里只有 Floor 能产生「本季不买」**——但硬门在前一步就可以独立否决（今天的 4/5 就是硬门挡的）；Band 永远挡不住买入，只把候选集从 4 只收窄到约 2 只；
    - 通过硬门的标的按 Score 降序，分差 <1 时取缺口更大者，每季至多 1 只；
    - 60 / 5 是**预注册候选值**，只经过行为验证（会在最弱季度 2026Q1 挡住），**没有收益验证**。
 4. **风格组 60% 上限只约束同因子标的**（`style_group` 内的红利类）；**低相关腿（纳指/标普/黄金）不受此限**——它们的作用就是把该组占比压下去，若也受限则规则自我否定。
@@ -198,7 +198,7 @@ $PY $SK/review.py --save --json      # 存档 + 机器可读
 
 ## 与报告的关系
 
-- 报告 `reports/etf/allocation/20261022-季定投计划-v14.html` 是**当前规则的决策存档**（硬门 + V1 评分），由 `research/plan-v14/generate.py` 直接消费 `review.py --json` 快照生成，与 skill 同源。
+- 报告 `reports/etf/allocation/20261022-季定投计划-v14.1.html` 是**当前规则的决策存档**（硬门 + V1 评分），由 `research/plan-v14/generate.py` 直接消费 `review.py --json` 快照生成，与 skill 同源。
 - `reports/etf/allocation/20261021-季定投计划.html`（v13）是**旧规则的存档**，其中「规则 3 状态门」已被 V1 取代，引用时注意版本。
 - `reports/research/T-State-Validation-20261022.html`：T3b 为什么被降级；`Gate-Redesign-20261022.html`：V1 的设计依据与七变体对抗。
 - 本目录 `V1-SPEC.md` / `v1_spec.json` 是**生产口径的唯一来源**；研究目录的同名文件是研究快照，若冲突以本目录为准。
