@@ -206,7 +206,7 @@ def main():
 </style></head><body><div class="wrap">
 
 <h1>季度定投计划 <span class="tag">v14</span> <span style="color:#95a5a6;font-weight:400">/</span> 硬门 + 连续评分</h1>
-<div class="sub">每季新增 3,000 元 · 快照 __DATE__ __TIME__ · K 线 __BAR__ · 规格 v__SPECV__（冻结） · 全部数字由 review.py 同源产出 · 非投资建议</div>
+<div class="sub">每季新增 3,000 元 · 快照 __DATE__ __TIME__ · K 线 __BAR__ · 规格 v__SPECV__（冻结） · 距季末 __DTOQ__ 个交易日 · 全部数字由 review.py 同源产出 · 非投资建议</div>
 
 <div class="card hero">
   <h2>__HERO__</h2>
@@ -447,7 +447,8 @@ echarts.init(document.getElementById('c3')).setOption(ax({
 
     rep = {
         "__ECHARTS__": JS, "__DATA__": json.dumps(chart, ensure_ascii=False),
-        "__DATE__": S["date"], "__TIME__": dt.datetime.now().strftime("%H:%M"), "__BAR__": S["bar_date"], "__SPECV__": str(S.get("spec_version")),
+        "__DATE__": S["date"], "__TIME__": dt.datetime.now().strftime("%H:%M"),
+        "__DTOQ__": str(S.get("days_to_qe", "—")), "__BAR__": S["bar_date"], "__SPECV__": str(S.get("spec_version")),
         "__HERO__": hero_title, "__HEROSUB__": hero_sub,
         "__TOTAL__": "{:,.0f}".format(S["total"]), "__CASHPCT__": n(S["cash_pct"], 1),
         "__SMAX__": n(S["score_max"], 1), "__FLOOR__": str(floor), "__BAND__": str(band),

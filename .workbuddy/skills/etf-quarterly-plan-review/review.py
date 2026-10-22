@@ -599,7 +599,8 @@ def main():
             pm = r["prem"]
             print(f"  {r['name']}：{pm['prem']:+.2f}%（净值 {pm['nav']} / 收盘 {pm['px']}）")
 
-    print(f"\n【本季 {q}】已执行：{'是' if done else '否'} | 距季末约 {left} 个交易日（{qe}）")
+    print(f"\n【本季 {q}】已执行：{'是' if done else '否'} | 距季末约 {left} 个交易日（{qe}）"
+          f"{'｜今天即决策日' if left == 0 else ''}")
     if action:
         if action.get("code"):
             print(f"  若此刻执行：买 {action['name']} {action['shares']:,} 份 × {action['px']:.3f}"
@@ -670,6 +671,7 @@ def main():
 
     # ── 存档
     snap = dict(date=now.date().isoformat(), quarter=q, bar_date=bar_date,
+                days_to_qe=left, is_decision_day=(left == 0),
                 mode="legacy" if a.legacy_gate else "v1",
                 spec_version=spec.get("version"),
                 total=m2["tot"], cash=cash, cash_pct=cash / m2["tot"] * 100,
@@ -700,7 +702,8 @@ def main():
                 hist = []
         hist = [h for h in hist if h.get("date") != snap["date"]] + [snap]
         json.dump(hist, open(HISTORY, "w"), ensure_ascii=False, indent=2)
-        print(f"\n已追加 {HISTORY}（共 {len(hist)} 条）")
+        print(f"\n已追加 {HISTORY}（共 {len(hist)} 条｜距季末 {left} 个交易日"
+              f"{'，决策日' if left == 0 else '，监控记录'}）")
 
     st["peak_value"] = peak
     if states:
