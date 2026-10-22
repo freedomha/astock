@@ -193,5 +193,5 @@ def select(candidates, spec=None):
     band = t["relative_band"]
     ok = [c for c in candidates if c["score"] >= floor and c["score"] >= mx - band]
     if not ok:
-        return [], mx, f"最高分 {mx:.1f} < 绝对下限 {floor}"
-    return ok, mx, f"{len(ok)} 只过门（最高 {mx:.1f}）"
+        return [], mx, f"硬门通过者最高分 {mx:.1f} < Eligibility Floor {floor}"
+    return ok, mx, f"{len(ok)} 只落在 Candidate Band 内（最高 {mx:.1f}）"

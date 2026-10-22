@@ -210,10 +210,10 @@ def main():
 
 <div class="card hero">
   <h2>__HERO__</h2>
-  <p style="margin-bottom:12px">__HEROSUB__。架构已从「T0-T8 状态门」换成「<b>硬门 + 连续评分</b>」：硬门只否决不可接受的风险，评分只负责排序，<b>绝对下限才是唯一能产生「不买」的开关</b>。</p>
+  <p style="margin-bottom:12px">__HEROSUB__。架构已从「T0-T8 状态门」换成「<b>硬门 + 连续评分</b>」：硬门只否决不可接受的风险，评分只负责排序，<b>只有 Eligibility Floor 能产生「不买」</b>。</p>
   <div class="kpi">
     <div class="kpibox"><div class="n">__TOTAL__</div><div class="l">总资产<br>现金 __CASHPCT__%</div></div>
-    <div class="kpibox"><div class="n">__SMAX__</div><div class="l">硬门通过者最高分<br>下限 __FLOOR__</div></div>
+    <div class="kpibox"><div class="n">__SMAX__</div><div class="l">硬门通过者最高分<br>Eligibility Floor __FLOOR__</div></div>
     <div class="kpibox"><div class="n">__RC__</div><div class="l">RC50 占比<br>绝对 __RCABS__%</div></div>
     <div class="kpibox"><div class="n">__STYLE2__ / __STYLE1__</div><div class="l">风格组风险 %<br>2 年 / 1 年</div></div>
   </div>
@@ -222,9 +222,9 @@ def main():
 <div class="card">
   <h2>一、架构：三个职责分离</h2>
   <div class="flow">
-    <div class="g"><b>HARD GATES</b>溢价 ≤1.5%<br>回撤 &gt;15% 暂停<br>风格组 ≤60%<br>单笔 &lt;2,000</div>
+    <div class="g"><b>HARD GATES</b>溢价 ≤1.5%<br>回撤 ≥15%（DD ≤ −15%）暂停<br>风格组 ≤60%<br>单笔 &lt;2,000</div>
     <div class="s"><b>SOFT SCORE</b>Trend 30<br>Momentum 30（钟形）<br>Risk 20<br>Diversification 20</div>
-    <div class="t"><b>THRESHOLD</b>Score ≥ __FLOOR__<br>且 ≥ max − __BAND__<br>无候选 → 现金</div>
+    <div class="t"><b>ELIGIBILITY</b>Floor = __FLOOR__<br>Band = max − __BAND__<br>两者同时满足<br>否则 → 现金</div>
     <div><b>EXECUTE</b>按分排序<br>→ 缺口<br>→ 买入 ≤3,000</div>
   </div>
   <table>
@@ -232,7 +232,7 @@ def main():
     <tbody>
       <tr><td><b>硬门</b></td><td class="l">这个风险我是否根本不该承担？</td><td class="l">溢价、回撤、风格组、数据质量</td><td>不能</td></tr>
       <tr><td><b>软分</b></td><td class="l">在可买的里面，哪个现在更值得优先？</td><td class="l">趋势 / 动量 / 波动 / 分散</td><td>能</td></tr>
-      <tr><td><b>阈值</b></td><td class="l">今天到底有没有值得买的？</td><td class="l">绝对下限 __FLOOR__ ＋ 相对带 __BAND__</td><td>—</td></tr>
+      <tr><td><b>阈值</b></td><td class="l">今天到底有没有值得买的？</td><td class="l"><b>Eligibility Floor</b> = __FLOOR__（绝对资格线）<br><b>Candidate Band</b> = max − __BAND__（相对候选带）</td><td>—</td></tr>
     </tbody>
   </table>
   <div class="note blue">这三个问题的答案性质不同，混在一张表里就会互相抵消。
@@ -247,8 +247,8 @@ def main():
     <li><b>一个季度撑起全部结论。</b>2025Q3 一季贡献 <b>__TOPQS__%</b> 的观测；剔除后横截面超额 <b>__EXQ__pp</b>、胜率 __EXQW__%。2026 样本外 <b>__OOS26__pp</b>。</li>
     <li><b>在 5 只标的的菜单上，它几乎不投。</b>回测的 5 个季度里，状态门只放行 <b>__M0T__ 次</b>买入——它不只是在防止错误投资，也在阻止资产配置发生。<b>「只稀释不卖出」的前提是「有钱投得出去」。</b></li>
   </ol>
-  <div class="note warn" style="margin-bottom:0">同日置换检验 p&lt;0.002：T3b <b>不是噪声</b>，横截面信息真实存在。所以正确的处理不是删掉它，而是<b>降级为描述性特征</b>——
-    报告里仍然显示 T 码，但它不再决定买卖。</div>
+  <div class="note warn" style="margin-bottom:0">同日置换检验 p&lt;0.002 只说明：<b>全样本存在统计可识别的横截面关联，但稳定性和样本外表现不足以支持其作为交易硬门。</b>
+    所以正确的处理不是删掉它，而是<b>降级为描述性特征</b>——报告里仍然显示 T 码，但它不再决定买卖。</div>
 </div>
 
 <div class="card">
@@ -258,7 +258,7 @@ def main():
     <tbody>__SCOREROWS__</tbody>
   </table></div>
   <div id="c1" class="chart"></div>
-  <div class="legend">堆叠＝四个分项之和（0–100）。红色虚线为绝对下限 __FLOOR__。</div>
+  <div class="legend">堆叠＝四个分项之和（0–100）。红色虚线为 <b>Eligibility Floor __FLOOR__</b>。</div>
   <div class="note">__DIVNOTE__</div>
 </div>
 
@@ -280,7 +280,7 @@ def main():
   <p>__ACTDETAIL__</p>
   <div class="note"><b>与旧规则的差别不在本季结论，在「什么时候会买」。</b>
     旧版同样是留现金，但路径是先看 T 码再看溢价；新版先过硬门（本季仍是溢价否决纳指/标普、风格组否决红利），
-    再看分数——黄金虽然过了硬门，<b>41.4 分不到下限 __FLOOR__</b>。
+    再看分数——黄金虽然过了硬门，<b>41.4 分不到 Eligibility Floor __FLOOR__</b>。
     差别在于：<b>旧规则等一个可能不出现的形态，新规则每季重新算分，分够了就买。</b></div>
 </div>
 
@@ -299,17 +299,18 @@ def main():
 
 <div class="card">
   <h2>七、阈值的证据：只验证行为，不验证收益</h2>
-  <p>下图是「五只标的中最高分」在过去 __THN__ 个交易日的分布通过率。<b>绝对下限 60 是唯一能产生「不买」的开关</b>；
-    相对带 __BAND__ 永远挡不住买入——最高分天然满足 <code>≥ max − __BAND__</code>，它只把候选集从 4 只收窄到约 2 只。</p>
+  <p>下图是「五只标的中最高分（<b>未扣硬门</b>）」在过去 __THN__ 个交易日的通过率。<b>Eligibility Floor 60 是唯一能产生「不买」的开关</b>；
+    Candidate Band（max − __BAND__）永远挡不住买入——当季最高分天然满足它，它只把候选集从 4 只收窄到约 2 只。
+    注意两者的分母不同：本段是「全池最高分」，第四节表格是「硬门通过者最高分」，后者才决定本季买不买。</p>
   <div id="c2" class="chart"></div>
   <div class="tw"><table>
-    <thead><tr><th>绝对下限</th><th>有候选的交易日占比</th><th>读法</th></tr></thead>
+    <thead><tr><th>Eligibility Floor</th><th>有候选的交易日占比</th><th>读法</th></tr></thead>
     <tbody>__THRROWS__</tbody>
   </table></div>
   <h3>五个历史决策日：最弱的季度长什么样</h3>
   <div id="c3" class="chart" style="height:260px"></div>
   <div class="tw"><table>
-    <thead><tr><th>季度末</th><th>最高分</th><th>≥60 的候选数</th><th>≥70 的候选数</th><th>本季动作（floor 60）</th></tr></thead>
+    <thead><tr><th>季度末</th><th>全池最高分<br><span style="font-weight:400">未扣硬门</span></th><th>≥60 的候选数</th><th>≥70 的候选数</th><th>本季动作<br><span style="font-weight:400">Floor 60</span></th></tr></thead>
     <tbody>__DECROWS__</tbody>
   </table></div>
   <div class="note ok" style="margin-bottom:0">下一步要看的是：在 <b>≥4 个新的季度决策点</b>（最早 2027Q4）之前，不得用收益对 V1 做「优于/劣于」判断。
@@ -324,10 +325,10 @@ def main():
       <tr><td>0</td><td class="l"><b>溢价门</b>：静态溢价 &gt; 1.5% 一律不买；折价不构成门槛</td><td>B 风控政策</td></tr>
       <tr><td>1</td><td class="l"><b>金额</b>：每季 3,000，单笔 ≤3,000，缺口按投入后总资产重算，不跨季结转</td><td>B</td></tr>
       <tr><td>2</td><td class="l"><b>最小额</b>：单笔 &lt;2,000 跳过（5 元佣金 = 0.25%）</td><td>B</td></tr>
-      <tr><td>3</td><td class="l"><b>评分门</b>：Score ≥ __FLOOR__ 且 ≥ max − __BAND__，按分排序取缺口；无候选留现金</td><td>C 待验证（行为已验证）</td></tr>
+      <tr><td>3</td><td class="l"><b>Eligibility Floor</b> = __FLOOR__（绝对资格线）＋ <b>Candidate Band</b> = max − __BAND__（相对候选带）：两者同时满足才进入候选，按分排序取缺口；无候选留现金。<b>只有 Floor 能产生「不买」，Band 只收窄候选集</b></td><td>C 待验证（行为已验证）</td></tr>
       <tr><td>4</td><td class="l"><b>风格组</b>：60% 上限只约束同因子标的（红利类），低相关腿不受限</td><td>B</td></tr>
       <tr><td>5</td><td class="l"><b>双窗口</b>：2 年与 1 年均低于 60% 才放行红利类</td><td>B</td></tr>
-      <tr><td>—</td><td class="l"><b>回撤</b>：相对峰值 &gt;15% 暂停全部买入，收窄至 10% 且复核通过后恢复</td><td>B</td></tr>
+      <tr><td>—</td><td class="l"><b>回撤</b>：相对峰值回撤幅度 <b>≥15%（即 Drawdown ≤ −15%）</b> → 暂停全部买入；回撤收窄至 10% 以内（Drawdown &gt; −10%）且复核通过后恢复</td><td>B</td></tr>
     </tbody>
   </table>
   <p class="muted">下单时点：季末最后一个交易日收盘后计算，下一交易日 14:45 之后下单（唯一一笔异常滑点 +76.8bps 来自盘中追价）。</p>
@@ -338,7 +339,7 @@ def main():
   <div class="tw"><table>
     <thead><tr><th>项目</th><th>v13（状态门）</th><th>v14（V1）</th></tr></thead>
     <tbody>
-      <tr><td>买不买由什么决定</td><td class="l">T 码 ∈ {T3b,T4}（分散腿放宽到 T1+）</td><td class="l">Score ≥ __FLOOR__ 且 ≥ max − __BAND__</td></tr>
+      <tr><td>买不买由什么决定</td><td class="l">T 码 ∈ {T3b,T4}（分散腿放宽到 T1+）</td><td class="l">Eligibility Floor __FLOOR__ ＋ Candidate Band max − __BAND__</td></tr>
       <tr><td>T 码的角色</td><td class="l">硬门（有否决权）</td><td class="l">描述性特征（只展示）</td></tr>
       <tr><td>溢价 / 回撤 / 风格组</td><td class="l">硬门</td><td class="l">硬门（不变）</td></tr>
       <tr><td>候选排序</td><td class="l">缺口最大者</td><td class="l">分数优先，分差 &lt;1 再比缺口</td></tr>
@@ -354,11 +355,11 @@ def main():
   <h2>十、局限与失效条件</h2>
   <ul>
     <li><b>Div 已饱和。</b>现金 __CASHPCT__% 时，任意非上证50 标的的 ΔRC50 都在 −1.7~−2.3pp，远超规格的 −0.15，所以 Div 恒为 20。
-      排序不受影响（同一常数），但<b>阈值 __FLOOR__ 实际等价于核心分 ≥40</b>。现金降到 10% 以下前，Div 事实是「非上证50」的门。</li>
+      排序不受影响（同一常数），但<b>Eligibility Floor __FLOOR__ 实际等价于核心分 ≥40</b>。现金降到 10% 以下前，Div 事实是「非上证50」的门。</li>
     <li><b>政策层样本极短。</b>5 个季度决策、收益差 647 元——不可判定。只有 RC50 的差异（40.2 vs 29.2）有结构性含义。</li>
     <li><b>溢价门不可回测。</b>历史模拟等于假设溢价门通过。</li>
     <li><b>QDII 用场内价算协方差</b>（已用指数代理做 lag1 修正），仍含跟踪误差与汇率缺口。</li>
-    <li><b>失效条件</b>：若连续 4 个季度「有候选但分数都不足 60」导致投出率 &lt;50%，说明下限过严，应按 V1-SPEC 第 6 节走变更流程，而不是当场下调。</li>
+    <li><b>失效条件</b>：若连续 4 个季度「有候选但分数都不足 Eligibility Floor」导致投出率 &lt;50%，说明 Floor 过严，应按 V1-SPEC 第 6 节走变更流程，而不是当场下调。</li>
   </ul>
 </div>
 
@@ -367,7 +368,7 @@ def main():
   <table>
     <thead><tr><th>版本</th><th>日期</th><th>变更</th></tr></thead>
     <tbody>
-      <tr><td>v14</td><td class="nw">2026-10-22</td><td class="l">架构切换：T0-T8 状态门 → 硬门 + V1 连续评分（30/30/20/20），阈值 60/5；T 码降为描述性特征</td></tr>
+      <tr><td>v14</td><td class="nw">2026-10-22</td><td class="l">架构切换：T0-T8 状态门 → 硬门 + V1 连续评分（30/30/20/20）；Eligibility Floor 60 ＋ Candidate Band 5；T 码降为描述性特征</td></tr>
       <tr><td>v13</td><td class="nw">2026-10-21</td><td class="l">规则分级 A/B/C；删自相矛盾表述；规模补口径</td></tr>
       <tr><td>v12</td><td class="nw">2026-10-21</td><td class="l">新增双口径 NAV（执行 vs 影子）</td></tr>
     </tbody>
@@ -438,7 +439,7 @@ echarts.init(document.getElementById('c3')).setOption(ax({
         actdetail = "该标的分数 %s，通过全部硬门，缺口足够。下单后请更新 plan_state.json 的 shares / cash 并跑 --mark-executed。" % n(act.get("score"), 1)
     else:
         actline = "本季不买，3,000 元并入现金。"
-        actdetail = ("选择原因：<b>%s</b>。硬门通过者中没有一只达到绝对下限 %d。"
+        actdetail = ("选择原因：<b>%s</b>。硬门通过者中没有一只达到 Eligibility Floor %d。"
                      "注意这不是「等某个形态出现」——下季重新计算，分数够了就买。" % (S.get("selection", ""), floor))
 
     style_note = ("<b>已超 60% 上限</b>，红利类本季禁买（低相关腿不受此限）。" if style_over

@@ -97,14 +97,14 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
 </style></head><body><div class="wrap">
 
 <h1>季度定投计划 <span class="tag">v14</span> <span style="color:#95a5a6;font-weight:400">/</span> 硬门 + 连续评分</h1>
-<div class="sub">每季新增 3,000 元 · 快照 2026-10-22 15:26 · K 线 2026-10-22 · 规格 v1.1（冻结） · 全部数字由 review.py 同源产出 · 非投资建议</div>
+<div class="sub">每季新增 3,000 元 · 快照 2026-10-22 15:44 · K 线 2026-10-22 · 规格 v1.1（冻结） · 全部数字由 review.py 同源产出 · 非投资建议</div>
 
 <div class="card hero">
   <h2>本季不买：留现金</h2>
-  <p style="margin-bottom:12px">最高分 41.4 < 绝对下限 60。架构已从「T0-T8 状态门」换成「<b>硬门 + 连续评分</b>」：硬门只否决不可接受的风险，评分只负责排序，<b>绝对下限才是唯一能产生「不买」的开关</b>。</p>
+  <p style="margin-bottom:12px">硬门通过者最高分 41.4 < Eligibility Floor 60。架构已从「T0-T8 状态门」换成「<b>硬门 + 连续评分</b>」：硬门只否决不可接受的风险，评分只负责排序，<b>只有 Eligibility Floor 能产生「不买」</b>。</p>
   <div class="kpi">
     <div class="kpibox"><div class="n">48,197</div><div class="l">总资产<br>现金 31.7%</div></div>
-    <div class="kpibox"><div class="n">41.4</div><div class="l">硬门通过者最高分<br>下限 60</div></div>
+    <div class="kpibox"><div class="n">41.4</div><div class="l">硬门通过者最高分<br>Eligibility Floor 60</div></div>
     <div class="kpibox"><div class="n">59.3</div><div class="l">RC50 占比<br>绝对 4.99%</div></div>
     <div class="kpibox"><div class="n">78.6 / 69.5</div><div class="l">风格组风险 %<br>2 年 / 1 年</div></div>
   </div>
@@ -113,9 +113,9 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
 <div class="card">
   <h2>一、架构：三个职责分离</h2>
   <div class="flow">
-    <div class="g"><b>HARD GATES</b>溢价 ≤1.5%<br>回撤 &gt;15% 暂停<br>风格组 ≤60%<br>单笔 &lt;2,000</div>
+    <div class="g"><b>HARD GATES</b>溢价 ≤1.5%<br>回撤 ≥15%（DD ≤ −15%）暂停<br>风格组 ≤60%<br>单笔 &lt;2,000</div>
     <div class="s"><b>SOFT SCORE</b>Trend 30<br>Momentum 30（钟形）<br>Risk 20<br>Diversification 20</div>
-    <div class="t"><b>THRESHOLD</b>Score ≥ 60<br>且 ≥ max − 5<br>无候选 → 现金</div>
+    <div class="t"><b>ELIGIBILITY</b>Floor = 60<br>Band = max − 5<br>两者同时满足<br>否则 → 现金</div>
     <div><b>EXECUTE</b>按分排序<br>→ 缺口<br>→ 买入 ≤3,000</div>
   </div>
   <table>
@@ -123,7 +123,7 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
     <tbody>
       <tr><td><b>硬门</b></td><td class="l">这个风险我是否根本不该承担？</td><td class="l">溢价、回撤、风格组、数据质量</td><td>不能</td></tr>
       <tr><td><b>软分</b></td><td class="l">在可买的里面，哪个现在更值得优先？</td><td class="l">趋势 / 动量 / 波动 / 分散</td><td>能</td></tr>
-      <tr><td><b>阈值</b></td><td class="l">今天到底有没有值得买的？</td><td class="l">绝对下限 60 ＋ 相对带 5</td><td>—</td></tr>
+      <tr><td><b>阈值</b></td><td class="l">今天到底有没有值得买的？</td><td class="l"><b>Eligibility Floor</b> = 60（绝对资格线）<br><b>Candidate Band</b> = max − 5（相对候选带）</td><td>—</td></tr>
     </tbody>
   </table>
   <div class="note blue">这三个问题的答案性质不同，混在一张表里就会互相抵消。
@@ -138,8 +138,8 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
     <li><b>一个季度撑起全部结论。</b>2025Q3 一季贡献 <b>60.4%</b> 的观测；剔除后横截面超额 <b>−0.52pp</b>、胜率 54.7%。2026 样本外 <b>−1.44pp</b>。</li>
     <li><b>在 5 只标的的菜单上，它几乎不投。</b>回测的 5 个季度里，状态门只放行 <b>1 次</b>买入——它不只是在防止错误投资，也在阻止资产配置发生。<b>「只稀释不卖出」的前提是「有钱投得出去」。</b></li>
   </ol>
-  <div class="note warn" style="margin-bottom:0">同日置换检验 p&lt;0.002：T3b <b>不是噪声</b>，横截面信息真实存在。所以正确的处理不是删掉它，而是<b>降级为描述性特征</b>——
-    报告里仍然显示 T 码，但它不再决定买卖。</div>
+  <div class="note warn" style="margin-bottom:0">同日置换检验 p&lt;0.002 只说明：<b>全样本存在统计可识别的横截面关联，但稳定性和样本外表现不足以支持其作为交易硬门。</b>
+    所以正确的处理不是删掉它，而是<b>降级为描述性特征</b>——报告里仍然显示 T 码，但它不再决定买卖。</div>
 </div>
 
 <div class="card">
@@ -149,7 +149,7 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
     <tbody><tr><td><b>纳指ETF广发</b></td><td>10.7</td><td>23.3</td><td>16.9</td><td>20.0</td><td>−2.259</td><td><b>70.9</b></td><td>+7680</td><td><span class='tag r'>硬门：溢价+13.7%</span></td></tr><tr><td><b>标普500ETF博时</b></td><td>8.0</td><td>18.1</td><td>18.4</td><td>20.0</td><td>−1.772</td><td><b>64.5</b></td><td>+1811</td><td><span class='tag r'>硬门：溢价+7.7%</span></td></tr><tr><td><b>红利低波ETF华泰柏</b></td><td>6.5</td><td>16.6</td><td>17.8</td><td>20.0</td><td>−1.718</td><td><b>60.8</b></td><td>+468</td><td><span class='tag r'>硬门：风格组>60%</span></td></tr><tr><td><b>黄金ETF华安</b></td><td>1.4</td><td>6.0</td><td>14.0</td><td>20.0</td><td>−1.920</td><td><b>41.4</b></td><td>+2612</td><td><span class='tag y'>分数不足</span></td></tr><tr><td><b>上证50ETF华夏</b></td><td>0.0</td><td>6.9</td><td>19.2</td><td>0.0</td><td>2.064</td><td><b>26.1</b></td><td>−4508</td><td><span class='tag r'>硬门：锁定不买</span></td></tr></tbody>
   </table></div>
   <div id="c1" class="chart"></div>
-  <div class="legend">堆叠＝四个分项之和（0–100）。红色虚线为绝对下限 60。</div>
+  <div class="legend">堆叠＝四个分项之和（0–100）。红色虚线为 <b>Eligibility Floor 60</b>。</div>
   <div class="note">Div 全部取满 20 分：现金占比 31.7% 时，任何非上证50 的买入都能把 RC50 拉低 1.7~2.3pp，远超规格阈值 −0.15。这意味着 <b>Div 在本季不区分标的</b>（只是一个常数），阈值 60 因此实际等价于核心分 ≥40。</div>
 </div>
 
@@ -168,10 +168,10 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
 <div class="card" style="border:2px solid #c0392b">
   <h2 style="color:#c0392b">五、本季结论</h2>
   <p style="font-size:15px"><b>本季不买，3,000 元并入现金。</b></p>
-  <p>选择原因：<b>最高分 41.4 < 绝对下限 60</b>。硬门通过者中没有一只达到绝对下限 60。注意这不是「等某个形态出现」——下季重新计算，分数够了就买。</p>
+  <p>选择原因：<b>硬门通过者最高分 41.4 < Eligibility Floor 60</b>。硬门通过者中没有一只达到 Eligibility Floor 60。注意这不是「等某个形态出现」——下季重新计算，分数够了就买。</p>
   <div class="note"><b>与旧规则的差别不在本季结论，在「什么时候会买」。</b>
     旧版同样是留现金，但路径是先看 T 码再看溢价；新版先过硬门（本季仍是溢价否决纳指/标普、风格组否决红利），
-    再看分数——黄金虽然过了硬门，<b>41.4 分不到下限 60</b>。
+    再看分数——黄金虽然过了硬门，<b>41.4 分不到 Eligibility Floor 60</b>。
     差别在于：<b>旧规则等一个可能不出现的形态，新规则每季重新算分，分够了就买。</b></div>
 </div>
 
@@ -190,17 +190,18 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
 
 <div class="card">
   <h2>七、阈值的证据：只验证行为，不验证收益</h2>
-  <p>下图是「五只标的中最高分」在过去 300 个交易日的分布通过率。<b>绝对下限 60 是唯一能产生「不买」的开关</b>；
-    相对带 5 永远挡不住买入——最高分天然满足 <code>≥ max − 5</code>，它只把候选集从 4 只收窄到约 2 只。</p>
+  <p>下图是「五只标的中最高分（<b>未扣硬门</b>）」在过去 300 个交易日的通过率。<b>Eligibility Floor 60 是唯一能产生「不买」的开关</b>；
+    Candidate Band（max − 5）永远挡不住买入——当季最高分天然满足它，它只把候选集从 4 只收窄到约 2 只。
+    注意两者的分母不同：本段是「全池最高分」，第四节表格是「硬门通过者最高分」，后者才决定本季买不买。</p>
   <div id="c2" class="chart"></div>
   <div class="tw"><table>
-    <thead><tr><th>绝对下限</th><th>有候选的交易日占比</th><th>读法</th></tr></thead>
+    <thead><tr><th>Eligibility Floor</th><th>有候选的交易日占比</th><th>读法</th></tr></thead>
     <tbody><tr><td><b>50</b></td><td>100.0%</td><td class='l'>等于不设门</td></tr><tr><td><b>55</b></td><td>98.3%</td><td class='l'>仅极端弱市挡住</td></tr><tr style="background:#f2f7fd"><td><b>60</b></td><td>91.0%</td><td class='l'>只在最弱季度挡住</td></tr><tr><td><b>65</b></td><td>86.7%</td><td class='l'>约七分之一的日子无标的</td></tr><tr><td><b>70</b></td><td>73.3%</td><td class='l'>近三成日子无标的</td></tr><tr><td><b>75</b></td><td>48.0%</td><td class='l'>半数日子空仓</td></tr></tbody>
   </table></div>
   <h3>五个历史决策日：最弱的季度长什么样</h3>
   <div id="c3" class="chart" style="height:260px"></div>
   <div class="tw"><table>
-    <thead><tr><th>季度末</th><th>最高分</th><th>≥60 的候选数</th><th>≥70 的候选数</th><th>本季动作（floor 60）</th></tr></thead>
+    <thead><tr><th>季度末</th><th>全池最高分<br><span style="font-weight:400">未扣硬门</span></th><th>≥60 的候选数</th><th>≥70 的候选数</th><th>本季动作<br><span style="font-weight:400">Floor 60</span></th></tr></thead>
     <tbody><tr><td>2025-09-30</td><td>81.0</td><td>3</td><td>3</td><td>买</td></tr><tr><td>2025-12-31</td><td>82.1</td><td>3</td><td>1</td><td>买</td></tr><tr style="background:#fdeeee"><td>2026-03-31</td><td>57.2</td><td>0</td><td>0</td><td><span class="muted">现金</span></td></tr><tr><td>2026-06-30</td><td>65.2</td><td>2</td><td>0</td><td>买</td></tr><tr><td>2026-09-30</td><td>76.2</td><td>3</td><td>1</td><td>买</td></tr></tbody>
   </table></div>
   <div class="note ok" style="margin-bottom:0">下一步要看的是：在 <b>≥4 个新的季度决策点</b>（最早 2027Q4）之前，不得用收益对 V1 做「优于/劣于」判断。
@@ -215,10 +216,10 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
       <tr><td>0</td><td class="l"><b>溢价门</b>：静态溢价 &gt; 1.5% 一律不买；折价不构成门槛</td><td>B 风控政策</td></tr>
       <tr><td>1</td><td class="l"><b>金额</b>：每季 3,000，单笔 ≤3,000，缺口按投入后总资产重算，不跨季结转</td><td>B</td></tr>
       <tr><td>2</td><td class="l"><b>最小额</b>：单笔 &lt;2,000 跳过（5 元佣金 = 0.25%）</td><td>B</td></tr>
-      <tr><td>3</td><td class="l"><b>评分门</b>：Score ≥ 60 且 ≥ max − 5，按分排序取缺口；无候选留现金</td><td>C 待验证（行为已验证）</td></tr>
+      <tr><td>3</td><td class="l"><b>Eligibility Floor</b> = 60（绝对资格线）＋ <b>Candidate Band</b> = max − 5（相对候选带）：两者同时满足才进入候选，按分排序取缺口；无候选留现金。<b>只有 Floor 能产生「不买」，Band 只收窄候选集</b></td><td>C 待验证（行为已验证）</td></tr>
       <tr><td>4</td><td class="l"><b>风格组</b>：60% 上限只约束同因子标的（红利类），低相关腿不受限</td><td>B</td></tr>
       <tr><td>5</td><td class="l"><b>双窗口</b>：2 年与 1 年均低于 60% 才放行红利类</td><td>B</td></tr>
-      <tr><td>—</td><td class="l"><b>回撤</b>：相对峰值 &gt;15% 暂停全部买入，收窄至 10% 且复核通过后恢复</td><td>B</td></tr>
+      <tr><td>—</td><td class="l"><b>回撤</b>：相对峰值回撤幅度 <b>≥15%（即 Drawdown ≤ −15%）</b> → 暂停全部买入；回撤收窄至 10% 以内（Drawdown &gt; −10%）且复核通过后恢复</td><td>B</td></tr>
     </tbody>
   </table>
   <p class="muted">下单时点：季末最后一个交易日收盘后计算，下一交易日 14:45 之后下单（唯一一笔异常滑点 +76.8bps 来自盘中追价）。</p>
@@ -229,7 +230,7 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
   <div class="tw"><table>
     <thead><tr><th>项目</th><th>v13（状态门）</th><th>v14（V1）</th></tr></thead>
     <tbody>
-      <tr><td>买不买由什么决定</td><td class="l">T 码 ∈ {T3b,T4}（分散腿放宽到 T1+）</td><td class="l">Score ≥ 60 且 ≥ max − 5</td></tr>
+      <tr><td>买不买由什么决定</td><td class="l">T 码 ∈ {T3b,T4}（分散腿放宽到 T1+）</td><td class="l">Eligibility Floor 60 ＋ Candidate Band max − 5</td></tr>
       <tr><td>T 码的角色</td><td class="l">硬门（有否决权）</td><td class="l">描述性特征（只展示）</td></tr>
       <tr><td>溢价 / 回撤 / 风格组</td><td class="l">硬门</td><td class="l">硬门（不变）</td></tr>
       <tr><td>候选排序</td><td class="l">缺口最大者</td><td class="l">分数优先，分差 &lt;1 再比缺口</td></tr>
@@ -245,11 +246,11 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
   <h2>十、局限与失效条件</h2>
   <ul>
     <li><b>Div 已饱和。</b>现金 31.7% 时，任意非上证50 标的的 ΔRC50 都在 −1.7~−2.3pp，远超规格的 −0.15，所以 Div 恒为 20。
-      排序不受影响（同一常数），但<b>阈值 60 实际等价于核心分 ≥40</b>。现金降到 10% 以下前，Div 事实是「非上证50」的门。</li>
+      排序不受影响（同一常数），但<b>Eligibility Floor 60 实际等价于核心分 ≥40</b>。现金降到 10% 以下前，Div 事实是「非上证50」的门。</li>
     <li><b>政策层样本极短。</b>5 个季度决策、收益差 647 元——不可判定。只有 RC50 的差异（40.2 vs 29.2）有结构性含义。</li>
     <li><b>溢价门不可回测。</b>历史模拟等于假设溢价门通过。</li>
     <li><b>QDII 用场内价算协方差</b>（已用指数代理做 lag1 修正），仍含跟踪误差与汇率缺口。</li>
-    <li><b>失效条件</b>：若连续 4 个季度「有候选但分数都不足 60」导致投出率 &lt;50%，说明下限过严，应按 V1-SPEC 第 6 节走变更流程，而不是当场下调。</li>
+    <li><b>失效条件</b>：若连续 4 个季度「有候选但分数都不足 Eligibility Floor」导致投出率 &lt;50%，说明 Floor 过严，应按 V1-SPEC 第 6 节走变更流程，而不是当场下调。</li>
   </ul>
 </div>
 
@@ -258,7 +259,7 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
   <table>
     <thead><tr><th>版本</th><th>日期</th><th>变更</th></tr></thead>
     <tbody>
-      <tr><td>v14</td><td class="nw">2026-10-22</td><td class="l">架构切换：T0-T8 状态门 → 硬门 + V1 连续评分（30/30/20/20），阈值 60/5；T 码降为描述性特征</td></tr>
+      <tr><td>v14</td><td class="nw">2026-10-22</td><td class="l">架构切换：T0-T8 状态门 → 硬门 + V1 连续评分（30/30/20/20）；Eligibility Floor 60 ＋ Candidate Band 5；T 码降为描述性特征</td></tr>
       <tr><td>v13</td><td class="nw">2026-10-21</td><td class="l">规则分级 A/B/C；删自相矛盾表述；规模补口径</td></tr>
       <tr><td>v12</td><td class="nw">2026-10-21</td><td class="l">新增双口径 NAV（执行 vs 影子）</td></tr>
     </tbody>

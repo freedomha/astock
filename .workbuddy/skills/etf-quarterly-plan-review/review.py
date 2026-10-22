@@ -521,7 +521,7 @@ def main():
     if a.no_trend:
         print(" ⚠ 已跳过趋势状态机（--no-trend）：T 码列为空；V1 评分不受影响")
     print(f" {now:%Y-%m-%d %H:%M} | 最新 K 线 {bar_date}{'（盘中未定稿）' if intraday else '（收盘）'}")
-    print(f" 判定架构 {'T0-T8 状态门（legacy）' if a.legacy_gate else 'V1 连续评分：硬门 → 软分 → 阈值 ' + str(spec['threshold']['absolute_floor'])}")
+    print(f" 判定架构 {'T0-T8 状态门（legacy）' if a.legacy_gate else 'V1：硬门 → 软分 → Eligibility Floor %d / Candidate Band %d' % (spec['threshold']['absolute_floor'], spec['threshold']['relative_band'])}")
     print("═" * W)
 
     pos_pct = (1 - cash / m2["tot"]) * 100
@@ -574,10 +574,10 @@ def main():
                   f"{sv['risk']:>7.1f}{sv['div']:>7.1f}"
                   f"{(f'{drc:+.3f}' if drc is not None else '—'):>8}{sv['total']:>7.1f}  {tag:<8}")
         if max_score is not None:
-            print(f"  阈值：下限 {floor} ＋ 相对带 {band}。硬门通过者最高分 {max_score:.1f}"
+            print(f"  Eligibility Floor {floor} ＋ Candidate Band {band}。硬门通过者最高分 {max_score:.1f}"
                   f" → 候选需 ≥ {max(max_score - band, floor):.1f}（被硬门否决的不参与比较）")
         else:
-            print(f"  阈值：下限 {floor} ＋ 相对带 {band}（无硬门通过者）")
+            print(f"  Eligibility Floor {floor} ＋ Candidate Band {band}（无硬门通过者）")
         if any(sv["div"] >= spec["score"]["diversification"]["points"] for sv in scores.values() if sv):
             print(f"  注：Div 已饱和（ΔRC50 ≤ {spec['score']['diversification']['full_at_pp']}），"
                   f"现金比例高时任何买入都能稀释 RC50，此时 Div 退化为门而非区分项。")
@@ -634,8 +634,8 @@ def main():
                   "且必须底层指数状态合格（当前 usNDX=T6，不在合格池）。")
         else:
             print(f"\n【本季不买】{sel_note}")
-            print(f"  绝对下限 {spec['threshold']['absolute_floor']} 是唯一能产生「不买」的开关；"
-                  f"相对带 {spec['threshold']['relative_band']} 只收窄候选集。")
+            print(f"  只有 Eligibility Floor {spec['threshold']['absolute_floor']} 能产生「不买」；"
+                  f"Candidate Band {spec['threshold']['relative_band']} 只收窄候选集。")
             for rc_ in resume_rows:
                 icon = "✅" if rc_["met"] else "⏳"
                 print(f"  {icon} {rc_['label']}")
