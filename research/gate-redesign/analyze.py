@@ -336,8 +336,12 @@ def policy_layer():
 
     DIDX = {d: i for i, d in enumerate(dates)}
 
-    def rc50_and_style(sh, cash, d):
-        """用 250 日协方差算 RC50 与风格组风险。"""
+    def mv_of(sh, d):
+        """份额 → 当日市值。原实现把份额直接当市值求和，导致权重错误。"""
+        return {c: sh[c] * px[c][d] for c in MENU}
+
+    def rc50_and_style(mv, cash, d):
+        """用 250 日协方差算 RC50 与风格组风险。mv 为该日市值字典。"""
         i = DIDX[d]
         lo = max(0, i - 250)
         win = dates[lo:i + 1]
@@ -358,8 +362,8 @@ def policy_layer():
                 ma_, mb_ = mean(ra), mean(rb)
                 cov = sum((x - ma_) * (y - mb_) for x, y in zip(ra, rb)) / max(1, n - 1)
                 C[a][b] = C[b][a] = cov * 252
-        tot = sum(sh.values()) + cash
-        w = [sh[c] / tot for c in MENU]
+        tot = sum(mv.values()) + cash
+        w = [mv[c] / tot for c in MENU]
         s = [sum(C[a][b] * w[b] for b in range(len(MENU))) for a in range(len(MENU))]
         var = sum(w[a] * s[a] for a in range(len(MENU)))
         if var <= 0:
@@ -372,13 +376,13 @@ def policy_layer():
         return rc50, style
 
     def delta_rc50(sh, cash, d, cand, amount=1000.0):
-        """从现金挪 amount 到 cand，RC50 的变化（pp，负=改善）。"""
-        tot = sum(sh.values()) + cash
+        """从现金挪 amount 到 cand，RC50 的变化（pp，负=改善）。sh 为份额。"""
+        tot = sum(mv_of(sh, d).values()) + cash
         if cash < amount:
             return None
-        sh2 = dict(sh)
+        sh2 = dict(mv_of(sh, d))
         sh2[cand] += amount
-        a, _ = rc50_and_style(sh, cash, d)
+        a, _ = rc50_and_style(mv_of(sh, d), cash, d)
         b, _ = rc50_and_style(sh2, cash - amount, d)
         return None if (a is None or b is None) else b - a
 
@@ -467,7 +471,7 @@ def policy_layer():
                 log.append(dict(date=d, pick=None, reason=detail))
                 continue
             if pick in STYLE:
-                _, style = rc50_and_style(sh, cash, d)
+                _, style = rc50_and_style(mv_of(sh, d), cash, d)
                 if style is not None and style > 60:
                     log.append(dict(date=d, pick=None, reason="风格组>60%"))
                     continue
@@ -492,7 +496,7 @@ def policy_layer():
         for _, v in nav:
             peaks = max(peaks, v)
             mdd = min(mdd, v / peaks - 1)
-        rc_end, style_end = rc50_and_style(sh, cash, dates[-1])
+        rc_end, style_end = rc50_and_style(mv_of(sh, dates[-1]), cash, dates[-1])
         return dict(model=model, end=pct(end_v), contributed=pct(contrib),
                     total_ret=pct((end_v / contrib - 1) * 100),
                     vol=pct(vol), mdd=pct(mdd * 100),

@@ -771,8 +771,8 @@
     "bought": 2589.9,
     "cash_end": 27712.71,
     "cash_ratio": 34.43,
-    "rc50_end": 38.24,
-    "style_end": 52.64,
+    "rc50_end": 40.19,
+    "style_end": 30.62,
     "nav": [
      [
       "2025-01-02",
@@ -2558,8 +2558,8 @@
     "bought": 4617.3,
     "cash_end": 25685.31,
     "cash_ratio": 32.79,
-    "rc50_end": 33.27,
-    "style_end": 40.27,
+    "rc50_end": 37.81,
+    "style_end": 27.23,
     "nav": [
      [
       "2025-01-02",
@@ -4348,8 +4348,8 @@
     "bought": 10721.9,
     "cash_end": 19580.71,
     "cash_ratio": 29.48,
-    "rc50_end": 22.85,
-    "style_end": 21.23,
+    "rc50_end": 29.24,
+    "style_end": 17.75,
     "nav": [
      [
       "2025-01-02",

@@ -231,7 +231,7 @@ HTML = """<!DOCTYPE html>
   <div class="kpi">
     <div class="kpibox"><div class="n">__V1EX__</div><div class="l">V1 非 2025Q3 超额<br>（T3b：__T3BEX__）</div></div>
     <div class="kpibox"><div class="n">__V1Y26__</div><div class="l">V1 在 2026 年<br>（T3b：__T3BY26__）</div></div>
-    <div class="kpibox"><div class="n">1 / 3 / 4</div><div class="l">5 个季度里实际买入次数<br>M0 / M1 / M2</div></div>
+    <div class="kpibox"><div class="n">__T0__ / __T1__ / __T2__</div><div class="l">5 个季度里实际买入次数<br>M0 / M1 / M2</div></div>
     <div class="kpibox"><div class="n">__RC0__ → __RC2__</div><div class="l">期末 RC50：M0 / M2<br>（结构差异，非运气）</div></div>
   </div>
 </div>
@@ -309,8 +309,8 @@ HTML = """<!DOCTYPE html>
   </table></div>
   <div class="note warn"><b>收益差不可判定：</b>最好与最差相差 __DIFF__ 元（占累计投入 __DIFFP__%），而这只来自 5 次决策中的 3 次方向差异。
     换成统计语言：5 个样本点、单次 3,000 元对 __START__ 元存量影响不到 6%，<b>这个差异连一个标准差都够不上</b>。任何「M2 比 M0 好 X%」的说法都是把单条路径当成期望。</div>
-  <div class="note ok"><b>但分散度是可判定的：</b>期末 RC50 —— M0 __RC0__、M1 __RC1__、M2 __RC2__。这个差异不是运气：M0 五季只买入 1 次（其余四季「合格:无」），
-    结构几乎没被新钱触及；M1/M2 各买入 3~4 次，纳指与黄金的权重被真正推上去。<b>「只稀释不卖出」的前提是「有钱投出去」，而 T-state 门在这个组合上基本不投。</b></div>
+  <div class="note ok"><b>但分散度是可判定的：</b>期末 RC50 —— M0 __RC0__、M1 __RC1__、M2 __RC2__。这个差异不是运气：M0 五季只买入 __T0__ 次（其余四季「合格:无」），
+    结构几乎没被新钱触及；M1/M2 分别买入 __T1__ / __T2__ 次，纳指与黄金的权重被真正推上去。<b>「只稀释不卖出」的前提是「有钱投出去」，而 T-state 门在这个组合上基本不投。</b></div>
 </div>
 
 <div class="card" style="border:2px solid #2c5c8f">
@@ -461,6 +461,8 @@ rep = {
     "__V1Y26__": n(V1["y2026"]["exc"], 2, True),
     "__T3BE__": n(T3B["all"]["exc"], 2, True), "__T3BEX__": n(T3B["ex_q3"]["exc"], 2, True),
     "__T3BY26__": n(T3B["y2026"]["exc"], 2, True),
+    "__T0__": str(P["models"]["M0"]["trades"]), "__T1__": str(P["models"]["M1"]["trades"]),
+    "__T2__": str(P["models"]["M2"]["trades"]),
     "__RC0__": n(P["models"]["M0"]["rc50_end"], 1), "__RC1__": n(P["models"]["M1"]["rc50_end"], 1),
     "__RC2__": n(P["models"]["M2"]["rc50_end"], 1),
     "__ICRISK__": n(A["ic"]["risk"]["mean"], 3, True),

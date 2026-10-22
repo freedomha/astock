@@ -104,8 +104,8 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
   <div class="kpi">
     <div class="kpibox"><div class="n">+0.58</div><div class="l">V1 非 2025Q3 超额<br>（T3b：−0.84）</div></div>
     <div class="kpibox"><div class="n">+0.71</div><div class="l">V1 在 2026 年<br>（T3b：−1.44）</div></div>
-    <div class="kpibox"><div class="n">1 / 3 / 4</div><div class="l">5 个季度里实际买入次数<br>M0 / M1 / M2</div></div>
-    <div class="kpibox"><div class="n">38.2 → 22.9</div><div class="l">期末 RC50：M0 / M2<br>（结构差异，非运气）</div></div>
+    <div class="kpibox"><div class="n">1 / 2 / 4</div><div class="l">5 个季度里实际买入次数<br>M0 / M1 / M2</div></div>
+    <div class="kpibox"><div class="n">40.2 → 29.2</div><div class="l">期末 RC50：M0 / M2<br>（结构差异，非运气）</div></div>
   </div>
 </div>
 
@@ -169,7 +169,7 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
   <p>同一组合、同一注资节奏（每季末 3,000 元）、同一初始权重，只有「买什么」由模型决定。起点 48,472 元，全程共 5 次决策、累计投入 63,472 元。</p>
   <div class="tw"><table>
     <thead><tr><th>模型</th><th>买入次数</th><th>累计收益率</th><th>年化波动</th><th>最大回撤</th><th>平均现金占比</th><th>期末 RC50</th><th>期末风格组</th><th>累计买入额</th></tr></thead>
-    <tbody><tr><td><b>M0 T0-T8 状态门</b></td><td>1</td><td>7.63%</td><td>12.48</td><td>−6.93</td><td>34.4</td><td><span class="up">+38.24</span></td><td><span class="up">+52.64</span></td><td>2590</td></tr><tr><td><b>M1 连续评分 30/30/20/20</b></td><td>2</td><td>7.63%</td><td>12.81</td><td>−7.80</td><td>32.8</td><td><span class="up">+33.27</span></td><td><span class="up">+40.27</span></td><td>4617</td></tr><tr><td><b>M2 极简 MA200+双动量+ΔRC</b></td><td>4</td><td>8.64%</td><td>13.26</td><td>−8.34</td><td>29.5</td><td><span class="up">+22.85</span></td><td><span class="up">+21.23</span></td><td>10722</td></tr><tr><td>全部留现金</td><td>0</td><td>0.00%</td><td>0.00</td><td>0.00</td><td>100.0</td><td>—</td><td>—</td><td>0</td></tr></tbody>
+    <tbody><tr><td><b>M0 T0-T8 状态门</b></td><td>1</td><td>7.63%</td><td>12.48</td><td>−6.93</td><td>34.4</td><td><span class="up">+40.19</span></td><td><span class="up">+30.62</span></td><td>2590</td></tr><tr><td><b>M1 连续评分 30/30/20/20</b></td><td>2</td><td>7.63%</td><td>12.81</td><td>−7.80</td><td>32.8</td><td><span class="up">+37.81</span></td><td><span class="up">+27.23</span></td><td>4617</td></tr><tr><td><b>M2 极简 MA200+双动量+ΔRC</b></td><td>4</td><td>8.64%</td><td>13.26</td><td>−8.34</td><td>29.5</td><td><span class="up">+29.24</span></td><td><span class="up">+17.75</span></td><td>10722</td></tr><tr><td>全部留现金</td><td>0</td><td>0.00%</td><td>0.00</td><td>0.00</td><td>100.0</td><td>—</td><td>—</td><td>0</td></tr></tbody>
   </table></div>
   <div id="c5" class="chart"></div>
   <div class="legend">四条曲线几乎完全重合——这就是结论。前 8 个月的差异全部来自存量持仓，与模型无关；之后三条线仍然贴在一起。</div>
@@ -182,8 +182,8 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
   </table></div>
   <div class="note warn"><b>收益差不可判定：</b>最好与最差相差 647 元（占累计投入 1.02%），而这只来自 5 次决策中的 3 次方向差异。
     换成统计语言：5 个样本点、单次 3,000 元对 48,472 元存量影响不到 6%，<b>这个差异连一个标准差都够不上</b>。任何「M2 比 M0 好 X%」的说法都是把单条路径当成期望。</div>
-  <div class="note ok"><b>但分散度是可判定的：</b>期末 RC50 —— M0 38.2、M1 33.3、M2 22.9。这个差异不是运气：M0 五季只买入 1 次（其余四季「合格:无」），
-    结构几乎没被新钱触及；M1/M2 各买入 3~4 次，纳指与黄金的权重被真正推上去。<b>「只稀释不卖出」的前提是「有钱投出去」，而 T-state 门在这个组合上基本不投。</b></div>
+  <div class="note ok"><b>但分散度是可判定的：</b>期末 RC50 —— M0 40.2、M1 37.8、M2 29.2。这个差异不是运气：M0 五季只买入 1 次（其余四季「合格:无」），
+    结构几乎没被新钱触及；M1/M2 分别买入 2 / 4 次，纳指与黄金的权重被真正推上去。<b>「只稀释不卖出」的前提是「有钱投出去」，而 T-state 门在这个组合上基本不投。</b></div>
 </div>
 
 <div class="card" style="border:2px solid #2c5c8f">
