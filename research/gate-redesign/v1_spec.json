@@ -1,0 +1,87 @@
+{
+  "version": "1.1",
+  "frozen_at": "2026-10-22",
+  "status": "FROZEN",
+  "doc": "V1-PREREGISTRATION.md",
+  "universe": {
+    "menu": ["sh510050", "sh513500", "sz159941", "sh512890", "sh518880"],
+    "never_buy": ["sh510050"],
+    "target_weight": {
+      "sh510050": 0.20, "sh513500": 0.20, "sz159941": 0.15, "sh512890": 0.15, "sh518880": 0.10
+    },
+    "style_group": ["sh510050", "sh512890"]
+  },
+  "hard_gates": {
+    "premium_max_pct": 1.5,
+    "drawdown_pause_pct": 15.0,
+    "drawdown_recover_pct": 10.0,
+    "style_group_max_pct": 60.0,
+    "style_group_window_years": [2, 1],
+    "min_trade_cny": 2000,
+    "max_trade_cny": 3000
+  },
+  "score": {
+    "weights": {"trend": 30, "momentum": 30, "risk": 20, "diversification": 20},
+    "trend": {
+      "dist_to_ma60_full_pct": 8.0,
+      "ma60_slope_full_pct": 5.0,
+      "ma120_slope_full_pct": 8.0,
+      "clip_at_zero": true
+    },
+    "momentum": {
+      "shape": "bell",
+      "legs": [
+        {"window": 20, "peak_pct": 6.0, "half_width_pct": 14.0},
+        {"window": 60, "peak_pct": 14.0, "half_width_pct": 26.0},
+        {"window": 120, "peak_pct": 26.0, "half_width_pct": 46.0}
+      ]
+    },
+    "risk": {
+      "vol_band_pct": [18.0, 25.0, 35.0],
+      "vol_points": [8.0, 4.0, 0.0],
+      "dd_peak_pct": -10.0,
+      "dd_half_width_pct": 18.0,
+      "dd_points": 6.0,
+      "jump_start_pct": 20.0,
+      "jump_zero_pct": 35.0,
+      "jump_points": 6.0
+    },
+    "diversification": {
+      "metric": "delta_rc50_per_1000",
+      "full_at_pp": -0.15,
+      "points": 20.0,
+      "cov_window_days": 250
+    },
+    "composition": "sum"
+  },
+  "threshold": {
+    "absolute_floor": 60,
+    "relative_band": 5,
+    "rule": "score >= 60 and score >= max_score - 5",
+    "no_candidate_action": "cash",
+    "retired": {"absolute_floor": 70}
+  },
+  "execution": {
+    "evaluate": "quarter_end_close",
+    "order_after": "14:45",
+    "lot_size": 100,
+    "carry_over_unfilled": false
+  },
+  "evaluation": {
+    "min_new_decision_points_before_verdict": 4,
+    "earliest_review": "2027Q4",
+    "metrics": [
+      "sign_consistency",
+      "deployment_rate",
+      "cash_ratio",
+      "rc50_direction",
+      "discipline_deviation"
+    ],
+    "not_a_criterion": "absolute_return_over_4_quarters"
+  },
+  "roles": {
+    "production": "V1",
+    "challenger": "M2",
+    "legacy_feature_only": "T0-T8"
+  }
+}
