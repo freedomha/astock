@@ -1,0 +1,461 @@
+{
+ "meta": {
+  "as_of": "2026-08-04",
+  "data": "etf_kline_data_500.json",
+  "n_etf": 346,
+  "n_days": 440,
+  "first": "2024-10-15",
+  "last": "2026-08-04",
+  "test_start": "2025-01-01"
+ },
+ "cross_section": {
+  "by_breadth": {
+   "低（<33 分位）": {
+    "0": {
+     "n": 9736,
+     "excess": 0.57
+    },
+    "1": {
+     "n": 9652,
+     "excess": -0.15
+    },
+    "2": {
+     "n": 9150,
+     "excess": -0.36
+    },
+    "3": {
+     "n": 8988,
+     "excess": -0.35
+    },
+    "4": {
+     "n": 8659,
+     "excess": 0.27
+    }
+   },
+   "中（33~67）": {
+    "0": {
+     "n": 7721,
+     "excess": -1.14
+    },
+    "1": {
+     "n": 7510,
+     "excess": -0.49
+    },
+    "2": {
+     "n": 8189,
+     "excess": -0.43
+    },
+    "3": {
+     "n": 8674,
+     "excess": 0.08
+    },
+    "4": {
+     "n": 9035,
+     "excess": 1.69
+    }
+   },
+   "高（≥67 分位）": {
+    "0": {
+     "n": 2270,
+     "excess": -2.77
+    },
+    "1": {
+     "n": 3219,
+     "excess": -1.67
+    },
+    "2": {
+     "n": 3339,
+     "excess": -0.87
+    },
+    "3": {
+     "n": 3396,
+     "excess": 1.14
+    },
+    "4": {
+     "n": 3481,
+     "excess": 3.08
+    }
+   }
+  },
+  "spread_by_breadth": {
+   "低（<33 分位）": -0.3,
+   "中（33~67）": 2.83,
+   "高（≥67 分位）": 5.85
+  }
+ },
+ "portfolio_20d": {
+  "基准·全池等权": {
+   "n_periods": 18,
+   "ann_pct": 25.3,
+   "bm_ann_pct": 26.8,
+   "excess_ann_pp": -1.5,
+   "avg_period_ret": 1.91,
+   "avg_period_bm": 2.01,
+   "avg_period_excess": -0.1,
+   "median_period_excess": -0.1,
+   "win_periods_pct": 0.0,
+   "max_dd_pct": -5.6,
+   "ann_vol_pct": 15.2,
+   "avg_names": 284.8
+  },
+  "仅广度≥50": {
+   "n_periods": 8,
+   "ann_pct": 25.9,
+   "bm_ann_pct": 27.4,
+   "excess_ann_pp": -1.6,
+   "avg_period_ret": 1.95,
+   "avg_period_bm": 2.05,
+   "avg_period_excess": -0.1,
+   "median_period_excess": -0.1,
+   "win_periods_pct": 0.0,
+   "max_dd_pct": -5.6,
+   "ann_vol_pct": 15.2,
+   "avg_names": 280.9
+  },
+  "仅动量 top20%": {
+   "n_periods": 18,
+   "ann_pct": 39.3,
+   "bm_ann_pct": 26.8,
+   "excess_ann_pp": 12.5,
+   "avg_period_ret": 2.84,
+   "avg_period_bm": 2.01,
+   "avg_period_excess": 0.83,
+   "median_period_excess": -0.18,
+   "win_periods_pct": 44.4,
+   "max_dd_pct": -7.8,
+   "ann_vol_pct": 20.0,
+   "avg_names": 56.8
+  },
+  "广度+动量 top20%": {
+   "n_periods": 8,
+   "ann_pct": 44.1,
+   "bm_ann_pct": 27.4,
+   "excess_ann_pp": 16.7,
+   "avg_period_ret": 3.2,
+   "avg_period_bm": 2.05,
+   "avg_period_excess": 1.15,
+   "median_period_excess": -0.36,
+   "win_periods_pct": 37.5,
+   "max_dd_pct": -7.8,
+   "ann_vol_pct": 24.8,
+   "avg_names": 62.0
+  },
+  "仅动量 top8": {
+   "n_periods": 18,
+   "ann_pct": 35.3,
+   "bm_ann_pct": 26.8,
+   "excess_ann_pp": 8.5,
+   "avg_period_ret": 2.65,
+   "avg_period_bm": 2.01,
+   "avg_period_excess": 0.64,
+   "median_period_excess": 0.42,
+   "win_periods_pct": 55.6,
+   "max_dd_pct": -9.6,
+   "ann_vol_pct": 22.7,
+   "avg_names": 8.0
+  },
+  "广度+动量 top8": {
+   "n_periods": 8,
+   "ann_pct": 22.3,
+   "bm_ann_pct": 27.4,
+   "excess_ann_pp": -5.2,
+   "avg_period_ret": 1.86,
+   "avg_period_bm": 2.05,
+   "avg_period_excess": -0.19,
+   "median_period_excess": 0.42,
+   "win_periods_pct": 62.5,
+   "max_dd_pct": -9.6,
+   "ann_vol_pct": 24.7,
+   "avg_names": 8.0
+  },
+  "广度+动量 top8（剔债券）": {
+   "n_periods": 8,
+   "ann_pct": 22.3,
+   "bm_ann_pct": 27.4,
+   "excess_ann_pp": -5.2,
+   "avg_period_ret": 1.86,
+   "avg_period_bm": 2.05,
+   "avg_period_excess": -0.19,
+   "median_period_excess": 0.42,
+   "win_periods_pct": 62.5,
+   "max_dd_pct": -9.6,
+   "ann_vol_pct": 24.7,
+   "avg_names": 8.0
+  }
+ },
+ "fair_benchmark": {
+  "dates": 8,
+  "高广度·全池等权": {
+   "n": 8,
+   "avg": 2.05
+  },
+  "高广度·动量 top20%": {
+   "n": 8,
+   "avg": 3.3
+  },
+  "高广度·动量 top8": {
+   "n": 8,
+   "avg": 1.96
+  },
+  "低广度·全池等权": {
+   "n": 10,
+   "avg": 1.98
+  },
+  "低广度·动量 top8": {
+   "n": 10,
+   "avg": 3.38
+  }
+ },
+ "robustness": {
+  "drop_best_period_avg": -0.08,
+  "all_avg": 0.64,
+  "t2026_avg": 2.67,
+  "t2026_n": 6,
+  "positive_periods": 10,
+  "total_periods": 18
+ },
+ "portfolio_5d": {
+  "n_periods": 75,
+  "ann_pct": 31.0,
+  "bm_ann_pct": 22.7,
+  "excess_ann_pp": 8.3,
+  "avg_period_ret": 0.69,
+  "avg_period_bm": 0.43,
+  "avg_period_excess": 0.26,
+  "median_period_excess": 0.11,
+  "win_periods_pct": 50.7,
+  "max_dd_pct": -21.5,
+  "ann_vol_pct": 38.8,
+  "avg_names": 8.0
+ },
+ "portfolio_5d_breadth": {
+  "n_periods": 28,
+  "ann_pct": 52.6,
+  "bm_ann_pct": 25.4,
+  "excess_ann_pp": 27.2,
+  "avg_period_ret": 1.03,
+  "avg_period_bm": 0.48,
+  "avg_period_excess": 0.56,
+  "median_period_excess": 0.24,
+  "win_periods_pct": 60.7,
+  "max_dd_pct": -12.6,
+  "ann_vol_pct": 43.6,
+  "avg_names": 8.0
+ },
+ "picks": [
+  {
+   "code": "sz159363",
+   "n": 5,
+   "name": "创业板人工智能ETF华宝",
+   "size_yi": 72.6
+  },
+  {
+   "code": "sz159570",
+   "n": 4,
+   "name": "港股通创新药ETF汇添富",
+   "size_yi": 244.3
+  },
+  {
+   "code": "sz159506",
+   "n": 4,
+   "name": "港股通创新药医疗ETF富国",
+   "size_yi": 32.5
+  },
+  {
+   "code": "sh513780",
+   "n": 4,
+   "name": "港股创新药ETF景顺",
+   "size_yi": 27.7
+  },
+  {
+   "code": "sh515880",
+   "n": 4,
+   "name": "通信ETF国泰",
+   "size_yi": 442.2
+  },
+  {
+   "code": "sh518860",
+   "n": 3,
+   "name": "上海金ETF建信",
+   "size_yi": 40.3
+  },
+  {
+   "code": "sh518680",
+   "n": 3,
+   "name": "金ETF富国",
+   "size_yi": 69.1
+  },
+  {
+   "code": "sh518880",
+   "n": 3,
+   "name": "黄金ETF华安",
+   "size_yi": 921.5
+  },
+  {
+   "code": "sh517520",
+   "n": 3,
+   "name": "黄金股ETF永赢",
+   "size_yi": 121.8
+  },
+  {
+   "code": "sh513200",
+   "n": 3,
+   "name": "港股通医药ETF易方达",
+   "size_yi": 9.3
+  },
+  {
+   "code": "sz159516",
+   "n": 3,
+   "name": "半导体设备ETF国泰",
+   "size_yi": 421.6
+  },
+  {
+   "code": "sh588710",
+   "n": 3,
+   "name": "科创半导体设备ETF华泰柏瑞",
+   "size_yi": 95.3
+  },
+  {
+   "code": "sz159326",
+   "n": 3,
+   "name": "电网设备ETF华夏",
+   "size_yi": 195.8
+  },
+  {
+   "code": "sh515220",
+   "n": 3,
+   "name": "煤炭ETF国泰",
+   "size_yi": 148.0
+  },
+  {
+   "code": "sh512800",
+   "n": 2,
+   "name": "银行ETF华宝",
+   "size_yi": 114.1
+  },
+  {
+   "code": "sh512670",
+   "n": 2,
+   "name": "国防ETF鹏华",
+   "size_yi": 16.7
+  },
+  {
+   "code": "sz159667",
+   "n": 2,
+   "name": "工业母机ETF国泰",
+   "size_yi": 21.2
+  },
+  {
+   "code": "sh513090",
+   "n": 2,
+   "name": "香港证券ETF易方达",
+   "size_yi": 189.0
+  },
+  {
+   "code": "sz159992",
+   "n": 2,
+   "name": "创新药ETF银华",
+   "size_yi": 173.7
+  },
+  {
+   "code": "sh515790",
+   "n": 2,
+   "name": "光伏ETF华泰柏瑞",
+   "size_yi": 50.8
+  }
+ ],
+ "pick_quality": {
+  "n_distinct": 96,
+  "size_median_yi": 20.9,
+  "size_min_yi": 0.0,
+  "n_not_in_liquid_pool": 1
+ },
+ "current": {
+  "date": "2026-08-04",
+  "breadth": 36.7,
+  "bp": 0.204,
+  "n_pool": 338,
+  "top": [
+   {
+    "code": "sh513770",
+    "name": "港股互联网ETF华宝",
+    "relp": 1.0,
+    "mom": 14.1,
+    "vol": 42.3,
+    "size_yi": 55.0
+   },
+   {
+    "code": "sz159792",
+    "name": "港股通互联网ETF富国",
+    "relp": 0.997,
+    "mom": 13.2,
+    "vol": 41.7,
+    "size_yi": 413.9
+   },
+   {
+    "code": "sh512690",
+    "name": "酒ETF鹏华",
+    "relp": 0.994,
+    "mom": 13.1,
+    "vol": 36.4,
+    "size_yi": 140.7
+   },
+   {
+    "code": "sz159707",
+    "name": "地产ETF华宝",
+    "relp": 0.991,
+    "mom": 11.4,
+    "vol": 36.2,
+    "size_yi": 6.1
+   },
+   {
+    "code": "sh517050",
+    "name": "互联网ETF华泰柏瑞",
+    "relp": 0.988,
+    "mom": 11.2,
+    "vol": 30.9,
+    "size_yi": 2.3
+   },
+   {
+    "code": "sh560080",
+    "name": "中药ETF汇添富",
+    "relp": 0.985,
+    "mom": 10.7,
+    "vol": 25.1,
+    "size_yi": 25.8
+   },
+   {
+    "code": "sh517090",
+    "name": "央企共赢ETF国泰",
+    "relp": 0.982,
+    "mom": 10.6,
+    "vol": 18.4,
+    "size_yi": 0.9
+   },
+   {
+    "code": "sh517520",
+    "name": "黄金股ETF永赢",
+    "relp": 0.979,
+    "mom": 10.4,
+    "vol": 52.2,
+    "size_yi": 121.8
+   },
+   {
+    "code": "sz159852",
+    "name": "软件ETF嘉实",
+    "relp": 0.976,
+    "mom": 10.3,
+    "vol": 38.9,
+    "size_yi": 79.3
+   },
+   {
+    "code": "sh517180",
+    "name": "中国国企ETF南方",
+    "relp": 0.973,
+    "mom": 9.9,
+    "vol": 18.2,
+    "size_yi": 1.6
+   }
+  ]
+ }
+}
