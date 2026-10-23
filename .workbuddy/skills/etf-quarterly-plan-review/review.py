@@ -275,6 +275,12 @@ def main():
     a.legacy_gate = legacy
     cash = float(st["cash"])
     codes = [h["code"] for h in holdings]
+    # 同指数候选并入估值域（市值 0），这样 ΔRC50 与协方差都能算到候选身上
+    for h in holdings:
+        for c in (h.get("candidates") or []):
+            if c not in codes:
+                codes.append(c)
+    shares_map = {h["code"]: h["shares"] for h in holdings}
     style_codes = st.get("style_group", [])
     now = dt.datetime.now()
     q = quarter_of(now.date())
@@ -304,6 +310,25 @@ def main():
         if px:
             prices[c] = float(px)
 
+    lim = float(rules.get("max_premium_pct", 5.0))
+
+    def prem_of(c):
+        v = (prem.get(c) or {}).get("prem")
+        return v if v is not None else None
+
+    def pick_rep(h):
+        """一条腿的代表标的：组内（可申购优先）溢价最低者。"""
+        grp = [h["code"]] + [c for c in (h.get("candidates") or []) if c in prices]
+        if not rules.get("premium_group_min") or len(grp) <= 1:
+            return h["code"], grp
+        purch = [c for c in grp if (prem.get(c) or {}).get("purchase") != "不可申购"]
+        pool = [c for c in (purch or grp) if prem_of(c) is not None]
+        if not pool:
+            return h["code"], grp
+        return min(pool, key=prem_of), grp
+
+    reps = {h["code"]: pick_rep(h) for h in holdings}
+
     klines = {c: fetch_kline(c, max(rules["cov_window_bars"], 250) + 10) for c in codes}
     empty = [c for c in codes if len(klines[c]) < 60]
     if empty:
@@ -314,7 +339,7 @@ def main():
     pmap = rules.get("qdii_proxy") or {}
     S2, n2, _ = build_cov(codes, klines, rules["cov_window_bars"], pmap)
     S1, n1, _ = build_cov(codes, klines, rules["cov_window_short_bars"], pmap)
-    mv = [holdings[i]["shares"] * prices[holdings[i]["code"]] for i in range(len(codes))]
+    mv = [shares_map.get(c, 0) * prices[c] for c in codes]
     m2 = metrics(codes, mv, cash, S2)
     m1 = metrics(codes, mv, cash, S1)
     idx = {c: i for i, c in enumerate(codes)}
@@ -326,7 +351,7 @@ def main():
     # ── V1 连续评分（Trend / Momentum / Risk / Diversification）
     spec = v1_score.load_spec()
     scores = {}
-    for c in codes:
+    for c in sorted({v[0] for v in reps.values()}):
         cl = [float(b["last"]) for b in (klines.get(c) or [])]
         if len(cl) < 121:
             scores[c] = None
@@ -339,13 +364,16 @@ def main():
     if not a.no_trend:
         intraday = now_is_intraday(now)
         sprox = rules.get("state_proxy") or {}
-        for c in codes:
+        pcache = {}
+        for c in sorted({v[0] for v in reps.values()}):
             if c in sprox:
-                pk = fetch_kline(sprox[c], 600)
-                st_ = trend_state(sprox[c], pk, intraday)
-                if st_:
-                    st_["src"] = f"底层指数 {sprox[c]}"
-                states[c] = st_
+                k = sprox[c]
+                if k not in pcache:
+                    pk = fetch_kline(k, 600)
+                    pcache[k] = trend_state(k, pk, intraday)
+                    if pcache[k]:
+                        pcache[k]["src"] = f"底层指数 {k}"
+                states[c] = dict(pcache[k]) if pcache.get(k) else None
             else:
                 states[c] = trend_state(c, klines[c], intraday)
 
@@ -370,24 +398,26 @@ def main():
     dd_total = (m2["tot"] / peak - 1) * 100 if peak else 0.0
     # 注资会机械抬高峰值（现金增加），使总资产口径低估回撤。
     # 同时算「持仓市值口径」，取更深的那个做回撤门——保守，且不会被注资掩盖。
-    hold_now = sum(holdings[i]["shares"] * prices[holdings[i]["code"]] for i in range(len(codes)))
+    hold_now = sum(mv)
     peak_hold_prev = st.get("peak_holdings")
     # 首次运行没有历史峰值 → 只建立基线，不给出 0% 这种误导性读数
     dd_hold = ((hold_now / peak_hold_prev - 1) * 100) if peak_hold_prev else None
     peak_hold = max(peak_hold_prev or 0.0, hold_now)
     dd = min(dd_total, dd_hold) if dd_hold is not None else dd_total
 
-    # ── 缺口与候选
+    # ── 缺口与候选（每条腿一行；代表标的＝组内最低溢价，见 pick_rep）
     rows = []
+    cap_tot = m2["tot"] + float(rules["quarterly_amount"])
     for h in holdings:
-        c = h["code"]
-        w = m2["w_pct"][c]
+        leg = h["code"]
+        c, grp = reps[leg]
         tgt = h["target_pct"]
-        cap_tot = m2["tot"] + float(rules["quarterly_amount"])
-        gap_pp = tgt - w
-        gap_amt = tgt / 100 * cap_tot - h["shares"] * prices[c]
+        leg_mv = sum(shares_map.get(x, 0) * prices.get(x, prices[c]) for x in grp)
+        gap_amt = tgt / 100 * cap_tot - leg_mv
+        gap_pp = tgt - leg_mv / m2["tot"] * 100
         s = states.get(c)
         sc = scores.get(c)
+        pm = prem.get(c) or {}
         blocked = []
         if h.get("locked"):
             blocked = ["锁定不买"]
@@ -399,14 +429,17 @@ def main():
             blocked.append("风格组>%.0f%%" % rules["style_group_limit_pct"])
         if not h.get("locked") and gap_amt <= 0:
             blocked.append("已达标")
-        pm = prem.get(c) or {}
-        if not h.get("locked") and pm.get("prem") is not None \
-                and pm["prem"] > rules.get("max_premium_pct", 1.5):
+        if not h.get("locked") and pm.get("prem") is not None and pm["prem"] > lim:
             blocked.append(f"溢价{pm['prem']:+.1f}%")
-        rows.append(dict(code=c, name=names[c], px=prices[c], w=w, tgt=tgt,
+        rows.append(dict(code=c, leg=leg, name=names.get(c, c), px=prices[c],
+                         w=m2["w_pct"].get(c, 0.0), tgt=tgt,
                          gap_pp=gap_pp, gap_amt=gap_amt, state=s, score=sc,
                          eligible=len(blocked) == 0, blocked=blocked,
-                         shares=h["shares"], prem=prem.get(c)))
+                         shares=shares_map.get(c, 0), prem=pm,
+                         group=[dict(code=x, name=names.get(x, x), prem=prem_of(x),
+                                     held=shares_map.get(x, 0) > 0,
+                                     purchase=(prem.get(x) or {}).get("purchase"))
+                                for x in grp]))
 
     # ── 本季下单建议
     if a.legacy_gate:
@@ -556,7 +589,7 @@ def main():
         stxt = f"{s['eff']} {s['label'][:5]}" if s else "—"
         if s and s.get("src"):
             stxt += "※"
-        if c in (rules.get("state_suspect") or []):
+        if r["code"] in (rules.get("state_suspect") or []):
             stxt += " ⚠"
         if r.get("pass_all"):
             mark = "可买"
@@ -574,6 +607,10 @@ def main():
         stotal = f"{sv['total']:.0f}" if sv else "—"
         print(f"  {r['code']:10} {r['name'][:11]:<12} {r['px']:>7.3f} {pr:>8} {r['w']:>6.1f}% {r['tgt']:>5.1f}%"
               f" {r['gap_amt']:>+9,.0f} {stotal:>6}  {stxt:<17} {mark}")
+        if len(r.get("group") or []) > 1:
+            g = " ".join(("%s%s" % (x["code"][2:], ("%+.1f%%" % x["prem"]) if x["prem"] is not None else "—")
+                          + ("*" if x["code"] == r["code"] else "")) for x in r["group"])
+            print(f"  {'':10} └ 组内 {g}   （* = 本行所取，组内最低）")
 
     # ── V1 评分明细
     if not a.legacy_gate:
@@ -706,7 +743,8 @@ def main():
                            weight=r["w"], target=r["tgt"], gap=r["gap_amt"],
                            score=(r["score"]["total"] if r.get("score") else None),
                            drc50=(r["score"]["drc50"] if r.get("score") else None),
-                           blocked=r["blocked"], pass_all=r.get("pass_all", False))
+                           blocked=r["blocked"], pass_all=r.get("pass_all", False),
+                           leg=r.get("leg"), group=r.get("group"))
                       for r in rows],
                 score_max=max_score, selection=sel_note,
                 premium={c: (prem[c]["prem"] if prem.get(c) else None) for c in codes},

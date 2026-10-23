@@ -1,5 +1,5 @@
 {
-  "version": "1.2",
+  "version": "1.3",
   "frozen_at": "2026-10-22",
   "status": "FROZEN",
   "doc": "V1-SPEC.md",
@@ -38,7 +38,10 @@
     "min_trade_cny": 2000,
     "max_trade_cny": 3000,
     "locked_assets_are_menu_policy": true,
-    "drawdown_caliber": "max_depth_of(total_assets, holdings_market_value)"
+    "drawdown_caliber": "max_depth_of(total_assets, holdings_market_value)",
+    "max_premium_pct": 5.0,
+    "premium_group_min": true,
+    "premium_note": "2026-10-22 由 1.5% 调为 5.0%（一次性定标）。原值照搬 2024 年观察、未按风险预算校准；5% 对应单笔最大溢价损失约 189 元 = 组合 0.37%。同指数取组内（可申购优先）最低溢价者。"
   },
   "score": {
     "weights": {
@@ -132,5 +135,6 @@
     "challenger": "M2",
     "legacy_feature_only": "T0-T8"
   },
-  "source_report": "reports/research/Gate-Redesign-20261022.html"
+  "source_report": "reports/research/Gate-Redesign-20261022.html",
+  "changelog": []
 }

@@ -19,7 +19,7 @@ import tempfile
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
 SKILL = os.path.join(ROOT, ".workbuddy/skills/etf-quarterly-plan-review")
-OUT = os.path.join(ROOT, "reports/etf/allocation/20261022-季定投计划-v14.1.html")
+OUT = os.path.join(ROOT, "reports/etf/allocation/20261022-季定投计划-v14.2.html")
 ECHARTS = os.path.join(ROOT, "research/assets/echarts.min.js")
 
 sys.path.insert(0, SKILL)
@@ -65,6 +65,10 @@ def main():
     spec = v1_score.load_spec()
     GR = load_json(os.path.join(ROOT, "research/gate-redesign/gate_results.json"), {})
     SEG = load_json(os.path.join(HERE, "seg_ic.json"), {})
+    PS = load_json(os.path.join(ROOT, ".workbuddy/skills/etf-quarterly-plan-review/plan_state.json"), {})
+    RULES = PS.get("rules") or {}
+    PREM_CAP = float(RULES.get("max_premium_pct", 5.0))
+    MIN_TRADE = float(RULES.get("min_trade", 2000))
     TV = load_json(os.path.join(ROOT, "research/tstate-validation/tstate_validation.json"), {})
     JS = open(ECHARTS, encoding="utf-8").read()
 
@@ -118,11 +122,75 @@ def main():
         out = []
         for r in rows:
             pm = S["premium"].get(r["code"])
-            prem = "%s%%%s" % (n(pm, 2, True), " !" if pm is not None and pm > 1.5 else "")
+            over = pm is not None and pm > PREM_CAP
+            prem = "%s%%%s" % (n(pm, 2, True), " !" if over else "")
             gate = "—" if not r["blocked"] else "、".join(r["blocked"])
-            out.append("<tr><td>%s</td><td>%s</td><td class='l'>%s</td><td>%s</td></tr>"
-                       % (r["name"][:10], prem, gate, "通过" if not r["blocked"] else "否决"))
+            g = r.get("group") or []
+            grp = ""
+            if len(g) > 1:
+                grp = ("<br><span class='muted' style='font-size:11px'>组内 "
+                       + " ".join("%s%s" % (x["code"][2:], ("%+.1f%%" % x["prem"]) if x["prem"] is not None else "—")
+                                   + ("*" if x["code"] == r["code"] else "") for x in g)
+                       + "</span>")
+            out.append("<tr><td>%s%s</td><td>%s</td><td class='l'>%s</td><td>%s</td></tr>"
+                       % (r["name"][:10], grp, prem, gate, "通过" if not r["blocked"] else "否决"))
         return "".join(out)
+
+
+    def prem_note():
+        """本次被溢价否决的是哪条腿、组内最低多少。"""
+        bad = [r for r in rows if any(b.startswith("溢价") for b in r["blocked"])]
+        if not bad:
+            return "本次没有被溢价否决的标的。"
+        parts = []
+        for r in bad:
+            pm = S["premium"].get(r["code"])
+            parts.append("%s（组内最低 <b>%s%%</b>）" % (r["name"][:8], n(pm, 2, True)))
+        return ("本次被溢价否决的是 <b>%s</b>，都超过 <b>%.1f%%</b> 上限。"
+                % ("、".join(parts), PREM_CAP))
+
+
+    def tail_note():
+        passed = [r for r in rows if not r["blocked"]]
+        small = [r for r in passed if r["score"] is not None and r["score"] >= floor and r["gap"] < MIN_TRADE]
+        if small:
+            return ("<b>本季真正的约束不是「买不买得到」，是「差得不够多」。</b>"
+                    "%s 已经通过硬门与 Floor，但该腿已接近目标权重，缺口 %s 元不足以构成一笔合法交易"
+                    "（下限 %s 元）。这与「等形态」「等溢价」是三种不同的等待——前者等的是价格，这里等的是<b>权重被摊薄</b>。"
+                    % ("、".join(r["name"][:10] for r in small),
+                       "、".join("{:,.0f} 元".format(r["gap"]) for r in small),
+                       "{:,.0f}".format(MIN_TRADE)))
+        hard = [r for r in rows if r["blocked"]]
+        if hard:
+            return ("<b>与旧版的差别不在结论，在「什么时候会买」。</b>旧版等一个可能永不出现的 T 码组合；"
+                    "新版每季重算分数，但硬门必须先放行——本季卡在硬门。")
+        return "<b>本季有可执行标的。</b>按第五节上方的下单指令执行。"
+
+
+    def verdict_html():
+        """结论句：按「硬门 → Floor → 缺口」三段归因，全部由快照生成。"""
+        hard = [r for r in rows if r["blocked"]]
+        passed = [r for r in rows if not r["blocked"]]
+        low = [r for r in passed if r["score"] is None or r["score"] < floor]
+        small = [r for r in passed if r["score"] is not None and r["score"] >= floor and r["gap"] < MIN_TRADE]
+        buy = [r for r in passed if r["score"] is not None and r["score"] >= floor and r["gap"] >= MIN_TRADE]
+        bits = []
+        if hard:
+            bits.append("<b>硬门否决 %d 只</b>（%s）" % (len(hard), "、".join(
+                "%s %s" % (r["name"][:10], "/".join(r["blocked"])) for r in hard)))
+        if low:
+            bits.append("通过硬门但<b>分数不足 Floor %d</b> 的是 %s" % (floor, "、".join(
+                "%s %s 分" % (r["name"][:10], n(r["score"], 1)) for r in low)))
+        if small:
+            bits.append("同时通过硬门与 Floor 的 <b>%s</b>（%s 分、溢价 %s%%）<b>缺口只剩 %s 元 &lt; 最小交易额 %s 元</b>，无法下单"
+                        % ("、".join(r["name"][:10] for r in small),
+                           "、".join(n(r["score"], 1) for r in small),
+                           "、".join(n(S["premium"].get(r["code"]), 2, True) for r in small),
+                           "、".join("{:,.0f}".format(r["gap"]) for r in small),
+                           "{:,.0f}".format(MIN_TRADE)))
+        if buy:
+            bits.append("<b>可执行：%s</b>" % "、".join(r["name"][:10] for r in buy))
+        return "本季不买。" if not buy else "本季应买入。", "；".join(bits) + "。"
 
     def thr_rows():
         out = []
@@ -185,7 +253,7 @@ def main():
     HTML = """<!DOCTYPE html>
 <html lang="zh-CN"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>季度定投计划 v14.1 · 硬门 + 连续评分</title>
+<title>季度定投计划 v14.2 · 硬门 + 连续评分</title>
 <script>__ECHARTS__</script>
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
@@ -233,7 +301,7 @@ def main():
   .flow .t{background:#eafaf1;border-color:#cdeada}
 </style></head><body><div class="wrap">
 
-<h1>季度定投计划 <span class="tag">v14.1</span> <span style="color:#95a5a6;font-weight:400">/</span> 硬门 + 连续评分</h1>
+<h1>季度定投计划 <span class="tag">v14.2</span> <span style="color:#95a5a6;font-weight:400">/</span> 硬门 + 连续评分</h1>
 <div class="sub">每季新增 3,000 元 · 快照 __DATE__ __TIME__ · K 线 __BAR__ · 规格 v__SPECV__（预注册，变更分级见 §十一） · 距季末 __DTOQ__ 个交易日 · 全部数字由 review.py 同源产出 · 非投资建议</div>
 
 <div class="card hero">
@@ -306,26 +374,26 @@ def main():
   <p><b>「锁定不买」的定义：</b>上证50 在 <code>plan_state.json</code> 中 <code>locked=true</code>，属于
     <b>菜单政策</b>而非风险门——它不参与评分排序，也不占用候选名额。触发条件写死为「该标的 locked」，与缺口正负无关；
     缺口 −4,508 只是结果，不是原因。任何要解除锁定的动作都必须改配置文件，不能由评分或规则自行放开。</p>
-  <p><b>溢价是本季最主要的否决来源。</b>QDII 场内价 = 净值 + 溢价，套利通道关闭时溢价可持续也可突然收敛；
-    按 +13.7% 的溢价买入，即使底层不动，收敛到 2% 也意味着 −10% 以上的损失。这条是 B 类风控政策，<b>不可被高分抵消</b>。</p>
-  <div class="note warn" style="margin-bottom:0"><b>已知盲区：溢价门无法回测。</b>接口不提供历史 NAV / IOPV 序列，只有当日静态溢价，
-    因此研究报告里的所有历史模拟都等于「假设溢价门通过」。历史结论不能证明「当时真的买得到」。</div>
+  <p><b>溢价门是唯一「每条腿都要查」的硬门。</b>QDII 场内价 = 净值 + 溢价；场外联接基金几乎全部暂停申购、或限额低到个位数，
+    套利链条断开，溢价既可能长期维持，也可能在额度放开后的几天内收敛。__PREMNOTE__</p>
+  <p class="muted">取值规则：同指数有多只 ETF 时，<b>只取组内（可申购优先）溢价最低者</b>作为该腿的代表（表中带 <code>*</code>）。</p>
+  <div class="note warn" style="margin-bottom:0"><b>更正：溢价门现在可以回测了。</b>原报告写「接口不提供历史 NAV 序列」是错的——
+    <code>etf detail &lt;code&gt; --date &lt;日期&gt;</code> 能返回当日 <code>closePrice</code> 与 <code>nav</code>。
+    26 个月采样（<code>research/premium/</code>）显示：溢价中位 2.5~4.7%，≤1.5% 的月份占 27%，但 <b>2025-10 之后连续 12 个月没有一个月低于 2.2%</b>。
+    这就是 1.5% 的门过去一年一次都没开的原因，也是 2026-10-22 把它调成 5.0% 的依据。</div>
 </div>
 
 <div class="card" style="border:2px solid #c0392b">
   <h2 style="color:#c0392b">五、本季结论</h2>
   <p style="font-size:15px"><b>__HEADLINE__</b></p>
-  <p><b>原因是硬门，不是分数。</b>5 只里 4 只被硬门否决：纳指（溢价 __PREM_NDX__）、标普（溢价 __PREM_SPX__）、
-    红利低波（风格组 __STYLE2__%）、上证50（锁定不买）。唯一通过硬门的是黄金，<b>41.4 分 &lt; Eligibility Floor __FLOOR__</b>。
-    可投菜单实际只剩 1 只，这不是「评分不够灵活」，是<b>可选标的被硬门压缩到近乎没有</b>。</p>
+  <p>__VERDICT__</p>
   <div class="note warn"><b>时点说明：距季末 __DTOQ__ 个交易日，这是季中观察，不是正式决策。</b>
     正式决策在 2026-12-31 收盘后做，届时溢价可能已收敛。
     （参考：2026-09-30 若只看全池分数，最高 __DEC0930__ 会触发买入。但<b>当时没有留下决策记录</b>——
     <code>review_history.json</code> 只有 2026-10-21 起的两条，v13 报告里唯一一次逐标的溢价实测是 <b>2026-10-21</b>（四只纳指 10%~16%），不是 09-30。
     所以这一格<b>缺的是记录，不是数据</b>：即使现在回补当天的静态溢价，也只能得到「当时的价格与净值」，回补不了「当时是否可申购」。
     本报告不据此声称「错过了一次买入」。）</div>
-  <div class="note"><b>与旧版的差别不在本季结论，在「以后怎么判」。</b>旧版要等一个可能永不出现的 T 码组合，
-    新版每季重算分数——但这句话有个前提：<b>硬门必须先放行</b>。本季恰恰卡在硬门，所以「分够了就买」在这里并不成立。</div>
+  <div class="note">__TAILNOTE__</div>
 </div>
 
 <div class="card">
@@ -404,7 +472,8 @@ def main():
     <tbody>
       <tr><td>买不买由什么决定</td><td class="l">T 码 ∈ {T3b,T4}（分散腿放宽到 T1+）</td><td class="l">Eligibility Floor __FLOOR__ ＋ Candidate Band max − __BAND__</td></tr>
       <tr><td>T 码的角色</td><td class="l">硬门（有否决权）</td><td class="l">描述性特征（只展示）</td></tr>
-      <tr><td>硬门</td><td class="l">溢价 / 回撤 / 风格组</td><td class="l"><b>硬门（扩充）</b>：溢价 / 风格组不变；回撤改为「总资产 / 持仓市值」双口径取更深者；<b>新增</b>锁定（菜单政策）与数据质量作废</td></tr>
+      <tr><td>硬门</td><td class="l">溢价 / 回撤 / 风格组</td><td class="l"><b>硬门（扩充）</b>：回撤改为「总资产 / 持仓市值」双口径取更深者；<b>新增</b>锁定（菜单政策）与数据质量作废；
+        <b>溢价门 1.5% → 5.0%，并改为同指数组内取最低溢价</b></td></tr>
       <tr><td>候选排序</td><td class="l">缺口最大者</td><td class="l">分数优先，分差 &lt;1 再比缺口</td></tr>
       <tr><td>「恢复」概念</td><td class="l">A 溢价收敛 / B 黄金转 T1</td><td class="l">无——每季独立按分数判定</td></tr>
       <tr><td>证据基础</td><td class="l">T3b +4.33pp（池化基准、样本内）</td><td class="l"><b>V1 自身</b>：Trend IC __ICTREND__、总分 IC __ICTOTAL__；Risk 把 top20 标准差 __SDT__→__SD1__、尾部 __CVT__→__CV1__（代价 __COST__pp）；
@@ -480,6 +549,10 @@ def main():
   <table>
     <thead><tr><th>版本</th><th>日期</th><th>变更</th></tr></thead>
     <tbody>
+      <tr><td>v14.2</td><td class="nw">2026-10-22</td><td class="l"><b>溢价门定标</b>（放宽，一次性）：1.5% → 5.0%；同指数改为「组内（可申购优先）最低溢价」。
+        依据：26 个月实测（<code>research/premium/</code>）显示 ≤1.5% 的月份占 27%，但 2025-10 后连续 12 个月无一月低于 2.2%；
+        场外联接基金全部暂停申购或限额个位数（广发 9-21 起暂停、华安 10-21 起暂停、易方达限 10 元），套利通道断开，换通道不可行。
+        5% 对应单笔最大溢价损失约 189 元（组合 0.37%）。<b>本次调参只允许一次，复评不早于 2027Q3。</b></td></tr>
       <tr><td>v14.1</td><td class="nw">2026-10-22</td><td class="l"><b>证据与口径</b>（不改判定）：
         证据基础改为 V1 自身并补三段分段 IC；投出率标注为「未扣硬门的上限」；结论改为「硬门否决 4/5」；复评节点 2027Q4 → 2027Q3；Div / 溢价 / 回撤口径入局限。<br>
         <b>澄清性修订</b>（不改变任何历史判定，只是把已执行的行为写进条文）：
@@ -582,6 +655,8 @@ echarts.init(document.getElementById('c3')).setOption(ax({
                       % n(S.get("drawdown_total"), 1)) if S.get("drawdown_holdings") is None
                      else ("总资产 %s%% / 持仓 %s%%" % (n(S.get("drawdown_total"), 1), n(S.get("drawdown_holdings"), 1))),
         "__PEAKH__": "{:,.0f}".format(S.get("peak_holdings") or 0),
+        "__PREMNOTE__": prem_note(),
+        "__VERDICT__": verdict_html()[1], "__TAILNOTE__": tail_note(),
         "__PREM_NDX__": ("%s%%" % n(pr.get("sz159941") if (pr := S.get("premium")) else None, 2, True)),
         "__PREM_SPX__": ("%s%%" % n(pr.get("sh513500") if (pr := S.get("premium")) else None, 2, True)),
         "__CASHNEW__": n((S["cash"] + 3000) / (S["total"] + 3000) * 100, 1),

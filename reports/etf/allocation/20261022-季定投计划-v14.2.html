@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>季度定投计划 v14.1 · 硬门 + 连续评分</title>
+<title>季度定投计划 v14.2 · 硬门 + 连续评分</title>
 <script>
 
 /*
@@ -96,18 +96,18 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
   .flow .t{background:#eafaf1;border-color:#cdeada}
 </style></head><body><div class="wrap">
 
-<h1>季度定投计划 <span class="tag">v14.1</span> <span style="color:#95a5a6;font-weight:400">/</span> 硬门 + 连续评分</h1>
-<div class="sub">每季新增 3,000 元 · 快照 2026-10-22 17:20 · K 线 2026-10-22 · 规格 v1.2（预注册，变更分级见 §十一） · 距季末 50 个交易日 · 全部数字由 review.py 同源产出 · 非投资建议</div>
+<h1>季度定投计划 <span class="tag">v14.2</span> <span style="color:#95a5a6;font-weight:400">/</span> 硬门 + 连续评分</h1>
+<div class="sub">每季新增 3,000 元 · 快照 2026-10-23 10:40 · K 线 2026-10-23 · 规格 v1.3（预注册，变更分级见 §十一） · 距季末 49 个交易日 · 全部数字由 review.py 同源产出 · 非投资建议</div>
 
 <div class="card hero">
   <h2>当前观察：若今日为决策日 → 不买</h2>
-  <p style="margin-bottom:12px">硬门通过者最高分 41.4 < Eligibility Floor 60。架构已从「T0-T8 状态门」换成「<b>硬门 + 连续评分</b>」：硬门只否决不可接受的风险，评分只负责排序。<b>「不买」有两个来源：硬门可以独立否决（不可被高分抵消），评分层里则只有 Eligibility Floor 能挡；Candidate Band 只收窄候选集、永远不会单独造成「不买」。</b>
+  <p style="margin-bottom:12px">1 只落在 Candidate Band 内（最高 61.5）。架构已从「T0-T8 状态门」换成「<b>硬门 + 连续评分</b>」：硬门只否决不可接受的风险，评分只负责排序。<b>「不买」有两个来源：硬门可以独立否决（不可被高分抵消），评分层里则只有 Eligibility Floor 能挡；Candidate Band 只收窄候选集、永远不会单独造成「不买」。</b>
     今天的不买来自前者——4 只被硬门否决，不是分数不够。</p>
   <div class="kpi">
-    <div class="kpibox"><div class="n">48,197</div><div class="l">总资产<br>现金 31.7%</div></div>
-    <div class="kpibox"><div class="n">41.4</div><div class="l">硬门通过者最高分<br>Eligibility Floor 60</div></div>
-    <div class="kpibox"><div class="n">59.3</div><div class="l">RC50 占比<br>绝对 4.99%</div></div>
-    <div class="kpibox"><div class="n">78.6 / 69.5</div><div class="l">风格组风险 %<br>2 年 / 1 年</div></div>
+    <div class="kpibox"><div class="n">47,924</div><div class="l">总资产<br>现金 31.9%</div></div>
+    <div class="kpibox"><div class="n">61.5</div><div class="l">硬门通过者最高分<br>Eligibility Floor 60</div></div>
+    <div class="kpibox"><div class="n">59.8</div><div class="l">RC50 占比<br>绝对 5.14%</div></div>
+    <div class="kpibox"><div class="n">79.7 / 69.8</div><div class="l">风格组风险 %<br>2 年 / 1 年</div></div>
   </div>
 </div>
 
@@ -152,11 +152,11 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
   <h2>三、今日评分</h2>
   <div class="tw"><table>
     <thead><tr><th>标的</th><th>Trend</th><th>Mom</th><th>Risk</th><th>Div</th><th>ΔRC50</th><th>合计</th><th>缺口</th><th>判定</th></tr></thead>
-    <tbody><tr><td><b>纳指ETF广发</b></td><td>10.7</td><td>23.3</td><td>16.9</td><td>20.0</td><td>−2.259</td><td><b>70.9</b></td><td>+7680</td><td><span class='tag r'>硬门：溢价+13.7%</span></td></tr><tr><td><b>标普500ETF博时</b></td><td>8.0</td><td>18.1</td><td>18.4</td><td>20.0</td><td>−1.772</td><td><b>64.5</b></td><td>+1811</td><td><span class='tag r'>硬门：溢价+7.7%</span></td></tr><tr><td><b>红利低波ETF华泰柏</b></td><td>6.5</td><td>16.6</td><td>17.8</td><td>20.0</td><td>−1.718</td><td><b>60.8</b></td><td>+468</td><td><span class='tag r'>硬门：风格组>60%</span></td></tr><tr><td><b>黄金ETF华安</b></td><td>1.4</td><td>6.0</td><td>14.0</td><td>20.0</td><td>−1.920</td><td><b>41.4</b></td><td>+2612</td><td><span class='tag y'>分数不足</span></td></tr><tr><td><b>上证50ETF华夏</b></td><td>0.0</td><td>6.9</td><td>19.2</td><td>0.0</td><td>2.064</td><td><b>26.1</b></td><td>−4508</td><td><span class='tag r'>硬门：锁定不买</span></td></tr></tbody>
+    <tbody><tr><td><b>纳斯达克100ETF</b></td><td>7.8</td><td>17.2</td><td>16.6</td><td>20.0</td><td>−2.216</td><td><b>61.6</b></td><td>+7639</td><td><span class='tag r'>硬门：溢价+7.3%</span></td></tr><tr><td><b>标普500ETF南方</b></td><td>7.2</td><td>15.9</td><td>18.4</td><td>20.0</td><td>−1.730</td><td><b>61.5</b></td><td>+1894</td><td><span class='tag g'>✓ 可买</span></td></tr><tr><td><b>红利低波ETF华泰柏</b></td><td>5.7</td><td>16.2</td><td>17.9</td><td>20.0</td><td>−1.775</td><td><b>59.8</b></td><td>+457</td><td><span class='tag r'>硬门：风格组>60%</span></td></tr><tr><td><b>黄金ETF华安</b></td><td>1.0</td><td>4.2</td><td>13.9</td><td>20.0</td><td>−1.872</td><td><b>39.1</b></td><td>+2632</td><td><span class='tag y'>分数不足</span></td></tr><tr><td><b>上证50ETF华夏</b></td><td>0.0</td><td>6.9</td><td>19.1</td><td>0.0</td><td>2.043</td><td><b>26.1</b></td><td>−4505</td><td><span class='tag r'>硬门：锁定不买</span></td></tr></tbody>
   </table></div>
   <div id="c1" class="chart"></div>
   <div class="legend">堆叠＝四个分项之和（0–100）。红色虚线为 <b>Eligibility Floor 60</b>。</div>
-  <div class="note">Div 全部取满 20 分：现金占比 31.7% 时，任何非上证50 的买入都能把 RC50 拉低 1.7~2.3pp，远超规格阈值 −0.15。这意味着 <b>Div 在本季不区分标的</b>（只是一个常数），阈值 60 因此实际等价于核心分 ≥40。</div>
+  <div class="note">Div 全部取满 20 分：现金占比 31.9% 时，任何非上证50 的买入都能把 RC50 拉低 1.7~2.3pp，远超规格阈值 −0.15。这意味着 <b>Div 在本季不区分标的</b>（只是一个常数），阈值 60 因此实际等价于核心分 ≥40。</div>
   <div class="legend">注：合计基于未取整的分项相加，与表内四列相加可能差 0.1（如红利 6.5+16.6+17.8+20.0＝60.9，合计 60.8）。</div>
 </div>
 
@@ -164,46 +164,46 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
   <h2>四、硬门判定</h2>
   <div class="tw"><table>
     <thead><tr><th>标的</th><th>静态溢价</th><th>否决原因</th><th>结果</th></tr></thead>
-    <tbody><tr><td>上证50ETF华夏</td><td>−1.44%</td><td class='l'>锁定不买</td><td>否决</td></tr><tr><td>标普500ETF博时</td><td>+7.71% !</td><td class='l'>溢价+7.7%</td><td>否决</td></tr><tr><td>纳指ETF广发</td><td>+13.73% !</td><td class='l'>溢价+13.7%</td><td>否决</td></tr><tr><td>红利低波ETF华泰柏</td><td>−1.77%</td><td class='l'>风格组>60%</td><td>否决</td></tr><tr><td>黄金ETF华安</td><td>−1.16%</td><td class='l'>—</td><td>通过</td></tr></tbody>
+    <tbody><tr><td>上证50ETF华夏</td><td>−1.25%</td><td class='l'>锁定不买</td><td>否决</td></tr><tr><td>标普500ETF南方<br><span class='muted' style='font-size:11px'>组内 513500+5.7% 513650+4.6%* 159655+4.9% 159612+5.6%</span></td><td>+4.59%</td><td class='l'>—</td><td>通过</td></tr><tr><td>纳斯达克100ETF<br><span class='muted' style='font-size:11px'>组内 159941+11.7% 513110+7.4% 159513+7.3%* 513390+7.8% 159632+7.8% 513870+9.1% 513300+9.2% 159696+10.7% 513100+12.5%</span></td><td>+7.32% !</td><td class='l'>溢价+7.3%</td><td>否决</td></tr><tr><td>红利低波ETF华泰柏</td><td>−1.16%</td><td class='l'>风格组>60%</td><td>否决</td></tr><tr><td>黄金ETF华安</td><td>−2.79%</td><td class='l'>—</td><td>通过</td></tr></tbody>
   </table></div>
   <p><b>「锁定不买」的定义：</b>上证50 在 <code>plan_state.json</code> 中 <code>locked=true</code>，属于
     <b>菜单政策</b>而非风险门——它不参与评分排序，也不占用候选名额。触发条件写死为「该标的 locked」，与缺口正负无关；
     缺口 −4,508 只是结果，不是原因。任何要解除锁定的动作都必须改配置文件，不能由评分或规则自行放开。</p>
-  <p><b>溢价是本季最主要的否决来源。</b>QDII 场内价 = 净值 + 溢价，套利通道关闭时溢价可持续也可突然收敛；
-    按 +13.7% 的溢价买入，即使底层不动，收敛到 2% 也意味着 −10% 以上的损失。这条是 B 类风控政策，<b>不可被高分抵消</b>。</p>
-  <div class="note warn" style="margin-bottom:0"><b>已知盲区：溢价门无法回测。</b>接口不提供历史 NAV / IOPV 序列，只有当日静态溢价，
-    因此研究报告里的所有历史模拟都等于「假设溢价门通过」。历史结论不能证明「当时真的买得到」。</div>
+  <p><b>溢价门是唯一「每条腿都要查」的硬门。</b>QDII 场内价 = 净值 + 溢价；场外联接基金几乎全部暂停申购、或限额低到个位数，
+    套利链条断开，溢价既可能长期维持，也可能在额度放开后的几天内收敛。本次被溢价否决的是 <b>纳斯达克100E（组内最低 <b>+7.32%</b>）</b>，都超过 <b>5.0%</b> 上限。</p>
+  <p class="muted">取值规则：同指数有多只 ETF 时，<b>只取组内（可申购优先）溢价最低者</b>作为该腿的代表（表中带 <code>*</code>）。</p>
+  <div class="note warn" style="margin-bottom:0"><b>更正：溢价门现在可以回测了。</b>原报告写「接口不提供历史 NAV 序列」是错的——
+    <code>etf detail &lt;code&gt; --date &lt;日期&gt;</code> 能返回当日 <code>closePrice</code> 与 <code>nav</code>。
+    26 个月采样（<code>research/premium/</code>）显示：溢价中位 2.5~4.7%，≤1.5% 的月份占 27%，但 <b>2025-10 之后连续 12 个月没有一个月低于 2.2%</b>。
+    这就是 1.5% 的门过去一年一次都没开的原因，也是 2026-10-22 把它调成 5.0% 的依据。</div>
 </div>
 
 <div class="card" style="border:2px solid #c0392b">
   <h2 style="color:#c0392b">五、本季结论</h2>
   <p style="font-size:15px"><b>当前观察：若今日为决策日 → 不买（3,000 元留现金）。</b></p>
-  <p><b>原因是硬门，不是分数。</b>5 只里 4 只被硬门否决：纳指（溢价 +13.73%）、标普（溢价 +7.71%）、
-    红利低波（风格组 78.6%）、上证50（锁定不买）。唯一通过硬门的是黄金，<b>41.4 分 &lt; Eligibility Floor 60</b>。
-    可投菜单实际只剩 1 只，这不是「评分不够灵活」，是<b>可选标的被硬门压缩到近乎没有</b>。</p>
-  <div class="note warn"><b>时点说明：距季末 50 个交易日，这是季中观察，不是正式决策。</b>
+  <p><b>硬门否决 3 只</b>（上证50ETF华夏 锁定不买、纳斯达克100ETF 溢价+7.3%、红利低波ETF华泰柏 风格组>60%）；通过硬门但<b>分数不足 Floor 60</b> 的是 黄金ETF华安 39.1 分；同时通过硬门与 Floor 的 <b>标普500ETF南方</b>（61.5 分、溢价 +4.59%）<b>缺口只剩 1,894 元 &lt; 最小交易额 2,000 元</b>，无法下单。</p>
+  <div class="note warn"><b>时点说明：距季末 49 个交易日，这是季中观察，不是正式决策。</b>
     正式决策在 2026-12-31 收盘后做，届时溢价可能已收敛。
     （参考：2026-09-30 若只看全池分数，最高 76.2 会触发买入。但<b>当时没有留下决策记录</b>——
     <code>review_history.json</code> 只有 2026-10-21 起的两条，v13 报告里唯一一次逐标的溢价实测是 <b>2026-10-21</b>（四只纳指 10%~16%），不是 09-30。
     所以这一格<b>缺的是记录，不是数据</b>：即使现在回补当天的静态溢价，也只能得到「当时的价格与净值」，回补不了「当时是否可申购」。
     本报告不据此声称「错过了一次买入」。）</div>
-  <div class="note"><b>与旧版的差别不在本季结论，在「以后怎么判」。</b>旧版要等一个可能永不出现的 T 码组合，
-    新版每季重算分数——但这句话有个前提：<b>硬门必须先放行</b>。本季恰恰卡在硬门，所以「分够了就买」在这里并不成立。</div>
+  <div class="note"><b>本季真正的约束不是「买不买得到」，是「差得不够多」。</b>标普500ETF南方 已经通过硬门与 Floor，但该腿已接近目标权重，缺口 1,894 元 元不足以构成一笔合法交易（下限 2,000 元）。这与「等形态」「等溢价」是三种不同的等待——前者等的是价格，这里等的是<b>权重被摊薄</b>。</div>
 </div>
 
 <div class="card">
   <h2>六、组合风险</h2>
   <div class="kpi" style="grid-template-columns:repeat(4,1fr)">
-    <div class="kpibox" style="background:#f8fafc;border:1px solid #eef1f4"><div class="n" style="color:#1f3a5f">8.42%</div><div class="l" style="color:#7f8c8d">σp（组合波动）</div></div>
-    <div class="kpibox" style="background:#f8fafc;border:1px solid #eef1f4"><div class="n" style="color:#1f3a5f">59.3%</div><div class="l" style="color:#7f8c8d">上证50 风险占比</div></div>
-    <div class="kpibox" style="background:#f8fafc;border:1px solid #eef1f4"><div class="n" style="color:#1f3a5f">4.99%</div><div class="l" style="color:#7f8c8d">绝对风险贡献</div></div>
-    <div class="kpibox" style="background:#f8fafc;border:1px solid #eef1f4"><div class="n" style="color:#1f3a5f">−0.5%</div><div class="l" style="color:#7f8c8d">回撤（取较深口径）<br>总资产 −0.5%<br><span class="muted" style="font-size:11px">持仓口径 0.0%（基线日，下期起有读数）</span></div></div>
+    <div class="kpibox" style="background:#f8fafc;border:1px solid #eef1f4"><div class="n" style="color:#1f3a5f">8.60%</div><div class="l" style="color:#7f8c8d">σp（组合波动）</div></div>
+    <div class="kpibox" style="background:#f8fafc;border:1px solid #eef1f4"><div class="n" style="color:#1f3a5f">59.8%</div><div class="l" style="color:#7f8c8d">上证50 风险占比</div></div>
+    <div class="kpibox" style="background:#f8fafc;border:1px solid #eef1f4"><div class="n" style="color:#1f3a5f">5.14%</div><div class="l" style="color:#7f8c8d">绝对风险贡献</div></div>
+    <div class="kpibox" style="background:#f8fafc;border:1px solid #eef1f4"><div class="n" style="color:#1f3a5f">−1.1%</div><div class="l" style="color:#7f8c8d">回撤（取较深口径）<br>总资产 −1.1%<br><span class="muted" style="font-size:11px">持仓口径 0.0%（基线日，下期起有读数）</span></div></div>
   </div>
-  <p>风格组（上证50＋红利低波）风险：<b>2 年 78.6% ／ 1 年 69.5%</b>。<b>已超 60% 上限</b>，<b>组内标的（红利低波 ＋ 上证50）本季禁买</b>（低相关腿不受此限）。</p>
+  <p>风格组（上证50＋红利低波）风险：<b>2 年 79.7% ／ 1 年 69.8%</b>。<b>已超 60% 上限</b>，<b>组内标的（红利低波 ＋ 上证50）本季禁买</b>（低相关腿不受此限）。</p>
   <div class="note">RC50 占比与绝对贡献要一起看：单独看占比会被「加高波动资产」机械稀释。
     251 日滚动窗口里风格组最低仍 62.1%、从未低于 60%——所以规则 4/5 的约束与窗口选择无关。</div>
-  <div class="note warn"><b>回撤口径：</b>总资产口径（−0.5%，峰值 48,453 含历次注资）会被每季 3,000 元的现金注入机械抬高，
-    <b>系统性低估回撤</b>。因此回撤门取「总资产」与「持仓市值」（0.0%（基线日，无可比历史），峰值 32,896）中更深的那个。
+  <div class="note warn"><b>回撤口径：</b>总资产口径（−1.1%，峰值 48,453 含历次注资）会被每季 3,000 元的现金注入机械抬高，
+    <b>系统性低估回撤</b>。因此回撤门取「总资产」与「持仓市值」（0.0%（基线日，无可比历史），峰值 32,624）中更深的那个。
     持仓口径对买入同样会抬高峰值，所以它也不是严格的资金流中性口径；真正干净的做法是用 v12 的双口径 NAV（按成交流水回放），当前未接入。（持仓口径本次仅建立基线，下期起才有读数）</div>
 </div>
 
@@ -241,7 +241,7 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
       <tr><td>1</td><td class="l"><b>金额</b>：每季 3,000，单笔 ≤3,000，缺口按投入后总资产重算，不跨季结转</td><td>B</td></tr>
       <tr><td>2</td><td class="l"><b>最小额</b>：单笔 &lt;2,000 跳过（5 元佣金 = 0.25%）</td><td>B</td></tr>
       <tr><td>3</td><td class="l"><b>Eligibility Floor</b> = 60（绝对资格线）＋ <b>Candidate Band</b> = max − 5（相对候选带）。
-        两个条件的 <b>max 一律指「硬门通过者中的最高分」</b>，不是全池最高分（今天两者差 29.5 分）。<b>评分层里只有 Floor 能产生「不买」；硬门可独立否决；Band 只收窄候选集</b></td><td>C 待验证（行为已验证）</td></tr>
+        两个条件的 <b>max 一律指「硬门通过者中的最高分」</b>，不是全池最高分（今天两者差 0.1 分）。<b>评分层里只有 Floor 能产生「不买」；硬门可独立否决；Band 只收窄候选集</b></td><td>C 待验证（行为已验证）</td></tr>
       <tr><td>4</td><td class="l"><b>风格组</b>：60% 上限约束组内标的——<b>红利低波</b>与<b>上证50</b>都算。上证50 当前 <code>locked=true</code>（规则 L），锁定优先于本规则；若将来解锁，它同样受 60% 限制，不能因为「核心指数」豁免</td><td>B</td></tr>
       <tr><td>5</td><td class="l"><b>双窗口</b>：2 年与 1 年均低于 60% 才放行<b>组内标的（红利低波 ＋ 上证50）</b></td><td>B</td></tr>
       <tr><td>6</td><td class="l"><b>数据质量</b>：报价缺失 / K 线不足 60 根 / 接口异常 → <b>本次评估作废</b>（不静默降级、不部分计算）。脚本遇到这类情况直接退出码 1</td><td>B</td></tr>
@@ -267,7 +267,8 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
     <tbody>
       <tr><td>买不买由什么决定</td><td class="l">T 码 ∈ {T3b,T4}（分散腿放宽到 T1+）</td><td class="l">Eligibility Floor 60 ＋ Candidate Band max − 5</td></tr>
       <tr><td>T 码的角色</td><td class="l">硬门（有否决权）</td><td class="l">描述性特征（只展示）</td></tr>
-      <tr><td>硬门</td><td class="l">溢价 / 回撤 / 风格组</td><td class="l"><b>硬门（扩充）</b>：溢价 / 风格组不变；回撤改为「总资产 / 持仓市值」双口径取更深者；<b>新增</b>锁定（菜单政策）与数据质量作废</td></tr>
+      <tr><td>硬门</td><td class="l">溢价 / 回撤 / 风格组</td><td class="l"><b>硬门（扩充）</b>：回撤改为「总资产 / 持仓市值」双口径取更深者；<b>新增</b>锁定（菜单政策）与数据质量作废；
+        <b>溢价门 1.5% → 5.0%，并改为同指数组内取最低溢价</b></td></tr>
       <tr><td>候选排序</td><td class="l">缺口最大者</td><td class="l">分数优先，分差 &lt;1 再比缺口</td></tr>
       <tr><td>「恢复」概念</td><td class="l">A 溢价收敛 / B 黄金转 T1</td><td class="l">无——每季独立按分数判定</td></tr>
       <tr><td>证据基础</td><td class="l">T3b +4.33pp（池化基准、样本内）</td><td class="l"><b>V1 自身</b>：Trend IC +0.107、总分 IC +0.067；Risk 把 top20 标准差 10.53→8.20、尾部 −20.80→−12.32（代价 0.12pp）；
@@ -322,7 +323,7 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
       正解是 v12 的双口径 NAV（按成交流水回放），尚未接入。</li>
     <li><b>政策层数字的口径。</b>「RC50 40.2% vs 29.2%」出自 Gate-Redesign 政策层回测：
       初始 48,472 元、5 次季度决策、累计投入 63,472 元、2025-09~2026-10、250 日协方差窗口、<b>未计溢价门</b>；
-      与今天组合的 RC50 59.3% 不是同一时点、也不是同一资金规模，不能直接比较。</li>
+      与今天组合的 RC50 59.8% 不是同一时点、也不是同一资金规模，不能直接比较。</li>
     <li><b>政策层样本极短。</b>5 个季度决策、期末收益差 647 元——不可判定。只有 RC50 的方向差异有结构性含义。</li>
     <li><b>溢价门不可回测，且是「静态溢价」。</b>分母是最近一期已公布 NAV，QDII 净值滞后 1~3 个交易日，不是同日 IOPV；
       美股隔夜波动会让它偏离真实溢价 ±1~2%。在 1.5% 阈值附近（例如 1.2% 或 1.9%）可能误判，需人工复核。</li>
@@ -331,7 +332,7 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
     <li><b>失效条件 ①（Floor 过严）</b>：连续 4 个季度「有候选但分数都不足 Eligibility Floor」→ 按 V1-SPEC 第 6 节走变更，不当场下调。</li>
     <li><b>失效条件 ②（硬门长期否决）</b>：连续 4 个季度「硬门把候选压到 ≤1 只」且现金占比持续上升（>45%），
       说明问题不在评分而在菜单/门槛结构——此时应复核 60% 风格组上限与 QDII 溢价容忍度，<b>而不是继续调评分</b>。
-      本季现金 31.7%，注入后 35.7%，距离该阈值尚有余量但方向不利。
+      本季现金 31.9%，注入后 35.9%，距离该阈值尚有余量但方向不利。
       <b>注：两个失效条件在不买路径上会同时触发</b>——持续不买时现金占比依次 35.7% → 39.4% → 42.6% → 45.3%，
       第 4 个季度正好越过 45%，与「连续 4 季候选 ≤1 只」同期发生。这是设计上的冗余，不是两个独立警报；
       实际读法是「4 个季度不买就重检门槛」，不是「先看哪个先响」。</li>
@@ -343,6 +344,10 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
   <table>
     <thead><tr><th>版本</th><th>日期</th><th>变更</th></tr></thead>
     <tbody>
+      <tr><td>v14.2</td><td class="nw">2026-10-22</td><td class="l"><b>溢价门定标</b>（放宽，一次性）：1.5% → 5.0%；同指数改为「组内（可申购优先）最低溢价」。
+        依据：26 个月实测（<code>research/premium/</code>）显示 ≤1.5% 的月份占 27%，但 2025-10 后连续 12 个月无一月低于 2.2%；
+        场外联接基金全部暂停申购或限额个位数（广发 9-21 起暂停、华安 10-21 起暂停、易方达限 10 元），套利通道断开，换通道不可行。
+        5% 对应单笔最大溢价损失约 189 元（组合 0.37%）。<b>本次调参只允许一次，复评不早于 2027Q3。</b></td></tr>
       <tr><td>v14.1</td><td class="nw">2026-10-22</td><td class="l"><b>证据与口径</b>（不改判定）：
         证据基础改为 V1 自身并补三段分段 IC；投出率标注为「未扣硬门的上限」；结论改为「硬门否决 4/5」；复评节点 2027Q4 → 2027Q3；Div / 溢价 / 回撤口径入局限。<br>
         <b>澄清性修订</b>（不改变任何历史判定，只是把已执行的行为写进条文）：
@@ -366,7 +371,7 @@ var Fr={},Gr={};var Wr,Hr=function(){function t(t,e,n){var i=this;this._sleepAft
 </div>
 
 <script>
-var DATA = {"names": ["纳指广发", "标普500博", "红利低波华泰", "黄金华安", "上证50华夏"], "trend": [10.7, 8.0, 6.5, 1.4, 0], "mom": [23.3, 18.1, 16.6, 6.0, 6.9], "risk": [16.9, 18.4, 17.8, 14.0, 19.2], "div": [20.0, 20.0, 20.0, 20.0, 0.0], "total": [70.9, 64.5, 60.8, 41.4, 26.1], "floor": [50, 55, 60, 65, 70, 75], "pass": [100.0, 98.3, 91.0, 86.7, 73.3, 48.0], "dec_dates": ["2025-09-30", "2025-12-31", "2026-03-31", "2026-06-30", "2026-09-30"], "dec_best": [81.04, 82.1, 57.17, 65.21, 76.21], "dec_floor": [60, 60, 60, 60, 60]};
+var DATA = {"names": ["纳斯达克10", "标普500南", "红利低波华泰", "黄金华安", "上证50华夏"], "trend": [7.8, 7.2, 5.7, 1.0, 0], "mom": [17.2, 15.9, 16.2, 4.2, 6.9], "risk": [16.6, 18.4, 17.9, 13.9, 19.1], "div": [20.0, 20.0, 20.0, 20.0, 0.0], "total": [61.6, 61.5, 59.8, 39.1, 26.1], "floor": [50, 55, 60, 65, 70, 75], "pass": [100.0, 98.3, 91.0, 86.7, 73.3, 48.0], "dec_dates": ["2025-09-30", "2025-12-31", "2026-03-31", "2026-06-30", "2026-09-30"], "dec_best": [81.04, 82.1, 57.17, 65.21, 76.21], "dec_floor": [60, 60, 60, 60, 60]};
 var CLR = {red:'#c0392b', green:'#27ae60', blue:'#2c5c8f', grey:'#95a5a6', ink:'#2c3e50', grid:'#eef1f4'};
 var base = {textStyle:{fontFamily:'-apple-system,PingFang SC,sans-serif'}, tooltip:{trigger:'axis'},
             grid:{left:52,right:40,top:36,bottom:46}};

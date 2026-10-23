@@ -1,5 +1,5 @@
 {
-  "as_of": "2026-10-21",
+  "as_of": "2026-10-22",
   "plan_report": "reports/etf/allocation/20261021-季定投计划.html",
   "cash": 15300.8,
   "peak_value": 48452.8,
@@ -22,7 +22,12 @@
       "target_pct": 20.0,
       "locked": false,
       "role": "diversifier-overseas",
-      "note": "T0 判定存疑（距52周低+24.6%、距250日高-4.5%），复核后可能改判 T1/T6"
+      "note": "标普腿＝同指数组，买入时取组内最低溢价（2026-10-22 起）。组内：513650/159655/159612。当前持有 513500 3200 股。",
+      "candidates": [
+        "sh513650",
+        "sz159655",
+        "sz159612"
+      ]
     },
     {
       "code": "sz159941",
@@ -32,7 +37,17 @@
       "target_pct": 15.0,
       "locked": false,
       "role": "diversifier-overseas",
-      "note": "2026-10-21 用户指定为纳指首选（规模393亿最大、可申购、成交额7.6亿）；溢价 17.07% 仍超限，本季不买。备用 sh513100/sz159632/sh513110。"
+      "note": "纳指腿＝同指数组，买入时取组内最低溢价（2026-10-22 起）。组内：513110/159513/513390/159632/513870/513300/159696/513100。当前持仓 0 股；历史首选 159941 因溢价常处高位，已不再固定。",
+      "candidates": [
+        "sh513110",
+        "sz159513",
+        "sh513390",
+        "sz159632",
+        "sh513870",
+        "sh513300",
+        "sz159696",
+        "sh513100"
+      ]
     },
     {
       "code": "sh512890",
@@ -82,11 +97,16 @@
     ],
     "fallback_nasdaq": [
       "sz159941",
-      "sh513100",
+      "sh513110",
+      "sz159513",
+      "sh513390",
       "sz159632",
-      "sh513110"
+      "sh513870",
+      "sh513300",
+      "sz159696",
+      "sh513100"
     ],
-    "max_premium_pct": 1.5,
+    "max_premium_pct": 5.0,
     "gate_overrides": {
       "sh518880": [
         "T1",
@@ -109,7 +129,7 @@
       "conditions": [
         {
           "id": "premium",
-          "desc": "任一纳指ETF溢价收敛至 1.5% 以内，且底层指数状态回到 T3b/T4",
+          "desc": "任一同指数 ETF 溢价回落至 5.0% 以内，且底层指数状态合格（V1 下只看评分）",
           "pick": "lowest_premium"
         },
         {
@@ -119,20 +139,64 @@
       ],
       "note": "任一成立即恢复当季执行；不要求两条同时满足。"
     },
-    "nasdaq_primary": "sz159941",
-    "nasdaq_primary_note": "2026-10-21 指定。首选 159941；若其不可申购/停牌，才换其余三只。溢价门仍对首选单独生效。",
+    "nasdaq_primary": null,
+    "nasdaq_primary_note": "已取消固定首选：改为同指数组内最低溢价（premium_group_min）。",
     "qdii_proxy": {
+      "sz159941": "usNDX",
+      "sh513110": "usNDX",
+      "sz159513": "usNDX",
+      "sh513390": "usNDX",
+      "sz159632": "usNDX",
+      "sh513870": "usNDX",
+      "sh513300": "usNDX",
+      "sz159696": "usNDX",
+      "sh513100": "usNDX",
       "sh513500": "usINX",
-      "sz159941": "usNDX"
+      "sh513650": "usINX",
+      "sz159655": "usINX",
+      "sz159612": "usINX"
     },
     "qdii_proxy_note": "QDII 用底层指数 lag1 收益替代场内价：剥离溢价污染 + 修正中美时差。市值仍按场内价计。",
     "state_suspect": [],
     "state_suspect_note": "已解决：513500 的 T0 误判通过 state_proxy（usINX）修正为 T6 高位整理。保留字段供将来标注其他可疑判定。",
     "state_proxy": {
       "sz159941": "usNDX",
-      "sh513500": "usINX"
+      "sh513110": "usNDX",
+      "sz159513": "usNDX",
+      "sh513390": "usNDX",
+      "sz159632": "usNDX",
+      "sh513870": "usNDX",
+      "sh513300": "usNDX",
+      "sz159696": "usNDX",
+      "sh513100": "usNDX",
+      "sh513500": "usINX",
+      "sh513650": "usINX",
+      "sz159655": "usINX",
+      "sz159612": "usINX"
     },
-    "state_proxy_note": "跨境ETF的 T 码用底层指数判定：场内价含溢价，会把溢价扩张读成趋势（实测 159941 场内 T4、usNDX 实际 T6）。"
+    "state_proxy_note": "跨境ETF的 T 码用底层指数判定：场内价含溢价，会把溢价扩张读成趋势（实测 159941 场内 T4、usNDX 实际 T6）。",
+    "max_premium_pct_note": "2026-10-22 由 1.5% 调为 5.0%（一次性定标）：原值照搬 2024 年观察，未按风险预算校准。5% 对应单笔最大溢价损失约 189 元 = 组合 0.37%。只允许调这一次，复评不早于 2027Q3。",
+    "premium_group_min": true,
+    "premium_group_min_note": "同指数多只 ETF 时，只取组内（可申购优先）溢价最低者，其余视为同腿的替代品。",
+    "premium_groups": {
+      "usNDX": [
+        "sz159941",
+        "sh513110",
+        "sz159513",
+        "sh513390",
+        "sz159632",
+        "sh513870",
+        "sh513300",
+        "sz159696",
+        "sh513100"
+      ],
+      "usINX": [
+        "sh513500",
+        "sh513650",
+        "sz159655",
+        "sz159612"
+      ]
+    }
   },
   "executed": {
     "2026Q3": true,
