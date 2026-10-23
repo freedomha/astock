@@ -245,9 +245,9 @@ def main():
 
     def prem_near():
         near = [r for r in rows if S["premium"].get(r["code"]) is not None
-                and abs(PREM_CAP - S["premium"][r["code"]]) <= 1.5]
+                and abs(PREM_CAP - S["premium"][r["code"]]) <= 2.0]
         if not near:
-            return "本次没有标的落在 ±1.5pp 内"
+            return "本次没有标的落在 ±2pp 内"
         return "；".join("%s %s%%、距门槛 %.2fpp" % (r["name"][:10], n(S["premium"][r["code"]], 2, True),
                                                   PREM_CAP - S["premium"][r["code"]]) for r in near) + "，属于误差范围"
 
@@ -264,7 +264,32 @@ def main():
             c += 3000.0
             t += 3000.0
             out.append(c / t * 100)
-        return " → ".join("%.1f%%" % x for x in out)
+        return ("%s（基于现金 %s / 总资产 %s，不计涨跌）"
+                % (" → ".join("%.1f%%" % x for x in out),
+                   "{:,.0f}".format(S["cash"]), "{:,.0f}".format(S["total"])))
+
+    def rob_rows():
+        """§九 稳健性：总分 t 在四种口径下 + 非重叠符号。"""
+        S0, S1, S2 = SEG["全样本"]["total"], SEG["剔除2025Q3"]["total"], SEG["2026"]["total"]
+        rows_ = [("普通 t（lag=0）", "tstat"), ("NW(3)（正文用）", "nw_tstat"),
+                 ("HH(3)（等权，重叠结构下更合适）", "hh_tstat"), ("NW(8)", "nw8_tstat")]
+        out = []
+        for lab, k in rows_:
+            out.append("<tr><td class=\"l\">%s</td><td>%s</td><td>%s</td><td>%s</td></tr>"
+                       % (lab, n(S0[k], 2, True), n(S1[k], 2, True), n(S2[k], 2, True)))
+        no = [(x["nonoverlap"] or {}) for x in (S0, S1, S2)]
+        cells = []
+        for d in no:
+            if not d:
+                cells.append("<span class=muted>—</span>")
+            else:
+                cells.append("<b>%d/%d</b> 正" % (d["n_pos"], d["n_offsets"]))
+        out.append("<tr><td class=\"l\">非重叠子样本（4 起点）符号</td><td>%s</td><td>%s</td><td>%s</td></tr>"
+                   % tuple(cells))
+        out.append("<tr class=\"muted\"><td class=\"l\">　└ 每个起点的点数</td><td>%s</td><td>%s</td><td>%s</td></tr>"
+                   % tuple("/".join(str(x) for x in (d.get("pts") or [])) or "—" for d in no))
+        return "".join(out)
+
 
     def thr_rows():
         out = []
@@ -444,9 +469,12 @@ def main():
     <b>「可申购优先」的含义：</b>指 <code>etf detail</code> 的 <code>purchaseStatus</code> 不是「不可申购」。
     对场内 ETF 来说它不决定你能不能买（二级市场随时可买），而是决定<b>一级市场套利是否存在</b>——不可申购的份额没有套利盘压价，
     溢价通常更高、也更难收敛，所以排序时把它排在后面。</div>
-  <div class="note">目标权重合计 <b>__TGTSUM__%</b>（20+20+15+15+10），剩余 __CASH_TGT__% 是<b>目标现金</b>，不是闲置。
-    因此五只缺口合计 __GAPSUM__ 元 + 当前持仓 __HOLDSUM__ 元 ≈ 注入后总资产 __CAPTOT__ 元，与现金 __CASHNEWAMT__ 元一起构成全部资产——
-    缺口之和不等于可用现金，是因为现金本身就是配置的一部分。</div>
+  <div class="note">目标权重合计 <b>__TGTSUM__%</b>（20+20+15+15+10），剩余 __CASH_TGT__% 是<b>目标现金</b>，不是闲置。两个等式分开写：
+    <div style="margin:8px 0 0 12px;font-variant-numeric:tabular-nums">
+      持仓 __HOLDSUM__ ＋ 现金 __CASHNEWAMT__ ≈ <b>__CAPTOT__</b>（注入后总资产）<br>
+      持仓 __HOLDSUM__ ＋ 缺口 __GAPSUM__ ≈ <b>__TGTVAL__</b> ＝ __TGTSUM__% × __CAPTOT__
+    </div>
+    缺口之和（__GAPSUM__）不等于可用现金（__CASHNEWAMT__），因为现金本身就是配置的一部分。</div>
 </div>
 
 <div class="card">
@@ -582,6 +610,17 @@ def main():
   <div class="note warn"><b>t 值必须看 NW 那一列。</b>IC 日平均间隔 <b>__GAP0__ 个交易日</b>，而前瞻窗口是 <b>20 日</b>——相邻 IC 的收益窗口重叠约 4 倍，普通 t 明显偏大。
     表中同时给出普通 t 与 Newey-West t（滞后 __NWLAG__ 期）。<b>全样本 Trend 的普通 t=2.04 是唯一过 2 的数字，NW 修正后只剩 __ICNWT2__；其余各项的 NW t 全部 ≤1.07。</b>
     所以「V1 未经验证」不是措辞保守，是数字本身就这样——按普通 t 不该称显著，按 NW t 更不该。</div>
+
+  <h3>稳健性：换一种方差口径会怎样</h3>
+  <div class="tw"><table>
+    <thead><tr><th>口径</th><th>全样本</th><th>剔除 2025Q3</th><th>2026 样本外</th></tr></thead>
+    <tbody>__ROBROWS__</tbody>
+  </table></div>
+  <div class="note">上表是<b>总分的 t 值</b>。Bartlett 权重在 L=3 时第 3 期只剩 0.25、会低估方差，
+    所以同时给等权（Hansen-Hodrick）与 NW(8) 作对照：<b>四种口径下总分 t 均 ≤1.10，没有任何一段接近 2</b>。
+    非重叠子样本每 4 个 IC 日取 1 个、4 种起点各算一次——它<b>不是更严格的 t 检验</b>（每段只剩 6~14 个点，t 没有信息量），
+    只回答「换一个起点，符号还正不正」：全样本 <b>4/4 正</b>、剔除 Q3 <b>3/4 正</b>、2026 <b>2/4 正</b>。<br>
+    <span class="muted">局限：IC 日间隔不是固定的（平均 5.0 日），lag 期数按平均间隔近似；严格做法是按实际日期判断两期收益窗口是否重叠（gap &lt; 20 个交易日）。</span></div>
   <div class="note"><b>结论必须照实写：</b>符号确实三段不翻（trend / momentum / 总分全为正），<b>但幅度和显著性都由 2025Q3 支撑</b>——
     总分 IC 从全样本 __ICTOTAL_S__（普通 t=__ICTOTT__、<b>NW t=__ICNWT__</b>）掉到剔除后 __ICTTOTEX__（NW t=__ICNWEX__）、2026 __ICTTOT26__（NW t=__ICNW26__）。
     这和 T3b 不是两种证据，是<b>同一段行情下的同一种证据，只是方向稳定一点</b>。所以本报告不再主张「V1 已被验证」，只主张「V1 没有翻符号，因而值得按预注册规则跑下去」。</div>
@@ -617,7 +656,9 @@ def main():
     <li><b>政策层样本极短。</b>5 个季度决策、期末收益差 647 元——不可判定。只有 RC50 的方向差异有结构性含义。</li>
     <li><b>溢价门只能部分回测，且是「静态溢价」。</b>可用 <code>etf detail --date</code> 取历史 NAV 做月度采样（26 个月，见 <code>research/premium/</code>），
       但<b>没有逐日序列、也补不出「当日是否可申购」</b>；分母是最近一期已公布 NAV，QDII 净值滞后 1~3 个交易日，不是同日 IOPV；
-      美股隔夜波动会让它偏离真实溢价 ±1~2%。在 __PREMCAP__% 阈值附近（__PREMNEAR__）可能误判，需人工复核。</li>
+      美股隔夜波动会让它偏离真实溢价 ±1~2%。在 __PREMCAP__% 的 <b>±2pp 误差带</b>内（__PREMNEAR__）不能直接采信：
+      <b>用当日 IOPV 或估算净值（场内价 × 当日指数涨跌 × 汇率）重算；拿不到数据一律按否决处理</b>——
+      与 v14.1「只会更严、不会更松」的原则一致，不给自己留主观放行的口子。</li>
     <li><b>QDII 用场内价算协方差</b>（已用指数代理做 lag1 修正），仍含跟踪误差与汇率缺口。</li>
     <li><b>投出率不可预期。</b>第七节的「5 季 4 次」是分数关的上限，未扣硬门。__TODAYWHY__</li>
     <li><b>失效条件 ①（Floor 过严）</b>：连续 4 个季度「有候选但分数都不足 Eligibility Floor」→ 按 V1-SPEC 第 6 节走变更，不当场下调。</li>
@@ -638,11 +679,19 @@ def main():
       <tr><td>v14.2</td><td class="nw">2026-10-22</td><td class="l"><b>溢价门定标</b>（放宽，一次性）：1.5% → 5.0%；同指数改为「组内（可申购优先）最低溢价」。
         依据：26 个月实测（<code>research/premium/</code>）显示 ≤1.5% 的月份占 27%，但 2025-10 后连续 12 个月无一月低于 2.2%；
         场外联接基金全部暂停申购或限额个位数（广发 9-21 起暂停、华安 10-21 起暂停、易方达限 10 元），套利通道断开，换通道不可行。
-        损失口径：按 3,000 元买入价 × 5% = <b>150 元</b>（组合 0.29%）；若溢价收敛到历史最低 −1.3%，则 3,000 × 6.3% = <b>189 元</b>（0.37%）。<br>
-        <b>治理披露（重要）：</b>这一步<b>确实触发了 V1-SPEC §6b 的「放宽」判据</b>（1.5% → 5.0% 让标普从否决变成通过），
-        按 v14.1 自己的条文应走 §6 的 8 个决策点流程，本次<b>未走</b>——属于<b>一次预注册违反</b>，不是豁免。
-        另外 5.0% 是<b>在看到当日各组溢价（纳指 7.3%、标普 6.4%）之后</b>才定的，因此本条只能算 <b>C 级证据</b>。
-        约束：本条只允许出现一次，复评不早于 2027Q3；若 2027Q3 的行为指标（投出率、RC50）不改善，应回退到 1.5%。</td></tr>
+        损失口径：按 3,000 元买入价 × 5% = <b>150 元</b>（组合 0.29%）；若溢价收敛到历史最低 −1.3%，
+        3,000 × 6.3% = <b>189 元</b>（0.37%）。<span class="muted">（6.3% 为近似；按 NAV 口径算 (1 − 0.987/1.05) = 6.0%，约 180 元，数量级不变。）</span><br>
+        <b>治理披露（两件事要分开说）：</b><br>
+        ① <b>规则类别确实变了。</b>1.5% → 5.0% 之后，溢价 4.6% 这种情形从「被挡」变成「通过」，符合 §6b 的「放宽」判据，
+        按 v14.1 自己的条文应走 §6 的 8 个决策点流程，本次<b>未走</b>——记为<b>一次预注册违反</b>，不是豁免。<br>
+        ② <b>但它不是「为了让当天那只能买」而设的。</b>定阈当天（10-22）标普 513650 实测 <b>+6.43%</b>，5.0% 当时<b>并没有</b>让它通过；
+        标普是 10-23 溢价回落到 +4.59%／+4.32% 之后才过的门（同一只代码 513650，不是换了标的）。
+        所以性质是<b>看过溢价分布之后的样本内校准</b>，评 <b>C 级证据</b>合理，但不应读作选择性放行。<br>
+        <b>回退触发（可量化）：</b>触发即走 §6 重新定标，<b>不机械回退到 1.5%</b>——1.5% 已有「连续 12 个月 0/12」的证据，回退等于永久关闭。
+        <div style="margin:6px 0 0 12px">
+          A. 已成交笔数累计的实际溢价损失 &gt; <b>组合的 0.5%</b>；或<br>
+          B. 成交后 20 日的平均溢价收敛损失 &gt; <b>2.0pp</b>。
+        </div></td></tr>
       <tr><td>v14.1</td><td class="nw">2026-10-22</td><td class="l"><b>证据与口径</b>（不改判定）：
         证据基础改为 V1 自身并补三段分段 IC；投出率标注为「未扣硬门的上限」；结论改为「硬门否决 4/5」；复评节点 2027Q4 → 2027Q3；Div / 溢价 / 回撤口径入局限。<br>
         <b>澄清性修订</b>（不改变任何历史判定，只是把已执行的行为写进条文）：
@@ -774,6 +823,7 @@ echarts.init(document.getElementById('c3')).setOption(ax({
         "__ICTOT26T__": n(SEG["2026"]["total"]["tstat"], 2, True),
         "__SDAY0__": str(SEG["全样本"]["_dates"]), "__SDAY1__": str(SEG["剔除2025Q3"]["_dates"]),
         "__SDAY2__": str(SEG["2026"]["_dates"]),
+        "__ROBROWS__": rob_rows(),
         "__ICMOM__": n(SEG["全样本"]["mom"]["mean"], 3, True),
         "__ICMOMT__": n(SEG["全样本"]["mom"]["tstat"], 2, True),
         "__ICMOMNW__": n(SEG["全样本"]["mom"]["nw_tstat"], 2, True),
@@ -811,6 +861,7 @@ echarts.init(document.getElementById('c3')).setOption(ax({
         "__TGTSUM__": ("%g" % sum(h["target_pct"] for h in PS.get("holdings") or [])),
         "__CASH_TGT__": ("%g" % (100 - sum(h["target_pct"] for h in PS.get("holdings") or []))),
         "__GAPSUM__": "{:,.0f}".format(sum(r["gap"] for r in rows)),
+        "__TGTVAL__": "{:,.0f}".format((S["total"] + 3000) * sum(h["target_pct"] for h in PS.get("holdings") or []) / 100),
         "__HOLDSUM__": "{:,.0f}".format(S["total"] - S["cash"]),
         "__CAPTOT__": "{:,.0f}".format(S["total"] + 3000),
         "__CASHNEWAMT__": "{:,.0f}".format(S["cash"] + 3000),

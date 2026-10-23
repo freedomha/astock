@@ -35,16 +35,36 @@ def spearman(xs, ys):
     num = sum((a-mx)*(b-my) for a,b in zip(rx,ry))
     den = (sum((a-mx)**2 for a in rx)*sum((b-my)**2 for b in ry))**0.5
     return num/den if den else None
-def nw_t(vals, lag):
-    """Newey-West t：前瞻 20 日、采样间隔 5 日 → 相邻 IC 重叠，普通 t 会偏大。"""
+def hc_t(vals, lag, bartlett=True):
+    """重叠窗口下的 t。bartlett=True → Newey-West；False → Hansen-Hodrick（等权）。
+
+    普通 t 等价于 lag=0。"重叠"指前瞻 20 日、IC 日间隔约 5 日 → 相邻 4 个观测共享收益窗口。
+    Bartlett 权重 1-j/(L+1) 在 L=3 时第 3 期只剩 0.25，会低估方差，所以同时给 HH 与 NW(8) 作对照。
+    """
     n = len(vals)
     m = sum(vals) / n
     d = [v - m for v in vals]
     var = sum(x * x for x in d) / n
     for L in range(1, lag + 1):
-        w = 1 - L / (lag + 1)
+        w = (1 - L / (lag + 1)) if bartlett else 1.0
         var += 2 * w * sum(d[i] * d[i - L] for i in range(L, n)) / n
     return m / (var / n) ** 0.5 if var > 0 else None
+
+
+def nonoverlap_signs(pairs, step=4):
+    """每 step 个 IC 日取 1 个（4 种起点），只看符号是否一致 —— 不是更严的 t 检验。"""
+    means = []
+    for off in range(step):
+        sub = pairs[off::step]
+        if not sub:
+            continue
+        means.append((sum(v for _, v in sub) / len(sub), len(sub), off))
+    if not means:
+        return None
+    return dict(n_offsets=len(means), n_pos=sum(1 for m, _, _ in means if m > 0),
+                lo=round(min(m for m, _, _ in means), 3),
+                hi=round(max(m for m, _, _ in means), 3),
+                pts=[n_ for _, n_, _ in means])
 
 
 def ic_for(g, key):
@@ -62,7 +82,10 @@ def ic_for(g, key):
     lag = max(1, round(20 / gap)) - 1 if gap else 0
     return dict(mean=round(m, 3), pos=round(sum(1 for x in per if x > 0) / n * 100, 1), n=n,
                 tstat=round(m / (sd / n ** 0.5), 2) if sd > 0 else None,
-                nw_tstat=round(nw_t(per, lag), 2) if sd > 0 else None,
+                nw_tstat=round(hc_t(per, lag), 2) if sd > 0 else None,
+                hh_tstat=round(hc_t(per, lag, bartlett=False), 2) if sd > 0 else None,
+                nw8_tstat=round(hc_t(per, 8), 2) if sd > 0 else None,
+                nonoverlap=nonoverlap_signs(pairs, 4),
                 avg_gap=round(gap, 1) if gap else None, nw_lag=lag)
 segs = {'全样本': rows, '剔除2025Q3': [r for r in rows if r['q']!='2025Q3'], '2025Q3': [r for r in rows if r['q']=='2025Q3'], '2026': [r for r in rows if r['date'][:4]=='2026']}
 out = {}

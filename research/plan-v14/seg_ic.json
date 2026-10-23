@@ -6,6 +6,20 @@
    "n": 56,
    "tstat": 2.04,
    "nw_tstat": 1.31,
+   "hh_tstat": 1.13,
+   "nw8_tstat": 1.39,
+   "nonoverlap": {
+    "n_offsets": 4,
+    "n_pos": 4,
+    "lo": 0.056,
+    "hi": 0.178,
+    "pts": [
+     14,
+     14,
+     14,
+     14
+    ]
+   },
    "avg_gap": 5.0,
    "nw_lag": 3
   },
@@ -15,6 +29,20 @@
    "n": 56,
    "tstat": 1.3,
    "nw_tstat": 0.93,
+   "hh_tstat": 0.86,
+   "nw8_tstat": 1.02,
+   "nonoverlap": {
+    "n_offsets": 4,
+    "n_pos": 4,
+    "lo": 0.006,
+    "hi": 0.108,
+    "pts": [
+     14,
+     14,
+     14,
+     14
+    ]
+   },
    "avg_gap": 5.0,
    "nw_lag": 3
   },
@@ -24,6 +52,20 @@
    "n": 56,
    "tstat": 2.2,
    "nw_tstat": 1.41,
+   "hh_tstat": 1.22,
+   "nw8_tstat": 1.48,
+   "nonoverlap": {
+    "n_offsets": 4,
+    "n_pos": 4,
+    "lo": 0.063,
+    "hi": 0.209,
+    "pts": [
+     14,
+     14,
+     14,
+     14
+    ]
+   },
    "avg_gap": 5.0,
    "nw_lag": 3
   },
@@ -33,6 +75,20 @@
    "n": 56,
    "tstat": -0.61,
    "nw_tstat": -0.4,
+   "hh_tstat": -0.34,
+   "nw8_tstat": -0.44,
+   "nonoverlap": {
+    "n_offsets": 4,
+    "n_pos": 1,
+    "lo": -0.088,
+    "hi": 0.03,
+    "pts": [
+     14,
+     14,
+     14,
+     14
+    ]
+   },
    "avg_gap": 5.0,
    "nw_lag": 3
   },
@@ -42,6 +98,20 @@
    "n": 56,
    "tstat": 1.65,
    "nw_tstat": 1.07,
+   "hh_tstat": 0.92,
+   "nw8_tstat": 1.1,
+   "nonoverlap": {
+    "n_offsets": 4,
+    "n_pos": 4,
+    "lo": 0.031,
+    "hi": 0.149,
+    "pts": [
+     14,
+     14,
+     14,
+     14
+    ]
+   },
    "avg_gap": 5.0,
    "nw_lag": 3
   },
@@ -55,6 +125,20 @@
    "n": 43,
    "tstat": 0.91,
    "nw_tstat": 0.62,
+   "hh_tstat": 0.52,
+   "nw8_tstat": 0.6,
+   "nonoverlap": {
+    "n_offsets": 4,
+    "n_pos": 3,
+    "lo": -0.021,
+    "hi": 0.108,
+    "pts": [
+     11,
+     11,
+     11,
+     10
+    ]
+   },
    "avg_gap": 6.5,
    "nw_lag": 2
   },
@@ -64,6 +148,20 @@
    "n": 43,
    "tstat": 1.35,
    "nw_tstat": 1.02,
+   "hh_tstat": 0.88,
+   "nw8_tstat": 1.07,
+   "nonoverlap": {
+    "n_offsets": 4,
+    "n_pos": 4,
+    "lo": 0.017,
+    "hi": 0.102,
+    "pts": [
+     11,
+     11,
+     11,
+     10
+    ]
+   },
    "avg_gap": 6.5,
    "nw_lag": 2
   },
@@ -73,6 +171,20 @@
    "n": 43,
    "tstat": 0.8,
    "nw_tstat": 0.56,
+   "hh_tstat": 0.47,
+   "nw8_tstat": 0.55,
+   "nonoverlap": {
+    "n_offsets": 4,
+    "n_pos": 3,
+    "lo": -0.024,
+    "hi": 0.11,
+    "pts": [
+     11,
+     11,
+     11,
+     10
+    ]
+   },
    "avg_gap": 6.5,
    "nw_lag": 2
   },
@@ -82,6 +194,20 @@
    "n": 43,
    "tstat": 0.18,
    "nw_tstat": 0.13,
+   "hh_tstat": 0.11,
+   "nw8_tstat": 0.14,
+   "nonoverlap": {
+    "n_offsets": 4,
+    "n_pos": 2,
+    "lo": -0.042,
+    "hi": 0.061,
+    "pts": [
+     11,
+     11,
+     11,
+     10
+    ]
+   },
    "avg_gap": 6.5,
    "nw_lag": 2
   },
@@ -91,6 +217,20 @@
    "n": 43,
    "tstat": 1.0,
    "nw_tstat": 0.69,
+   "hh_tstat": 0.57,
+   "nw8_tstat": 0.65,
+   "nonoverlap": {
+    "n_offsets": 4,
+    "n_pos": 3,
+    "lo": -0.01,
+    "hi": 0.122,
+    "pts": [
+     11,
+     11,
+     11,
+     10
+    ]
+   },
    "avg_gap": 6.5,
    "nw_lag": 2
   },
@@ -104,6 +244,20 @@
    "n": 13,
    "tstat": 5.0,
    "nw_tstat": 4.6,
+   "hh_tstat": 5.29,
+   "nw8_tstat": 6.14,
+   "nonoverlap": {
+    "n_offsets": 4,
+    "n_pos": 4,
+    "lo": 0.154,
+    "hi": 0.37,
+    "pts": [
+     4,
+     3,
+     3,
+     3
+    ]
+   },
    "avg_gap": 5.0,
    "nw_lag": 3
   },
@@ -113,6 +267,20 @@
    "n": 13,
    "tstat": 0.1,
    "nw_tstat": 0.07,
+   "hh_tstat": 0.06,
+   "nw8_tstat": 0.06,
+   "nonoverlap": {
+    "n_offsets": 4,
+    "n_pos": 2,
+    "lo": -0.088,
+    "hi": 0.069,
+    "pts": [
+     4,
+     3,
+     3,
+     3
+    ]
+   },
    "avg_gap": 5.0,
    "nw_lag": 3
   },
@@ -122,6 +290,20 @@
    "n": 13,
    "tstat": 5.1,
    "nw_tstat": 4.53,
+   "hh_tstat": 5.25,
+   "nw8_tstat": 6.57,
+   "nonoverlap": {
+    "n_offsets": 4,
+    "n_pos": 4,
+    "lo": 0.209,
+    "hi": 0.483,
+    "pts": [
+     4,
+     3,
+     3,
+     3
+    ]
+   },
    "avg_gap": 5.0,
    "nw_lag": 3
   },
@@ -131,6 +313,20 @@
    "n": 13,
    "tstat": -1.95,
    "nw_tstat": -1.62,
+   "hh_tstat": -1.83,
+   "nw8_tstat": -2.79,
+   "nonoverlap": {
+    "n_offsets": 4,
+    "n_pos": 0,
+    "lo": -0.246,
+    "hi": -0.035,
+    "pts": [
+     4,
+     3,
+     3,
+     3
+    ]
+   },
    "avg_gap": 5.0,
    "nw_lag": 3
   },
@@ -140,6 +336,20 @@
    "n": 13,
    "tstat": 2.58,
    "nw_tstat": 1.84,
+   "hh_tstat": 1.6,
+   "nw8_tstat": 1.87,
+   "nonoverlap": {
+    "n_offsets": 4,
+    "n_pos": 4,
+    "lo": 0.01,
+    "hi": 0.214,
+    "pts": [
+     4,
+     3,
+     3,
+     3
+    ]
+   },
    "avg_gap": 5.0,
    "nw_lag": 3
   },
@@ -153,6 +363,20 @@
    "n": 25,
    "tstat": 0.57,
    "nw_tstat": 0.39,
+   "hh_tstat": 0.35,
+   "nw8_tstat": 0.41,
+   "nonoverlap": {
+    "n_offsets": 4,
+    "n_pos": 3,
+    "lo": -0.003,
+    "hi": 0.111,
+    "pts": [
+     7,
+     6,
+     6,
+     6
+    ]
+   },
    "avg_gap": 5.0,
    "nw_lag": 3
   },
@@ -162,6 +386,20 @@
    "n": 25,
    "tstat": 0.65,
    "nw_tstat": 0.49,
+   "hh_tstat": 0.47,
+   "nw8_tstat": 0.58,
+   "nonoverlap": {
+    "n_offsets": 4,
+    "n_pos": 2,
+    "lo": -0.024,
+    "hi": 0.174,
+    "pts": [
+     7,
+     6,
+     6,
+     6
+    ]
+   },
    "avg_gap": 5.0,
    "nw_lag": 3
   },
@@ -171,6 +409,20 @@
    "n": 25,
    "tstat": 0.19,
    "nw_tstat": 0.13,
+   "hh_tstat": 0.12,
+   "nw8_tstat": 0.13,
+   "nonoverlap": {
+    "n_offsets": 4,
+    "n_pos": 3,
+    "lo": -0.069,
+    "hi": 0.112,
+    "pts": [
+     7,
+     6,
+     6,
+     6
+    ]
+   },
    "avg_gap": 5.0,
    "nw_lag": 3
   },
@@ -180,6 +432,20 @@
    "n": 25,
    "tstat": 0.76,
    "nw_tstat": 0.52,
+   "hh_tstat": 0.46,
+   "nw8_tstat": 0.49,
+   "nonoverlap": {
+    "n_offsets": 4,
+    "n_pos": 3,
+    "lo": -0.027,
+    "hi": 0.128,
+    "pts": [
+     7,
+     6,
+     6,
+     6
+    ]
+   },
    "avg_gap": 5.0,
    "nw_lag": 3
   },
@@ -189,6 +455,20 @@
    "n": 25,
    "tstat": 0.49,
    "nw_tstat": 0.34,
+   "hh_tstat": 0.3,
+   "nw8_tstat": 0.38,
+   "nonoverlap": {
+    "n_offsets": 4,
+    "n_pos": 2,
+    "lo": -0.025,
+    "hi": 0.179,
+    "pts": [
+     7,
+     6,
+     6,
+     6
+    ]
+   },
    "avg_gap": 5.0,
    "nw_lag": 3
   },
