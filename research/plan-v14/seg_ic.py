@@ -51,6 +51,17 @@ def hc_t(vals, lag, bartlett=True):
     return m / (var / n) ** 0.5 if var > 0 else None
 
 
+def acf(vals, L):
+    """IC 序列的自相关 ρ1..ρL，用于解释 NW 期数的效果。"""
+    n = len(vals)
+    m = sum(vals) / n
+    d = [v - m for v in vals]
+    g0 = sum(x * x for x in d) / n
+    if g0 <= 0:
+        return None
+    return [round((sum(d[i] * d[i - j] for i in range(j, n)) / n) / g0, 3) for j in range(1, L + 1)]
+
+
 def nonoverlap_signs(pairs, step=4):
     """每 step 个 IC 日取 1 个（4 种起点），只看符号是否一致 —— 不是更严的 t 检验。"""
     means = []
@@ -86,6 +97,7 @@ def ic_for(g, key):
                 hh_tstat=round(hc_t(per, lag, bartlett=False), 2) if sd > 0 else None,
                 nw8_tstat=round(hc_t(per, 8), 2) if sd > 0 else None,
                 nonoverlap=nonoverlap_signs(pairs, 4),
+                acf=acf(per, 8),
                 avg_gap=round(gap, 1) if gap else None, nw_lag=lag)
 segs = {'全样本': rows, '剔除2025Q3': [r for r in rows if r['q']!='2025Q3'], '2025Q3': [r for r in rows if r['q']=='2025Q3'], '2026': [r for r in rows if r['date'][:4]=='2026']}
 out = {}
