@@ -146,7 +146,7 @@ def main():
         for r in bad:
             pm = S["premium"].get(r["code"])
             parts.append("%s（组内最低 <b>%s%%</b>）" % (r["name"][:8], n(pm, 2, True)))
-        return ("本次被溢价否决的是 <b>%s</b>，都超过 <b>%.1f%%</b> 上限。"
+        return ("本次被溢价否决的是 <b>%s</b>，超过 <b>%.1f%%</b> 上限。"
                 % ("、".join(parts), PREM_CAP))
 
 
@@ -191,6 +191,80 @@ def main():
         if buy:
             bits.append("<b>可执行：%s</b>" % "、".join(r["name"][:10] for r in buy))
         return "本季不买。" if not buy else "本季应买入。", "；".join(bits) + "。"
+
+
+    def _split():
+        hard = [r for r in rows if r["blocked"]]
+        passed = [r for r in rows if not r["blocked"]]
+        low = [r for r in passed if r["score"] is None or r["score"] < floor]
+        small = [r for r in passed if r["score"] is not None and r["score"] >= floor and r["gap"] < MIN_TRADE]
+        buy = [r for r in passed if r["score"] is not None and r["score"] >= floor and r["gap"] >= MIN_TRADE]
+        return hard, passed, low, small, buy
+
+    def hero_note():
+        hard, passed, low, small, buy = _split()
+        prem_n = sum(1 for r in hard if any(b.startswith("溢价") for b in r["blocked"]))
+        txt = ("<b>「不买」有三个来源：硬门（独立否决，不可被高分抵消）、Eligibility Floor、最小交易额（规则 2）。"
+               "Candidate Band 只收窄候选集，永远不会单独造成不买。</b>")
+        if small:
+            txt += ("今天的实际路径是：硬门否决 %d 只（其中溢价 %d 只）；%s 过了硬门但分数不足；"
+                    "<b>%s 硬门与 Floor 都过了，卡在最小交易额</b>——不是买不到，是差得不够多。"
+                    % (len(hard), prem_n,
+                       "、".join("%s（%s 分）" % (r["name"][:8], n(r["score"], 1)) for r in low) or "无",
+                       "、".join(r["name"][:10] for r in small)))
+        elif buy:
+            txt += "今天有可执行标的：%s。" % "、".join(r["name"][:10] for r in buy)
+        else:
+            txt += "今天的实际路径是：硬门否决 %d 只；其余通过硬门者分数均不足 %d。" % (len(hard), floor)
+        return txt
+
+    def today_why():
+        hard, passed, low, small, buy = _split()
+        if small:
+            return ("本季即反例：硬门只否决了 %d 只，%s 也过了 Floor，最后卡在最小交易额——"
+                    "<b>挡住买入的不再是溢价，而是「缺口不够」</b>。" % (len(hard), "、".join(r["name"][:10] for r in small)))
+        if buy:
+            return "本季有可执行标的，投出率 = 1。"
+        return "本季全部候选都停在硬门或 Floor 上。"
+
+    def today_line():
+        """§七 用：今天的分数与硬门对照，全部取快照。"""
+        hard, passed, low, small, buy = _split()
+        best = max(rows, key=lambda r: (r["score"] or -1))
+        gmax = max((r["score"] for r in passed if r["score"] is not None), default=None)
+        if small:
+            return ("按今天的实测：五条腿里最高分 <b>%s</b> 来自 %s（被硬门否决），硬门通过者最高 <b>%s</b>；"
+                    "后者已过 Floor，但缺口 %s 元 &lt; 2,000，仍不买。"
+                    % (n(best["score"], 1), best["name"][:10], n(gmax, 1),
+                       "、".join("{:,.0f}".format(r["gap"]) for r in small)))
+        if buy:
+            return ("按今天的实测：全池最高分 <b>%s</b>（%s），硬门通过者最高 <b>%s</b>；有可执行标的。"
+                    % (n(best["score"], 1), best["name"][:10], n(gmax, 1)))
+        return ("按今天的实测：全池最高分 <b>%s</b>（%s），硬门通过者最高 <b>%s</b>，未达 Floor。"
+                % (n(best["score"], 1), best["name"][:10], n(gmax, 1)))
+
+    def prem_near():
+        near = [r for r in rows if S["premium"].get(r["code"]) is not None
+                and abs(PREM_CAP - S["premium"][r["code"]]) <= 1.5]
+        if not near:
+            return "本次没有标的落在 ±1.5pp 内"
+        return "；".join("%s %s%%、距门槛 %.2fpp" % (r["name"][:10], n(S["premium"][r["code"]], 2, True),
+                                                  PREM_CAP - S["premium"][r["code"]]) for r in near) + "，属于误差范围"
+
+    def bar_note():
+        if S.get("bar_date") == S.get("date"):
+            return "<span style=\"color:#c0392b\">（含当日未定稿 bar，盘中口径）</span>"
+        return ""
+
+    def cash_path():
+        """持续不买时，现金占比的 4 季路径（不计涨跌）。"""
+        t, c = S["total"], S["cash"]
+        out = []
+        for _ in range(4):
+            c += 3000.0
+            t += 3000.0
+            out.append(c / t * 100)
+        return " → ".join("%.1f%%" % x for x in out)
 
     def thr_rows():
         out = []
@@ -302,12 +376,11 @@ def main():
 </style></head><body><div class="wrap">
 
 <h1>季度定投计划 <span class="tag">v14.2</span> <span style="color:#95a5a6;font-weight:400">/</span> 硬门 + 连续评分</h1>
-<div class="sub">每季新增 3,000 元 · 快照 __DATE__ __TIME__ · K 线 __BAR__ · 规格 v__SPECV__（预注册，变更分级见 §十一） · 距季末 __DTOQ__ 个交易日 · 全部数字由 review.py 同源产出 · 非投资建议</div>
+<div class="sub">每季新增 3,000 元 · 快照 __DATE__ __TIME__ · K 线 __BAR__ __BARNOTE__ · 规格 v__SPECV__（预注册，变更分级见 §十一） · 距季末 __DTOQ__ 个交易日 · 全部数字由 review.py 同源产出 · 非投资建议</div>
 
 <div class="card hero">
   <h2>__HERO__</h2>
-  <p style="margin-bottom:12px">__HEROSUB__。架构已从「T0-T8 状态门」换成「<b>硬门 + 连续评分</b>」：硬门只否决不可接受的风险，评分只负责排序。<b>「不买」有两个来源：硬门可以独立否决（不可被高分抵消），评分层里则只有 Eligibility Floor 能挡；Candidate Band 只收窄候选集、永远不会单独造成「不买」。</b>
-    今天的不买来自前者——4 只被硬门否决，不是分数不够。</p>
+  <p style="margin-bottom:12px">__HEROSUB__。架构已从「T0-T8 状态门」换成「<b>硬门 + 连续评分</b>」：硬门只否决不可接受的风险，评分只负责排序。__HERONOTE__</p>
   <div class="kpi">
     <div class="kpibox"><div class="n">__TOTAL__</div><div class="l">总资产<br>现金 __CASHPCT__%</div></div>
     <div class="kpibox"><div class="n">__SMAX__</div><div class="l">硬门通过者最高分<br>Eligibility Floor __FLOOR__</div></div>
@@ -319,7 +392,7 @@ def main():
 <div class="card">
   <h2>一、架构：三个职责分离</h2>
   <div class="flow">
-    <div class="g"><b>HARD GATES</b>溢价 ≤1.5%<br>回撤 ≥15%（DD ≤ −15%）暂停<br>风格组 ≤60%（组内）<br>锁定不买<br>数据质量作废</div>
+    <div class="g"><b>HARD GATES</b>溢价 ≤__PREMCAP__%<br>回撤 ≥15%（DD ≤ −15%）暂停<br>风格组 ≤60%（组内）<br>锁定不买<br>数据质量作废</div>
     <div class="s"><b>SOFT SCORE</b>Trend 30<br>Momentum 30（钟形）<br>Risk 20<br>Diversification 20</div>
     <div class="t"><b>ELIGIBILITY</b>Floor = __FLOOR__<br>Band = max − __BAND__<br>两者同时满足<br>否则 → 现金</div>
     <div><b>EXECUTE</b>按分排序<br>→ 缺口<br>→ 单笔 ≥2,000<br>→ 买入 ≤3,000</div>
@@ -333,8 +406,8 @@ def main():
     </tbody>
   </table>
   <div class="note blue">这三个问题的答案性质不同，混在一张表里就会互相抵消。
-    最典型的是 <b>Risk 组件</b>：横截面 IC 是 __ICRISK__（负），单看预测收益像是有害的；但它把 top20 的收益标准差从 __SDT__ 压到 __SD1__、5% 尾部从 __CVT__ 改善到 __CV1__。
-    <b>用 IC 评价保险，会得出「保险有害」的结论——但保费必须写明：</b>代价是 top20 的同日横截面超额从 __EXC_NORISK__pp 降到 __EXC_V1__pp（−__COST__pp/20 日）。
+    最典型的是 <b>Risk 组件</b>：横截面 IC 是 __ICRISK__（负），单看预测收益像是有害的；但它把 <b>top 20%</b> 的收益标准差从 __SDT__ 压到 __SD1__、5% 尾部从 __CVT__ 改善到 __CV1__。
+    <b>用 IC 评价保险，会得出「保险有害」的结论——但保费必须写明：</b>代价是 top 20% 的同日横截面超额从 __EXC_NORISK__pp 降到 __EXC_V1__pp（−__COST__pp/20 日）。
     口径：__POOL__ 个观测、319 只 ETF，取总分前 20%（3,322 条）；标准差与尾部单位均为「20 日收益 %」，尾部＝最差 5% 的均值。</div>
 </div>
 
@@ -346,7 +419,8 @@ def main():
       T3b 相对同日全市场只再多 <b>__CSEX__pp（36%）</b>，这才是选券效应。<span class="muted">（不要用 4.05/4.33=94% 解读——分母不是超额，是绝对收益。）</span></li>
     <li><b>一个季度撑起全部结论。</b>2025Q3 一季贡献 <b>__TOPQS__%</b> 的观测；剔除后横截面超额 <b>__EXQ__pp</b>、胜率 __EXQW__%。2026 样本外 <b>__OOS26__pp</b>。</li>
     <li><b>在 5 只标的的菜单上，它几乎不投。</b>政策层回测的 5 个季度里，状态门只放行 <b>__M0T__ 次</b>买入。
-      <b>这是「上限」不是「预期」</b>：该回测没有溢价数据，等于假设溢价门永远通过；真实历史上 QDII 常年溢价，实际能买的次数只会更少。
+      <b>这是「上限」不是「预期」</b>：该回测（Gate-Redesign 政策层）没有逐日溢价序列，等于假设溢价门永远通过；
+      现在可以用 <code>etf detail --date</code> 补月度采样（26 个月，见 <code>research/premium/</code>），但补不出「当日是否可申购」。实际能买的次数只会更少。
       它不只是在防止错误投资，也在阻止资产配置发生——<b>「只稀释不卖出」的前提是「有钱投得出去」。</b></li>
   </ol>
   <div class="note warn" style="margin-bottom:0">同日置换检验 p&lt;0.002 只说明：<b>全样本存在统计可识别的横截面关联，但稳定性和样本外表现不足以支持其作为交易硬门。</b>
@@ -362,7 +436,17 @@ def main():
   <div id="c1" class="chart"></div>
   <div class="legend">堆叠＝四个分项之和（0–100）。红色虚线为 <b>Eligibility Floor __FLOOR__</b>。</div>
   <div class="note">__DIVNOTE__</div>
-  <div class="legend">注：合计基于未取整的分项相加，与表内四列相加可能差 0.1（如红利 6.5+16.6+17.8+20.0＝60.9，合计 60.8）。</div>
+  <div class="legend">注：合计按未取整的分项相加后取整，与表内四个一位小数分项直接相加可能差 0.1。</div>
+  <div class="note"><b>打分用的是哪只券？</b>表中代码＝该腿的<b>代表标的</b>（同指数组内可申购、溢价最低者）。
+    Trend / Momentum / Risk 用<b>该代表标的自己的场内价格序列</b>算；状态（T 码）用<b>底层指数</b>（usNDX / usINX）算，
+    因为场内价含溢价、会把溢价扩张读成趋势；缺口用<b>整条腿的市值</b>算（含该腿已持有的其他代码）。
+    所以「溢价看 A、分数看 B」在同一腿内不会发生——溢价落选的那只只作为替代品列在组内。<br>
+    <b>「可申购优先」的含义：</b>指 <code>etf detail</code> 的 <code>purchaseStatus</code> 不是「不可申购」。
+    对场内 ETF 来说它不决定你能不能买（二级市场随时可买），而是决定<b>一级市场套利是否存在</b>——不可申购的份额没有套利盘压价，
+    溢价通常更高、也更难收敛，所以排序时把它排在后面。</div>
+  <div class="note">目标权重合计 <b>__TGTSUM__%</b>（20+20+15+15+10），剩余 __CASH_TGT__% 是<b>目标现金</b>，不是闲置。
+    因此五只缺口合计 __GAPSUM__ 元 + 当前持仓 __HOLDSUM__ 元 ≈ 注入后总资产 __CAPTOT__ 元，与现金 __CASHNEWAMT__ 元一起构成全部资产——
+    缺口之和不等于可用现金，是因为现金本身就是配置的一部分。</div>
 </div>
 
 <div class="card">
@@ -373,7 +457,7 @@ def main():
   </table></div>
   <p><b>「锁定不买」的定义：</b>上证50 在 <code>plan_state.json</code> 中 <code>locked=true</code>，属于
     <b>菜单政策</b>而非风险门——它不参与评分排序，也不占用候选名额。触发条件写死为「该标的 locked」，与缺口正负无关；
-    缺口 −4,508 只是结果，不是原因。任何要解除锁定的动作都必须改配置文件，不能由评分或规则自行放开。</p>
+    缺口 __LOCKGAP__ 元只是结果，不是原因。任何要解除锁定的动作都必须改配置文件，不能由评分或规则自行放开。</p>
   <p><b>溢价门是唯一「每条腿都要查」的硬门。</b>QDII 场内价 = 净值 + 溢价；场外联接基金几乎全部暂停申购、或限额低到个位数，
     套利链条断开，溢价既可能长期维持，也可能在额度放开后的几天内收敛。__PREMNOTE__</p>
   <p class="muted">取值规则：同指数有多只 ETF 时，<b>只取组内（可申购优先）溢价最低者</b>作为该腿的代表（表中带 <code>*</code>）。</p>
@@ -416,9 +500,10 @@ def main():
   <h2>七、阈值的证据：只验证行为，不验证收益</h2>
   <p>下图是「五只标的中最高分（<b>未扣硬门</b>）」在过去 __THN__ 个交易日的通过率。<b>在评分层里，只有 Eligibility Floor 60 能产生「不买」</b>——但硬门可以先一步独立否决，今天的 4/5 就是这么被挡的；
     Candidate Band（max − __BAND__）两层都挡不住买入——当季最高分天然满足它，它只把候选集从 4 只收窄到约 2 只。
-    注意两者的分母不同：本段是「全池最高分」，第三节表格是「硬门通过者最高分」，后者才决定本季买不买。</p>
-  <div class="note warn"><b>这些「通过率」是上限，不是投出率。</b>历史上没有溢价序列，无法复现溢价门；
-    按今天的实测，全池最高分 70.9 过 Floor，但<b>硬门之后只剩 41.4</b>，结果仍是现金。
+    注意两者的分母不同：<b>历史表的「全池最高分」＝政策层回测里 4 只候选的最高分</b>，而<u>今天</u>的「硬门通过者最高分」只算通过硬门的腿；
+    两者不可直接比，后者才决定本季买不买。</p>
+  <div class="note warn"><b>这些「通过率」是上限，不是投出率。</b>历史上只有月度溢价采样（26 个月），没有逐日序列，也补不出「当日是否可申购」；
+    __TODAYLINE__
     因此下文「5 个决策日里 4 次会买」只能读作<b>「分数这一关会放行几次」</b>，不能读作「V1 每年能投出去几次」。</div>
   <div id="c2" class="chart"></div>
   <div class="tw"><table>
@@ -442,7 +527,7 @@ def main():
   <table>
     <thead><tr><th>#</th><th>规则</th><th>证据等级</th></tr></thead>
     <tbody>
-      <tr><td>0</td><td class="l"><b>溢价门</b>：静态溢价 &gt; 1.5% 一律不买；折价不构成门槛</td><td>B 风控政策</td></tr>
+      <tr><td>0</td><td class="l"><b>溢价门</b>：静态溢价 &gt; __PREMCAP__% 一律不买；同指数取组内（可申购优先）最低溢价者；折价不构成门槛</td><td>B 风控政策</td></tr>
       <tr><td>1</td><td class="l"><b>金额</b>：每季 3,000，单笔 ≤3,000，缺口按投入后总资产重算，不跨季结转</td><td>B</td></tr>
       <tr><td>2</td><td class="l"><b>最小额</b>：单笔 &lt;2,000 跳过（5 元佣金 = 0.25%）</td><td>B</td></tr>
       <tr><td>3</td><td class="l"><b>Eligibility Floor</b> = __FLOOR__（绝对资格线）＋ <b>Candidate Band</b> = max − __BAND__（相对候选带）。
@@ -468,7 +553,7 @@ def main():
 <div class="card">
   <h2>九、与 v13 的差异</h2>
   <div class="tw"><table>
-    <thead><tr><th>项目</th><th>v13（状态门）</th><th>v14.1（V1）</th></tr></thead>
+    <thead><tr><th>项目</th><th>v13（状态门）</th><th>v14.2（V1）</th></tr></thead>
     <tbody>
       <tr><td>买不买由什么决定</td><td class="l">T 码 ∈ {T3b,T4}（分散腿放宽到 T1+）</td><td class="l">Eligibility Floor __FLOOR__ ＋ Candidate Band max − __BAND__</td></tr>
       <tr><td>T 码的角色</td><td class="l">硬门（有否决权）</td><td class="l">描述性特征（只展示）</td></tr>
@@ -476,7 +561,7 @@ def main():
         <b>溢价门 1.5% → 5.0%，并改为同指数组内取最低溢价</b></td></tr>
       <tr><td>候选排序</td><td class="l">缺口最大者</td><td class="l">分数优先，分差 &lt;1 再比缺口</td></tr>
       <tr><td>「恢复」概念</td><td class="l">A 溢价收敛 / B 黄金转 T1</td><td class="l">无——每季独立按分数判定</td></tr>
-      <tr><td>证据基础</td><td class="l">T3b +4.33pp（池化基准、样本内）</td><td class="l"><b>V1 自身</b>：Trend IC __ICTREND__、总分 IC __ICTOTAL__；Risk 把 top20 标准差 __SDT__→__SD1__、尾部 __CVT__→__CV1__（代价 __COST__pp）；
+      <tr><td>证据基础</td><td class="l">T3b +4.33pp（池化基准、样本内）</td><td class="l"><b>V1 自身</b>：Trend IC __ICTREND__、总分 IC __ICTOTAL__；Risk 把 top 20% 标准差 __SDT__→__SD1__、尾部 __CVT__→__CV1__（代价 __COST__pp）；
         Floor 60 在 300 日样本里 __PASS60__% 有候选、在最弱季 2026Q1 挡住</td></tr>
     </tbody>
   </table></div>
@@ -495,7 +580,7 @@ def main():
     <tbody>__SEGROWS__</tbody>
   </table></div>
   <div class="note warn"><b>t 值必须看 NW 那一列。</b>IC 日平均间隔 <b>__GAP0__ 个交易日</b>，而前瞻窗口是 <b>20 日</b>——相邻 IC 的收益窗口重叠约 4 倍，普通 t 明显偏大。
-    表中同时给出普通 t 与 Newey-West t（滞后 __NWLAG__ 期）。<b>全样本 Trend 的普通 t=2.04 是唯一过 2 的数字，NW 修正后只剩 __ICNWT2__；其余全部低于 1.35。</b>
+    表中同时给出普通 t 与 Newey-West t（滞后 __NWLAG__ 期）。<b>全样本 Trend 的普通 t=2.04 是唯一过 2 的数字，NW 修正后只剩 __ICNWT2__；其余各项的 NW t 全部 ≤1.07。</b>
     所以「V1 未经验证」不是措辞保守，是数字本身就这样——按普通 t 不该称显著，按 NW t 更不该。</div>
   <div class="note"><b>结论必须照实写：</b>符号确实三段不翻（trend / momentum / 总分全为正），<b>但幅度和显著性都由 2025Q3 支撑</b>——
     总分 IC 从全样本 __ICTOTAL_S__（普通 t=__ICTOTT__、<b>NW t=__ICNWT__</b>）掉到剔除后 __ICTTOTEX__（NW t=__ICNWEX__）、2026 __ICTTOT26__（NW t=__ICNW26__）。
@@ -515,10 +600,10 @@ def main():
       而本计划的菜单只有 <b>5 只，能评分的最多 4 只</b>。「在 319 只里排前 20%」和「在 4 只里排第一」不是同一个问题——
       横截面 IC 为正，<b>不保证 4 只里挑出来的那只优于另外三只</b>。政策层 5 个决策点就是这个外推的唯一实测，而它不可判定。
       这是 V1 从「研究结论」到「下单动作」之间最大的一道缝。</li>
-    <li><b>权重未经证据校准。</b>30/30/20/20 是<b>预注册</b>值，不是拟合结果：Momentum 的全样本 IC 只有 +__ICMOM__（NW t=__ICMOMNW__），
+    <li><b>权重未经证据校准。</b>30/30/20/20 是<b>预注册</b>值，不是拟合结果：Momentum 的全样本 IC 只有 __ICMOM__（NW t=__ICMOMNW__），
       却与 Trend 同权 30；Div 的 IC 根本算不出来，却占 20。这就是为什么现在调权重更危险——<b>没有一段独立验证能告诉你该往哪调</b>。</li>
     <li><b>Div 分项有设计缺陷（未修）。</b>它只看 RC50 的改善，不看风格组：红利低波买入后 RC50 下降（拿满 20 分），
-      却同时推高本来就 78.6% 的风格组风险——<b>分散分项在奖励一个加剧集中度的动作</b>。
+      却同时推高本来就 __STYLE2__% 的风格组风险——<b>分散分项在奖励一个加剧集中度的动作</b>。
       不立即改的原因：改 Div 会改变合格集，属模型变更（V1-SPEC 第 6 节）。
       候选修法：① Div 输入改为 max(−ΔRC50, −Δ风格组)；② 风格组成员 Div 封顶（如 ≤5 分）。二者都需要样本外验证。</li>
     <li><b>Div 在当前现金比例下饱和。</b>任意非上证50 的 ΔRC50 都在 −1.7~−2.3pp，远超规格 −0.15，所以 Div 恒为 20，
@@ -530,15 +615,16 @@ def main():
       初始 48,472 元、5 次季度决策、累计投入 63,472 元、2025-09~2026-10、250 日协方差窗口、<b>未计溢价门</b>；
       与今天组合的 RC50 __RC__% 不是同一时点、也不是同一资金规模，不能直接比较。</li>
     <li><b>政策层样本极短。</b>5 个季度决策、期末收益差 647 元——不可判定。只有 RC50 的方向差异有结构性含义。</li>
-    <li><b>溢价门不可回测，且是「静态溢价」。</b>分母是最近一期已公布 NAV，QDII 净值滞后 1~3 个交易日，不是同日 IOPV；
-      美股隔夜波动会让它偏离真实溢价 ±1~2%。在 1.5% 阈值附近（例如 1.2% 或 1.9%）可能误判，需人工复核。</li>
+    <li><b>溢价门只能部分回测，且是「静态溢价」。</b>可用 <code>etf detail --date</code> 取历史 NAV 做月度采样（26 个月，见 <code>research/premium/</code>），
+      但<b>没有逐日序列、也补不出「当日是否可申购」</b>；分母是最近一期已公布 NAV，QDII 净值滞后 1~3 个交易日，不是同日 IOPV；
+      美股隔夜波动会让它偏离真实溢价 ±1~2%。在 __PREMCAP__% 阈值附近（__PREMNEAR__）可能误判，需人工复核。</li>
     <li><b>QDII 用场内价算协方差</b>（已用指数代理做 lag1 修正），仍含跟踪误差与汇率缺口。</li>
-    <li><b>投出率不可预期。</b>第七节的「5 季 4 次」是分数关的上限，未扣硬门。本季即反例，硬门后仍为现金。</li>
+    <li><b>投出率不可预期。</b>第七节的「5 季 4 次」是分数关的上限，未扣硬门。__TODAYWHY__</li>
     <li><b>失效条件 ①（Floor 过严）</b>：连续 4 个季度「有候选但分数都不足 Eligibility Floor」→ 按 V1-SPEC 第 6 节走变更，不当场下调。</li>
     <li><b>失效条件 ②（硬门长期否决）</b>：连续 4 个季度「硬门把候选压到 ≤1 只」且现金占比持续上升（>45%），
       说明问题不在评分而在菜单/门槛结构——此时应复核 60% 风格组上限与 QDII 溢价容忍度，<b>而不是继续调评分</b>。
       本季现金 __CASHPCT__%，注入后 __CASHNEW__%，距离该阈值尚有余量但方向不利。
-      <b>注：两个失效条件在不买路径上会同时触发</b>——持续不买时现金占比依次 35.7% → 39.4% → 42.6% → 45.3%，
+      <b>注：两个失效条件在不买路径上会同时触发</b>——持续不买时现金占比依次 __CASHPATH__，
       第 4 个季度正好越过 45%，与「连续 4 季候选 ≤1 只」同期发生。这是设计上的冗余，不是两个独立警报；
       实际读法是「4 个季度不买就重检门槛」，不是「先看哪个先响」。</li>
   </ul>
@@ -552,7 +638,11 @@ def main():
       <tr><td>v14.2</td><td class="nw">2026-10-22</td><td class="l"><b>溢价门定标</b>（放宽，一次性）：1.5% → 5.0%；同指数改为「组内（可申购优先）最低溢价」。
         依据：26 个月实测（<code>research/premium/</code>）显示 ≤1.5% 的月份占 27%，但 2025-10 后连续 12 个月无一月低于 2.2%；
         场外联接基金全部暂停申购或限额个位数（广发 9-21 起暂停、华安 10-21 起暂停、易方达限 10 元），套利通道断开，换通道不可行。
-        5% 对应单笔最大溢价损失约 189 元（组合 0.37%）。<b>本次调参只允许一次，复评不早于 2027Q3。</b></td></tr>
+        损失口径：按 3,000 元买入价 × 5% = <b>150 元</b>（组合 0.29%）；若溢价收敛到历史最低 −1.3%，则 3,000 × 6.3% = <b>189 元</b>（0.37%）。<br>
+        <b>治理披露（重要）：</b>这一步<b>确实触发了 V1-SPEC §6b 的「放宽」判据</b>（1.5% → 5.0% 让标普从否决变成通过），
+        按 v14.1 自己的条文应走 §6 的 8 个决策点流程，本次<b>未走</b>——属于<b>一次预注册违反</b>，不是豁免。
+        另外 5.0% 是<b>在看到当日各组溢价（纳指 7.3%、标普 6.4%）之后</b>才定的，因此本条只能算 <b>C 级证据</b>。
+        约束：本条只允许出现一次，复评不早于 2027Q3；若 2027Q3 的行为指标（投出率、RC50）不改善，应回退到 1.5%。</td></tr>
       <tr><td>v14.1</td><td class="nw">2026-10-22</td><td class="l"><b>证据与口径</b>（不改判定）：
         证据基础改为 V1 自身并补三段分段 IC；投出率标注为「未扣硬门的上限」；结论改为「硬门否决 4/5」；复评节点 2027Q4 → 2027Q3；Div / 溢价 / 回撤口径入局限。<br>
         <b>澄清性修订</b>（不改变任何历史判定，只是把已执行的行为写进条文）：
@@ -621,7 +711,7 @@ echarts.init(document.getElementById('c3')).setOption(ax({
 
     div_sat = all((sc[c] or {}).get("div", 0) >= spec["score"]["diversification"]["points"]
                   for c in codes if c != "sh510050")
-    divnote = ("Div 全部取满 20 分：现金占比 %s%% 时，任何非上证50 的买入都能把 RC50 拉低 1.7~2.3pp，"
+    divnote = ("非上证50 的四只 Div 全部取满 20 分：现金占比 %s%% 时，任何非上证50 的买入都能把 RC50 拉低 1.7~2.3pp，"
                "远超规格阈值 −0.15。这意味着 <b>Div 在本季不区分标的</b>（只是一个常数），"
                "阈值 %d 因此实际等价于核心分 ≥40。" % (n(S["cash_pct"], 1), floor)) if div_sat else \
               "Div 有区分度：ΔRC50 在候选之间存在差异，排序部分依赖分散效果。"
@@ -714,6 +804,16 @@ echarts.init(document.getElementById('c3')).setOption(ax({
         "__THRROWS__": thr_rows(), "__DECROWS__": dec_rows(),
         "__THN__": str(TH.get("n_days", "—")),
         "__DIVNOTE__": divnote, "__ACTLINE__": actline, "__ACTDETAIL__": actdetail,
+        "__HERONOTE__": hero_note(), "__TODAYLINE__": today_line(), "__TODAYWHY__": today_why(),
+        "__PREMCAP__": ("%g" % PREM_CAP), "__CASHPATH__": cash_path(),
+        "__LOCKGAP__": "{:,.0f}".format(next((r["gap"] for r in rows if r["code"] == "sh510050"), 0)),
+        "__PREMNEAR__": prem_near(), "__BARNOTE__": bar_note(),
+        "__TGTSUM__": ("%g" % sum(h["target_pct"] for h in PS.get("holdings") or [])),
+        "__CASH_TGT__": ("%g" % (100 - sum(h["target_pct"] for h in PS.get("holdings") or []))),
+        "__GAPSUM__": "{:,.0f}".format(sum(r["gap"] for r in rows)),
+        "__HOLDSUM__": "{:,.0f}".format(S["total"] - S["cash"]),
+        "__CAPTOT__": "{:,.0f}".format(S["total"] + 3000),
+        "__CASHNEWAMT__": "{:,.0f}".format(S["cash"] + 3000),
     }
     html = HTML
     for k, v in rep.items():
