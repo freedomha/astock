@@ -208,5 +208,342 @@
       "premium": "最低 sh513110 +9.43%（还需回落 7.9pp）",
       "gold_t1": "当前 T0 长期下降｜周线 -9.61%｜距MA60 -5.43%｜溢价 -1.16%"
     }
+  },
+  {
+    "date": "2026-10-30",
+    "quarter": "2026Q4",
+    "bar_date": "2026-10-30",
+    "days_to_qe": 44,
+    "is_decision_day": false,
+    "mode": "v1",
+    "spec_version": "1.3",
+    "total": 48578.100000000006,
+    "cash": 15300.8,
+    "cash_pct": 31.497320809171203,
+    "sd": 7.964369229373773,
+    "rc50": 56.76608437265537,
+    "rc50_abs": 4.521060556496118,
+    "style2": 76.19669525638844,
+    "style1": 70.1221228612187,
+    "drawdown": -0.12755178602510409,
+    "peak": 48620.59999999999,
+    "drawdown_total": -0.08741150870203995,
+    "drawdown_holdings": -0.12755178602510409,
+    "peak_holdings": 33319.799999999996,
+    "states": {
+      "sh510050": "T0",
+      "sh513500": null,
+      "sz159941": null,
+      "sh512890": "T3b",
+      "sh518880": "T8",
+      "sh513650": null,
+      "sz159655": "T6",
+      "sz159612": null,
+      "sh513110": null,
+      "sz159513": "T6",
+      "sh513390": null,
+      "sz159632": null,
+      "sh513870": null,
+      "sh513300": null,
+      "sz159696": null,
+      "sh513100": null
+    },
+    "scores": {
+      "sh510050": {
+        "trend": 0,
+        "momentum": 8.6,
+        "risk": 19.5,
+        "div": 0.0,
+        "total": 28.1
+      },
+      "sh513500": null,
+      "sz159941": null,
+      "sh512890": {
+        "trend": 9.4,
+        "momentum": 20.4,
+        "risk": 16.7,
+        "div": 20.0,
+        "total": 66.5
+      },
+      "sh518880": {
+        "trend": 0,
+        "momentum": 4.4,
+        "risk": 14.0,
+        "div": 20.0,
+        "total": 38.4
+      },
+      "sh513650": null,
+      "sz159655": {
+        "trend": 5.9,
+        "momentum": 17.5,
+        "risk": 17.9,
+        "div": 20.0,
+        "total": 61.4
+      },
+      "sz159612": null,
+      "sh513110": null,
+      "sz159513": {
+        "trend": 7.4,
+        "momentum": 16.3,
+        "risk": 15.6,
+        "div": 20.0,
+        "total": 59.3
+      },
+      "sh513390": null,
+      "sz159632": null,
+      "sh513870": null,
+      "sh513300": null,
+      "sz159696": null,
+      "sh513100": null
+    },
+    "rows": [
+      {
+        "code": "sh510050",
+        "name": "上证50ETF华夏",
+        "px": 2.862,
+        "weight": 30.63602734565575,
+        "target": 20.0,
+        "gap": -4566.779999999997,
+        "score": 28.1,
+        "drc50": 2.1068,
+        "blocked": [
+          "锁定不买"
+        ],
+        "pass_all": false,
+        "leg": "sh510050",
+        "group": [
+          {
+            "code": "sh510050",
+            "name": "上证50ETF华夏",
+            "prem": -0.33430839949852853,
+            "held": true,
+            "purchase": "可申购"
+          }
+        ]
+      },
+      {
+        "code": "sz159655",
+        "name": "标普500ETF华夏",
+        "px": 1.984,
+        "weight": 0.0,
+        "target": 20.0,
+        "gap": 1813.220000000003,
+        "score": 61.4,
+        "drc50": -1.8768,
+        "blocked": [
+          "溢价+5.9%"
+        ],
+        "pass_all": false,
+        "leg": "sh513500",
+        "group": [
+          {
+            "code": "sh513500",
+            "name": "标普500ETF博时",
+            "prem": 8.30751671286485,
+            "held": true,
+            "purchase": "可申购"
+          },
+          {
+            "code": "sh513650",
+            "name": "标普500ETF南方",
+            "prem": 6.057363013698636,
+            "held": false,
+            "purchase": "可申购"
+          },
+          {
+            "code": "sz159655",
+            "name": "标普500ETF华夏",
+            "prem": 5.852851731313025,
+            "held": false,
+            "purchase": "可申购"
+          },
+          {
+            "code": "sz159612",
+            "name": "标普500ETF国泰",
+            "prem": 6.365289685632636,
+            "held": false,
+            "purchase": "不可申购"
+          }
+        ]
+      },
+      {
+        "code": "sz159513",
+        "name": "纳斯达克100ETF大成",
+        "px": 1.781,
+        "weight": 0.0,
+        "target": 15.0,
+        "gap": 7736.715,
+        "score": 59.3,
+        "drc50": -2.4027,
+        "blocked": [
+          "溢价+7.8%"
+        ],
+        "pass_all": false,
+        "leg": "sz159941",
+        "group": [
+          {
+            "code": "sz159941",
+            "name": "纳指ETF广发",
+            "prem": 11.141066253285704,
+            "held": false,
+            "purchase": "可申购"
+          },
+          {
+            "code": "sh513110",
+            "name": "纳指ETF华泰柏瑞",
+            "prem": 7.798366558356018,
+            "held": false,
+            "purchase": "可申购"
+          },
+          {
+            "code": "sz159513",
+            "name": "纳斯达克100ETF大成",
+            "prem": 7.782619220527698,
+            "held": false,
+            "purchase": "可申购"
+          },
+          {
+            "code": "sh513390",
+            "name": "纳指100ETF博时",
+            "prem": 8.705417303027584,
+            "held": false,
+            "purchase": "可申购"
+          },
+          {
+            "code": "sz159632",
+            "name": "纳斯达克ETF华安",
+            "prem": 7.990594081370084,
+            "held": false,
+            "purchase": "可申购"
+          },
+          {
+            "code": "sh513870",
+            "name": "纳指ETF富国",
+            "prem": 9.394019581899983,
+            "held": false,
+            "purchase": "可申购"
+          },
+          {
+            "code": "sh513300",
+            "name": "纳斯达克ETF华夏",
+            "prem": 8.140898612852343,
+            "held": false,
+            "purchase": "可申购"
+          },
+          {
+            "code": "sz159696",
+            "name": "纳指ETF易方达",
+            "prem": 11.559791094599703,
+            "held": false,
+            "purchase": "可申购"
+          },
+          {
+            "code": "sh513100",
+            "name": "纳指ETF国泰",
+            "prem": 12.875579753982658,
+            "held": false,
+            "purchase": "不可申购"
+          }
+        ]
+      },
+      {
+        "code": "sh512890",
+        "name": "红利低波ETF华泰柏瑞",
+        "px": 1.243,
+        "weight": 15.352597157978595,
+        "target": 15.0,
+        "gap": 278.71499999999924,
+        "score": 66.5,
+        "drc50": -1.6421,
+        "blocked": [
+          "风格组>60%"
+        ],
+        "pass_all": false,
+        "leg": "sh512890",
+        "group": [
+          {
+            "code": "sh512890",
+            "name": "红利低波ETF华泰柏瑞",
+            "prem": 1.9771925506604227,
+            "held": true,
+            "purchase": "可申购"
+          }
+        ]
+      },
+      {
+        "code": "sh518880",
+        "name": "黄金ETF华安",
+        "px": 8.115,
+        "weight": 5.0115175356796575,
+        "target": 10.0,
+        "gap": 2723.3100000000013,
+        "score": 38.4,
+        "drc50": -1.9568,
+        "blocked": [],
+        "pass_all": false,
+        "leg": "sh518880",
+        "group": [
+          {
+            "code": "sh518880",
+            "name": "黄金ETF华安",
+            "prem": -1.745931809376211,
+            "held": true,
+            "purchase": "可申购"
+          }
+        ]
+      }
+    ],
+    "score_max": 38.4,
+    "selection": "硬门通过者最高分 38.4 < Eligibility Floor 60",
+    "premium": {
+      "sh510050": -0.33430839949852853,
+      "sh513500": 8.30751671286485,
+      "sz159941": 11.141066253285704,
+      "sh512890": 1.9771925506604227,
+      "sh518880": -1.745931809376211,
+      "sh513650": 6.057363013698636,
+      "sz159655": 5.852851731313025,
+      "sz159612": 6.365289685632636,
+      "sh513110": 7.798366558356018,
+      "sz159513": 7.782619220527698,
+      "sh513390": 8.705417303027584,
+      "sz159632": 7.990594081370084,
+      "sh513870": 9.394019581899983,
+      "sh513300": 8.140898612852343,
+      "sz159696": 11.559791094599703,
+      "sh513100": 12.875579753982658
+    },
+    "action": {
+      "code": null,
+      "reason": "硬门通过者最高分 38.4 < Eligibility Floor 60 → 留现金"
+    },
+    "triggers": [
+      "🟠 风格组超限"
+    ],
+    "executed": false,
+    "changes": [
+      {
+        "code": "sh510050",
+        "name": "上证50ETF华夏",
+        "old": "T8",
+        "new": "T0",
+        "dir": "flat"
+      },
+      {
+        "code": "sh518880",
+        "name": "黄金ETF华安",
+        "old": "T0",
+        "new": "T8",
+        "dir": "flat"
+      }
+    ],
+    "resume": {
+      "premium": false,
+      "gold_t1": false
+    },
+    "resume_detail": {
+      "premium": "最低 sz159513 +7.78%（还需回落 2.8pp）",
+      "gold_t1": "当前 T8 结构破坏｜周线 -15.43%｜距MA60 -7.94%｜溢价 -1.75%"
+    }
   }
 ]
