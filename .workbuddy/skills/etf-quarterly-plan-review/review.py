@@ -9,6 +9,7 @@
   python3 review.py --legacy-gate       # 回退到 T0-T8 状态门（对照/回滚）
   python3 review.py --json              # 额外打印机器可读 JSON
   python3 review.py --save              # 把本次指标追加到 review_history.json
+  python3 review.py --report            # 判定 + 生成 HTML 报告（复用同一份快照）
   python3 review.py --mark-executed     # 把本季标记为已执行（成交后跑）
   python3 review.py --state <path>      # 指定状态文件
 
@@ -262,6 +263,8 @@ def main():
     ap.add_argument("--quarter-end", action="store_true", help="季末执行模式")
     ap.add_argument("--json", action="store_true", help="打印 JSON")
     ap.add_argument("--save", action="store_true", help="追加到 review_history.json")
+    ap.add_argument("--report", action="store_true",
+                    help="同时生成 HTML 报告（复用本次快照，不二次取数）")
     ap.add_argument("--mark-executed", action="store_true", help="把本季标记为已执行")
     ap.add_argument("--no-trend", action="store_true", help="跳过趋势状态机（快跑）")
     ap.add_argument("--legacy-gate", action="store_true",
@@ -729,7 +732,7 @@ def main():
 
     # ── 存档
     snap = dict(date=now.date().isoformat(), quarter=q, bar_date=bar_date,
-                days_to_qe=left, is_decision_day=(left == 0),
+                days_to_qe=left, is_decision_day=(left == 0), intraday=intraday,
                 mode="legacy" if a.legacy_gate else "v1",
                 spec_version=spec.get("version"),
                 total=m2["tot"], cash=cash, cash_pct=cash / m2["tot"] * 100,
@@ -771,6 +774,23 @@ def main():
         st["last_states"] = {c: states[c]["eff"] for c in codes if states.get(c)}
     st["last_run"] = now.isoformat(timespec="seconds")
     json.dump(st, open(a.state, "w"), ensure_ascii=False, indent=2)
+
+    if a.report:
+        # 把本次快照落盘再交给生成器，保证报告与控制台逐位一致
+        tmpdir = tempfile.mkdtemp()
+        snapfile = os.path.join(tmpdir, "snapshot.json")
+        json.dump(snap, open(snapfile, "w", encoding="utf-8"), ensure_ascii=False)
+        gen = os.path.join(ROOT, "research/plan-v14/generate.py")
+        r_ = subprocess.run([sys.executable, gen, "--snapshot", snapfile],
+                            capture_output=True, text=True, timeout=600)
+        out = (r_.stdout or "").strip() or (r_.stderr or "").strip()[-800:]
+        if out:
+            if a.json:                                  # 别污染 stdout 的 JSON
+                print(out, file=sys.stderr)
+            else:
+                print("\n" + out)
+        if r_.returncode != 0:
+            print("⚠️  报告生成失败（判定结果本身有效）", file=sys.stderr)
 
     if a.json:
         print(json.dumps(snap, ensure_ascii=False, indent=2))

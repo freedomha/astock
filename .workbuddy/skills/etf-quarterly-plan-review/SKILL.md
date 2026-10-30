@@ -49,6 +49,7 @@ T3b 的超额 64% 来自时间效应，剔除 2025Q3 后为 −0.52pp、2026 样
 | 每周末例行复评 | `review.py` |
 | 想知道"这季该投了吗、买哪只" | `review.py --quarter-end` |
 | 需要机器可读结果 / 存档 | `--json` / `--save` |
+| 要一份 HTML 报告（与本次判定同源） | `review.py --report` |
 | 成交后回填 | `review.py --mark-executed` |
 | 数据源慢，只想看评分与缺口 | 加 `--no-trend`（T 码留空，评分照算） |
 | 对照/回滚到旧状态门 | `--legacy-gate` |
@@ -170,9 +171,14 @@ SK=".workbuddy/skills/etf-quarterly-plan-review"
 $PY $SK/review.py                    # 周度复评
 $PY $SK/review.py --quarter-end      # 季末执行模式
 $PY $SK/review.py --save --json      # 存档 + 机器可读
+$PY $SK/review.py --report           # 判定 + 生成 HTML 报告
+$PY $SK/review.py --save --report    # 推荐：存档 + 出报告（本季决策存档）
 ```
 
 > Bash 调用需 `dangerouslyDisableSandbox: true`。
+
+`--report` 把**本次运行已经算好的快照**写成临时文件交给 `research/plan-v14/generate.py`（`--snapshot`），
+不在生成器里二次取数——否则盘中重跑会让报告分数与控制台分数不一致。与 `--json` 同用时，报告路径打到 stderr，stdout 保持纯 JSON。
 
 ### Step 3 解读输出
 
@@ -200,7 +206,9 @@ $PY $SK/review.py --save --json      # 存档 + 机器可读
 
 ## 与报告的关系
 
-- 报告 `reports/etf/allocation/20261022-季定投计划-v14.2.html` 是**当前规则的决策存档**（硬门 + V1 评分），由 `research/plan-v14/generate.py` 直接消费 `review.py --json` 快照生成，与 skill 同源。
+- `review.py --report` 直接出报告，产物为 `reports/etf/allocation/<快照日期>-季定投计划-v14.2.html`（按日期命名，不覆盖历史存档）。
+  生成器是 `research/plan-v14/generate.py`，它既可 `--snapshot <json>` 吃外部快照（`--report` 走这条），也可不带参数自己跑一次 `review.py --json`。
+- 报告与 skill **同源**：报告里的每个数字都来自同一次 `review.py` 运行，不存在第二套口径。
 - `reports/etf/allocation/20261021-季定投计划.html`（v13）是**旧规则的存档**，其中「规则 3 状态门」已被 V1 取代，引用时注意版本。
 - `reports/research/T-State-Validation-20261022.html`：T3b 为什么被降级；`Gate-Redesign-20261022.html`：V1 的设计依据与七变体对抗。
 - 本目录 `V1-SPEC.md` / `v1_spec.json` 是**生产口径的唯一来源**；研究目录的同名文件是研究快照，若冲突以本目录为准。

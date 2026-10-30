@@ -5,9 +5,14 @@
 数据来源只有一个：`review.py --json` 的快照。报告与 skill 同源，避免两套口径。
 证据数字来自两份研究报告的 JSON（T-State Validation / Gate Redesign）。
 
-输出：reports/etf/allocation/20261022-季定投计划-v14.1.html
+输出：reports/etf/allocation/<快照日期>-季定投计划-v14.2.html
+
+两种入口：
+  generate.py                       # 现场跑一次 review.py --json 再生成
+  generate.py --snapshot snap.json  # 吃外部快照（review.py --report 走这条，避免二次取数）
 """
 
+import argparse
 import datetime as dt
 import json
 import os
@@ -19,7 +24,8 @@ import tempfile
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
 SKILL = os.path.join(ROOT, ".workbuddy/skills/etf-quarterly-plan-review")
-OUT = os.path.join(ROOT, "reports/etf/allocation/20261022-季定投计划-v14.2.html")
+OUT_TMPL = os.path.join(ROOT, "reports/etf/allocation/%s-季定投计划-v14.2.html")
+OUT = None  # 由 main() 按快照日期赋值，避免覆盖历史决策存档
 ECHARTS = os.path.join(ROOT, "research/assets/echarts.min.js")
 
 sys.path.insert(0, SKILL)
@@ -33,8 +39,15 @@ def load_json(p, default=None):
         return default
 
 
-def run_review():
-    """跑一次 review.py，拿 --json 快照（用临时状态文件，不改生产状态）。"""
+def run_review(snapshot=None):
+    """拿 review.py 的快照。
+
+    传 snapshot 路径时直接读该文件——由 review.py --report 传入本次判定的快照，
+    保证报告数字与同一次运行的控制台输出逐位一致（否则二次取数会让评分漂移）。
+    未传时自行跑一次 review.py（用临时状态文件，不改生产状态）。
+    """
+    if snapshot:
+        return json.load(open(snapshot, encoding="utf-8"))
     tmp = os.path.join(tempfile.mkdtemp(), "plan_state.json")
     shutil.copy(os.path.join(SKILL, "plan_state.json"), tmp)
     r = subprocess.run([sys.executable, os.path.join(SKILL, "review.py"),
@@ -60,8 +73,15 @@ def sp(x, nd=2):
     return '<span class="%s">%s</span>' % (c, n(x, nd, True))
 
 
-def main():
-    S = run_review()
+def main(argv=None):
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--snapshot", default=None,
+                    help="review.py --json 快照文件；省略则现场跑一次 review.py")
+    a = ap.parse_args(argv)
+
+    global OUT
+    S = run_review(a.snapshot)
+    OUT = OUT_TMPL % str(S["date"]).replace("-", "")
     spec = v1_score.load_spec()
     GR = load_json(os.path.join(ROOT, "research/gate-redesign/gate_results.json"), {})
     SEG = load_json(os.path.join(HERE, "seg_ic.json"), {})
@@ -252,9 +272,13 @@ def main():
                                                   PREM_CAP - S["premium"][r["code"]]) for r in near) + "，属于误差范围"
 
     def bar_note():
-        if S.get("bar_date") == S.get("date"):
+        if S.get("intraday") is None:
+            intraday = (S.get("bar_date") == S.get("date"))
+        else:
+            intraday = bool(S.get("intraday"))
+        if intraday:
             return "<span style=\"color:#c0392b\">（含当日未定稿 bar，盘中口径）</span>"
-        return ""
+        return "（收盘）"
 
     def cash_path():
         """持续不买时，现金占比的 4 季路径（不计涨跌）。"""
